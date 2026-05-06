@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --primary: #2e7d5e;
+  --primary-dark: #235f47;
+  --primary-light: #e8f5f0;
+  --accent: #f0f7f4;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --radius: 0.75rem;
+}
+
+* {
+  box-sizing: border-box;
+  border-color: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Cairo', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  direction: rtl;
+}
+
+/* ── Scrollbar hide ── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ── Smooth transitions ── */
+a, button { transition-duration: 200ms; }

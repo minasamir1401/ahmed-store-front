@@ -1,0 +1,6 @@
+mithaly-backend/
+_ahmed-store-back/
+node_modules/
+.next/
+.env
+*.log

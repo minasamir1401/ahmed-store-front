@@ -68,14 +68,16 @@ export default async function ArticleDetailPage({ params }: PageParams) {
   try {
     const tip = await getTip(params.id)
     if (tip) {
-      post = {
-        id: tip.id,
-        title: tip.title,
-        image: tip.image || 'https://placehold.co/800x400/e8f0ed/2e7d5e?text=Health+Tip',
-        excerpt: tip.content ? tip.content.substring(0, 120) + '...' : '',
-        content: tip.content || '',
-        rawDate: tip.createdAt
-      }
+        post = {
+          id: tip.id,
+          title: tip.title,
+          titleEn: tip.titleEn,
+          image: tip.image || 'https://placehold.co/800x400/e8f0ed/2e7d5e?text=Health+Tip',
+          excerpt: tip.content ? tip.content.substring(0, 120) + '...' : '',
+          content: tip.content || '',
+          contentEn: tip.contentEn || '',
+          rawDate: tip.createdAt
+        }
     }
   } catch (err) {
     console.error('Error fetching tip:', err)

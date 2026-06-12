@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
+export const maxDuration = 60
 
 type ChatMessage = {
   role: 'system' | 'user' | 'assistant'

@@ -509,6 +509,8 @@ export function useAdminDashboard() {
         })
       } else if (activeTab === 'offers') {
         setFormData({ title: '', discount: '', image: '', productId: '' })
+      } else if (activeTab === 'medical-tips') {
+        setFormData({ title: '', titleEn: '', content: '', contentEn: '', image: '' })
       } else {
         setFormData({ name: '', nameEn: '', title: '', image: '' })
       }

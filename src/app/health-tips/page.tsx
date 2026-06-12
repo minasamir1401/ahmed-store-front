@@ -26,12 +26,14 @@ export default function HealthTipsPage() {
       .then(data => {
         const formatted = data.map((tip: any) => ({
           id: tip.id,
-          title: tip.title,
+          title: language === 'en' ? (tip.titleEn || tip.title) : tip.title,
           image: tip.image || 'https://placehold.co/800x400/e8f0ed/2e7d5e?text=Health+Tip',
           category: language === 'ar' ? 'نصيحة طبية' : 'Health Tip',
           readTime: language === 'ar' ? '3 دقائق' : '3 mins',
           date: new Date(tip.createdAt).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-          excerpt: tip.content ? tip.content.substring(0, 120) + '...' : ''
+          excerpt: language === 'en' 
+            ? (tip.contentEn ? tip.contentEn.substring(0, 120) + '...' : tip.content ? tip.content.substring(0, 120) + '...' : '') 
+            : (tip.content ? tip.content.substring(0, 120) + '...' : '')
         }))
         setPosts(formatted)
         setLoading(false)

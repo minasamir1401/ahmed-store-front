@@ -13,9 +13,14 @@ export default function ArticleDetailClient({ post, params }: { post: any, param
     if (!post) return null
     return {
       ...post,
+      title: language === 'en' ? (post.titleEn || post.title) : post.title,
+      content: language === 'en' ? (post.contentEn || post.content) : post.content,
+      excerpt: language === 'en' 
+        ? (post.contentEn ? post.contentEn.substring(0, 120) + '...' : post.content ? post.content.substring(0, 120) + '...' : '') 
+        : (post.content ? post.content.substring(0, 120) + '...' : ''),
       category: language === 'ar' ? 'نصيحة طبية' : 'Health Tip',
       readTime: language === 'ar' ? '3 دقائق' : '3 mins',
-      date: new Date(post.rawDate).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+      date: new Date(post.rawDate || post.createdAt).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
     }
   }, [post, language])
 

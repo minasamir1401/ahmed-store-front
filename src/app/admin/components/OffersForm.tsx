@@ -1,62 +1,115 @@
 import React from 'react';
-import { Loader2, CheckCircle2, Upload, Plus, Edit2, Trash2, Eye, Search, Sparkles } from 'lucide-react';
+import { Loader2, Upload, Tag, Box, Image as ImageIcon } from 'lucide-react';
 
 export default function OffersForm(props: any) {
   const { 
-    formData, setFormData, handleSave, loading, uploading, handleFileUpload, 
-    categories, brandSearch, setBrandSearch, showBrandSuggestions, setShowBrandSuggestions,
-    filteredBrands, brandUploading, isAILoading, handleAIFill,
-    sizesPricesList, setSizesPricesList, supplementFactsList, setSupplementFactsList,
-    keyInfoObj, setKeyInfoObj, productSpecsObj, setProductSpecsObj,
-    certificationsObj, setCertificationsObj, dosageCalculatorObj, setDosageCalculatorObj,
-    addLog, BACKEND_API, productsList
+    formData, setFormData, loading, uploading, handleFileUpload, productsList
   } = props;
 
   return (
-    <>
-      // Offers Tab Form with image upload, title, discount tag, and product selector
-                    <div className="space-y-8 max-w-xl mx-auto py-10">
-                      <label className="text-[10px] font-black text-emerald-600 uppercase tracking-widest block mr-1 text-center">صورة بنر العرض الرئيسي</label>
-                      <div className="aspect-video bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
-                         {formData.image ? <img src={formData.image} className="w-full h-full object-cover p-2 rounded-[2rem]" alt="preview" /> : <Upload size={36} className="text-slate-300" />}
-                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span className="text-white font-black text-xs bg-emerald-600 px-4 py-2 rounded-xl shadow-md">تغيير الصورة</span>
-                         </div>
-                         <input type="file" onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], 'main')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
-                         {uploading && (
-                          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
-                            <Loader2 className="animate-spin text-emerald-600" size={32} />
-                          </div>
-                         )}
-                      </div>
-                      <div className="space-y-4">
-                         <div className="space-y-2">
-                           <label className="text-xs font-black text-slate-800 block mr-1">عنوان العرض</label>
-                           <input type="text" value={formData.title || ''} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-50 focus:bg-white border border-transparent focus:border-emerald-500/20 rounded-2xl py-4 px-6 font-black text-sm outline-none transition-all text-slate-700" placeholder="مثال: مكملات أوميجا 3 بأعلى جودة" required />
-                         </div>
+    <div className="space-y-8 max-w-4xl mx-auto py-8">
+      {/* Header section */}
+      <div className="text-center mb-10">
+        <h2 className="text-2xl font-black text-slate-800">تفاصيل العرض الترويجي</h2>
+        <p className="text-slate-500 text-sm mt-2">قم بضبط إعدادات العرض وصورة البنر بكل سهولة لزيادة المبيعات</p>
+      </div>
 
-                         <div className="space-y-2">
-                           <label className="text-xs font-black text-slate-800 block mr-1">علامة الخصم (Discount Tag)</label>
-                           <input type="text" value={formData.discount || ''} onChange={e => setFormData({...formData, discount: e.target.value})} className="w-full bg-slate-50 focus:bg-white border border-transparent focus:border-emerald-500/20 rounded-2xl py-4 px-6 font-black text-sm outline-none transition-all text-slate-700" placeholder="مثال: خصم 30% أو عروض حصرية" required />
-                         </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        {/* Left/Right Column: Image Upload */}
+        <div className="space-y-4">
+          <label className="flex items-center gap-2 text-sm font-black text-slate-800">
+            <ImageIcon size={18} className="text-emerald-600" />
+            صورة بنر العرض <span className="text-red-500">*</span>
+          </label>
+          <p className="text-xs text-slate-500">يفضل استخدام صور أفقية بدقة عالية لظهور جذاب في الواجهة الرئيسية</p>
+          
+          <div className="aspect-[16/9] w-full bg-slate-50 hover:bg-slate-100/80 rounded-[2rem] border-2 border-dashed border-slate-200 hover:border-emerald-500/50 flex flex-col items-center justify-center relative overflow-hidden group shadow-sm transition-all">
+             {formData.image ? (
+               <img src={formData.image} className="w-full h-full object-cover p-2 rounded-[2rem]" alt="preview" />
+             ) : (
+               <div className="flex flex-col items-center gap-3 text-slate-400">
+                 <Upload size={44} className="group-hover:text-emerald-500 transition-colors" />
+                 <span className="text-xs font-bold px-4 text-center">اضغط هنا أو اسحب الصورة للرفع</span>
+               </div>
+             )}
+             
+             <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-[2px]">
+                <span className="text-white font-black text-xs bg-emerald-600 px-6 py-3 rounded-2xl shadow-xl transform translate-y-2 group-hover:translate-y-0 transition-all">
+                  {formData.image ? 'تغيير الصورة' : 'رفع صورة جديدة'}
+                </span>
+             </div>
+             
+             <input type="file" onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], 'main')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+             
+             {uploading && (
+              <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-10">
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="animate-spin text-emerald-600" size={36} />
+                  <span className="text-sm font-black text-emerald-600 tracking-wider">جاري الرفع...</span>
+                </div>
+              </div>
+             )}
+          </div>
+        </div>
 
-                         <div className="space-y-2">
-                           <label className="text-xs font-black text-slate-800 block mr-1">المنتج المرتبط بالعرض (التوجيه عند الضغط)</label>
-                           <select 
-                             value={formData.productId || ''} 
-                             onChange={e => setFormData({...formData, productId: e.target.value})} 
-                             className="w-full bg-slate-50 focus:bg-white border border-slate-200 rounded-2xl py-4 px-6 font-black text-sm outline-none transition-all text-slate-700 cursor-pointer"
-                           >
-                             <option value="">-- بدون توجيه لمنتج معين (فقط صورة وعرض) --</option>
-                             {productsList.map((prod: any) => (
-                               <option key={prod.id} value={prod.id}>
-                                 {prod.title} ({prod.price} ج.م)
-                               </option>
-                             ))}
-                           </select>
-                         </div>
-                      </div>
-                    </div>
-    </>
+        {/* Form Fields */}
+        <div className="space-y-6">
+           <div className="space-y-2">
+             <label className="flex items-center gap-2 text-sm font-black text-slate-800">
+               <Tag size={18} className="text-emerald-600" />
+               عنوان العرض <span className="text-red-500">*</span>
+             </label>
+             <input 
+               type="text" 
+               value={formData.title || ''} 
+               onChange={e => setFormData({...formData, title: e.target.value})} 
+               className="w-full bg-white focus:bg-slate-50 border-2 border-slate-100 focus:border-emerald-500/50 rounded-2xl py-4 px-5 font-black text-sm outline-none transition-all text-slate-700 shadow-sm" 
+               placeholder="مثال: خصومات كبرى على منتجات العناية بالشعر..." 
+               required 
+             />
+           </div>
+
+           <div className="space-y-2">
+             <label className="flex items-center gap-2 text-sm font-black text-slate-800">
+               <Tag size={18} className="text-amber-500" />
+               علامة الخصم (شريط ملون)
+             </label>
+             <input 
+               type="text" 
+               value={formData.discount || ''} 
+               onChange={e => setFormData({...formData, discount: e.target.value})} 
+               className="w-full bg-white focus:bg-amber-50/30 border-2 border-slate-100 focus:border-amber-500/50 rounded-2xl py-4 px-5 font-black text-sm outline-none transition-all text-slate-700 shadow-sm" 
+               placeholder="مثال: خصم 30% 🔥 أو وفر 150 جنيه" 
+               required 
+             />
+           </div>
+
+           <div className="space-y-2">
+             <label className="flex items-center gap-2 text-sm font-black text-slate-800">
+               <Box size={18} className="text-blue-500" />
+               توجيه الضغط إلى منتج (اختياري)
+             </label>
+             <div className="relative">
+               <select 
+                 value={formData.productId || ''} 
+                 onChange={e => setFormData({...formData, productId: e.target.value})} 
+                 className="w-full bg-white focus:bg-blue-50/30 border-2 border-slate-100 focus:border-blue-500/50 rounded-2xl py-4 px-5 pr-10 font-black text-sm outline-none transition-all text-slate-700 shadow-sm appearance-none cursor-pointer"
+               >
+                 <option value="">-- بدون توجيه لمنتج معين (عرض فقط) --</option>
+                 {productsList?.map((prod: any) => (
+                   <option key={prod.id} value={prod.id}>
+                     {prod.title} - ({prod.price} ج.م)
+                   </option>
+                 ))}
+               </select>
+               <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 bg-white pl-2">
+                 ▼
+               </div>
+             </div>
+             <p className="text-[11px] text-slate-500 mt-2 font-medium">إذا تم اختيار منتج، سيتم تحويل المستخدم مباشرة لصفحة المنتج عند الضغط على البنر في الواجهة الرئيسية.</p>
+           </div>
+        </div>
+      </div>
+    </div>
   );
 }

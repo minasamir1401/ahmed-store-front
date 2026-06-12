@@ -1,0 +1,37 @@
+import { MetadataRoute } from 'next'
+import { getServerSiteUrl } from '@/lib/seo'
+
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const baseUrl = await getServerSiteUrl()
+
+  return {
+    rules: {
+      userAgent: '*',
+      allow: [
+        '/',
+        '/products',
+        '/categories',
+        '/offers',
+        '/brands',
+        '/health-tips',
+        '/bmi-calculator',
+        '/about',
+        '/faq',
+        '/shipping',
+        '/returns',
+        '/track'
+      ],
+      disallow: [
+        '/admin',
+        '/cart',
+        '/checkout',
+        '/profile',
+        '/login',
+        '/forgot',
+        '/wishlist',
+        '/api/'
+      ],
+    },
+    sitemap: `${baseUrl}/sitemap.xml`,
+  }
+}

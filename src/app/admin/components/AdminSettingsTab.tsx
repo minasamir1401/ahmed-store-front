@@ -25,13 +25,13 @@ export default function AdminSettingsTab(props: any) {
 
                     <div className="space-y-4">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase mr-1">البريد الإلكتروني / اسم المستخدم</label>
+                        <label className="text-[10px] font-black text-slate-400 uppercase mr-1">اسم المستخدم / البريد الإلكتروني</label>
                         <input 
-                          type="email" 
+                          type="text" 
                           value={adminEmail} 
                           onChange={e => setAdminEmail(e.target.value)} 
                           className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700" 
-                          placeholder="admin@mithaly.com" 
+                          placeholder="admin أو admin@mithaly.com" 
                           required 
                           disabled={adminSaveLoading}
                         />

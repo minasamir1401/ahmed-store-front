@@ -96,13 +96,13 @@ export default function BrandsPage() {
                 >
                   <div className="aspect-square w-full bg-gray-50 rounded-[1.5rem] p-4 flex items-center justify-center overflow-hidden border border-gray-50 group-hover:bg-white transition-all">
                     {brand.image ? (
-                      <img src={safeBrandImage(brand.image)} className="w-full h-full object-contain mix-blend-multiply" alt={translate(brand.name)} />
+                      <img src={safeBrandImage(brand.image)} className="w-full h-full object-contain mix-blend-multiply" alt={language === 'en' ? (brand.nameEn || translate(brand.name)) : brand.name} />
                     ) : (
                       <Building2 size={32} className="text-gray-300" />
                     )}
                   </div>
                   <div className="text-center">
-                    <h3 className="text-sm font-black text-gray-800 group-hover:text-primary transition-colors">{translate(brand.name)}</h3>
+                    <h3 className="text-sm font-black text-gray-800 group-hover:text-primary transition-colors">{language === 'en' ? (brand.nameEn || translate(brand.name)) : brand.name}</h3>
                     <div className="mt-2 flex items-center justify-center gap-1 text-[10px] font-black text-primary uppercase opacity-0 group-hover:opacity-100 transition-all">
                       <span>{language === 'ar' ? 'اكتشف المنتجات' : 'Discover Products'}</span>
                       <ChevronLeft size={10} className={language === 'en' ? 'rotate-180' : ''} />

@@ -251,7 +251,7 @@ function FilterSidebar({
                           : 'text-gray-600 hover:bg-[#f7fbf9] border border-transparent'
                       }`}
                     >
-                      <span>{translate(cat.name)}</span>
+                      <span>{language === 'en' ? (cat.nameEn || translate(cat.name)) : cat.name}</span>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] text-gray-400 font-bold">{cat.count}</span>
                         <div

@@ -100,7 +100,7 @@ export default function CategoriesPage() {
                   <div className="relative z-10 flex flex-col items-center gap-6 p-4 sm:p-8 w-full h-full">
                     {cat.image ? (
                       <div className="w-24 h-24 sm:w-36 sm:h-36 rounded-[2rem] overflow-hidden shadow-sm transition-transform duration-500 group-hover:scale-110 bg-transparent flex items-center justify-center">
-                        <img src={cat.image} alt={translate(cat.name)} className="w-full h-full object-contain" />
+                        <img src={cat.image} alt={language === 'en' ? (cat.nameEn || translate(cat.name)) : cat.name} className="w-full h-full object-contain" />
                       </div>
                     ) : (
                       <div className="w-24 h-24 sm:w-36 sm:h-36 bg-[#f0f7f4] rounded-[2rem] flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white shadow-sm transition-all duration-500">
@@ -109,7 +109,7 @@ export default function CategoriesPage() {
                     )}
                     
                     <div className="text-center space-y-2 mt-auto">
-                      <h3 className="text-sm sm:text-xl font-black text-gray-800 group-hover:text-primary transition-colors">{translate(cat.name)}</h3>
+                      <h3 className="text-sm sm:text-xl font-black text-gray-800 group-hover:text-primary transition-colors">{language === 'en' ? (cat.nameEn || translate(cat.name)) : cat.name}</h3>
                       <div className="inline-block bg-gray-50 px-4 py-1.5 rounded-full text-[10px] font-black text-gray-400 group-hover:bg-primary/10 group-hover:text-primary transition-all">
                         {language === 'ar' ? `${cat.count} منتج متوفر` : `${cat.count} products available`}
                       </div>

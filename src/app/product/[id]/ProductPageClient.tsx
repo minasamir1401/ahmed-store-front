@@ -593,7 +593,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
             {[
               { label: t('bottom_home'), action: () => router.push('/') },
               { label: language === 'ar' ? 'المتجر' : 'Store', action: () => router.push('/products') },
-              { label: translate(product.category?.name), action: null, primary: true }
+              { label: getLocalizedValue(language, product.category?.name, product.category?.nameEn, translate), action: null, primary: true }
             ].map((item, i) => (
               <React.Fragment key={i}>
                 {i > 0 && <ChevronLeft size={14} className="text-gray-300 flex-shrink-0" />}
@@ -667,7 +667,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
               <div className="block lg:hidden space-y-4 px-1 mt-4">
                 {/* Category + Brand + Stars */}
                 <div className="flex flex-wrap items-center gap-2.5 max-[340px]:gap-1.5">
-                  <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] max-[340px]:text-[9px] font-black uppercase tracking-wider">{translate(product.category?.name)}</span>
+                  <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] max-[340px]:text-[9px] font-black uppercase tracking-wider">{getLocalizedValue(language, product.category?.name, product.category?.nameEn, translate)}</span>
                   {product.brand && (
                     <Link href={`/brands/${product.brand.id}`} className="flex items-center gap-2 bg-gray-50 text-gray-700 pr-1 pl-3 py-1 rounded-full text-[11px] max-[340px]:text-[10px] font-black border border-gray-100 hover:border-primary/30 hover:bg-white transition-all shadow-sm">
                       {product.brand.image ? (
@@ -1114,7 +1114,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
             >
               {/* Category + Brand + Stars */}
               <motion.div variants={fadeUp} className="hidden lg:flex flex-wrap items-center gap-2.5 max-[340px]:gap-1.5 order-1">
-                <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] max-[340px]:text-[9px] font-black uppercase tracking-wider">{translate(product.category?.name)}</span>
+                <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] max-[340px]:text-[9px] font-black uppercase tracking-wider">{getLocalizedValue(language, product.category?.name, product.category?.nameEn, translate)}</span>
                 
                 {product.brand && (
                   <Link href={`/brands/${product.brand.id}`} className="flex items-center gap-2 bg-gray-50 text-gray-700 pr-1 pl-3 py-1 rounded-full text-[11px] max-[340px]:text-[10px] font-black border border-gray-100 hover:border-primary/30 hover:bg-white transition-all shadow-sm">

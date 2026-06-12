@@ -510,7 +510,7 @@ export function useAdminDashboard() {
       } else if (activeTab === 'offers') {
         setFormData({ title: '', discount: '', image: '', productId: '' })
       } else {
-        setFormData({ name: '', title: '', image: '' })
+        setFormData({ name: '', nameEn: '', title: '', image: '' })
       }
     }
     setIsModalOpen(true)

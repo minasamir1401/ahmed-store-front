@@ -510,9 +510,15 @@ export default function AdminDashboard() {
                          )}
                       </div>
                       <div className="space-y-4">
-                         <div className="space-y-2">
-                           <label className="text-xs font-black text-slate-800 block mr-1">الاسم أو العنوان</label>
-                           <input type="text" value={formData.name || formData.title || ''} onChange={e => setFormData({...formData, [activeTab === 'categories' ? 'name' : 'title']: e.target.value})} className="w-full bg-slate-50 focus:bg-white border border-transparent focus:border-emerald-500/20 rounded-2xl py-4 px-6 font-black text-sm outline-none transition-all text-slate-700" placeholder="اكتب الاسم هنا..." required />
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                           <div className="space-y-2">
+                             <label className="text-xs font-black text-slate-800 block mr-1">الاسم أو العنوان (عربي)</label>
+                             <input type="text" value={formData.name || ''} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full bg-slate-50 focus:bg-white border border-transparent focus:border-emerald-500/20 rounded-2xl py-4 px-6 font-black text-sm outline-none transition-all text-slate-700" placeholder="اكتب الاسم هنا..." required />
+                           </div>
+                           <div className="space-y-2">
+                             <label className="text-xs font-black text-slate-800 block mr-1">الاسم بالإنجليزية (English Name)</label>
+                             <input type="text" value={formData.nameEn || ''} onChange={e => setFormData({...formData, nameEn: e.target.value})} className="w-full bg-slate-50 focus:bg-white border border-transparent focus:border-emerald-500/20 rounded-2xl py-4 px-6 font-black text-sm outline-none transition-all text-slate-700 text-left dir-ltr" placeholder="Enter English name..." />
+                           </div>
                          </div>
                       </div>
                     </div>

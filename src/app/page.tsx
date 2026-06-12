@@ -442,7 +442,7 @@ export default function Home() {
                       if (item.type === 'category') {
                         const catObj = categories.find(c => c.id === item.id);
                         if (catObj) {
-                          title = translate(catObj.name);
+                          title = language === 'en' ? (catObj.nameEn || translate(catObj.name)) : catObj.name;
                           defaultImg = catObj.image || defaultImg;
                           href = `/products?category=${item.id}`;
                         }

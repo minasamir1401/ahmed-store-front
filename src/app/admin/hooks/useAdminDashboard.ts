@@ -526,7 +526,7 @@ export function useAdminDashboard() {
     const providerNames = { gemini: 'Gemini', openrouter: 'OpenRouter' }
     addLog(`جاري جلب تفاصيل ${formData.title.substring(0, 15)} باستخدام ${providerNames[activeProvider]}...`)
     try {
-      const response = await fetchWithAdminAuth('/api/ai/generate', {
+      const response = await fetchWithAdminAuth('/services/ai/generate', {
         method: 'POST',
         body: JSON.stringify({
           provider: activeProvider,
@@ -670,7 +670,7 @@ export function useAdminDashboard() {
     const providerNames = { gemini: 'Gemini', openrouter: 'OpenRouter' }
     addLog(`جاري توليد كلمات SEO لمنتج ${formData.title.substring(0, 15)} باستخدام ${providerNames[activeProvider]}...`)
     try {
-      const response = await fetchWithAdminAuth('/api/ai/generate', {
+      const response = await fetchWithAdminAuth('/services/ai/generate', {
         method: 'POST',
         body: JSON.stringify({
           provider: activeProvider,
@@ -908,7 +908,7 @@ export function useAdminDashboard() {
     setIsAILoading(true)
     addLog(`جاري توليد المقالة الطبية عن: ${formData.title.substring(0, 15)}...`)
     try {
-      const response = await fetchWithAdminAuth('/api/ai/generate', {
+      const response = await fetchWithAdminAuth('/services/ai/generate', {
         method: 'POST',
         body: JSON.stringify({
           provider: aiProvider,

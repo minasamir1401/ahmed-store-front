@@ -35,19 +35,12 @@ export function useAdminDashboard() {
   const [brandUploading, setBrandUploading] = useState(false)
   const [backupLoading, setBackupLoading] = useState(false)
   const [restoreLoading, setRestoreLoading] = useState(false)
-  const [aiProvider, setAiProvider] = useState<AIProvider>(() => {
-    if (typeof window !== 'undefined') {
-      const savedProvider = localStorage.getItem('mithaly_ai_provider')
-      return savedProvider === 'openrouter' ? 'openrouter' : 'gemini'
-    }
-    return 'gemini'
-  })
+  const [aiProvider, setAiProvider] = useState<AIProvider>('openrouter')
 
   const handleAiProviderChange = (provider: AIProvider) => {
-    setAiProvider(provider)
-    localStorage.setItem('mithaly_ai_provider', provider)
-    const providerNames = { gemini: 'Gemini (مباشر)', openrouter: 'OpenRouter' }
-    addLog(`تم تغيير مزود الذكاء الاصطناعي إلى ${providerNames[provider]}`)
+    setAiProvider('openrouter')
+    localStorage.setItem('mithaly_ai_provider', 'openrouter')
+    addLog(`تم تثبيت OpenRouter كمزود الذكاء الاصطناعي الوحيد`)
   }
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -705,11 +698,12 @@ export function useAdminDashboard() {
 - وصف الميتا يجب أن يكون مقنعاً ومناسباً للظهور في جوجل، ويفضل بين 150 و 220 حرفاً تقريباً.
 - الكلمات المفتاحية يجب أن تكون كثيرة ومنوعة ومفصولة بفواصل، وتشمل عربي وإنجليزي، ومرادفات، ونوايا شراء، ولا تكرر نفس الكلمة بلا فائدة.
 - لا تضف تشكيل كامل للحروف العربية لأن ذلك يضعف البحث، لكن اضبط الصياغة وعلامات الترقيم والتنسيق.
+- **إجباري جداً:** اذكر اسم المتجر "Vitamins HUB" في نهاية العنوان (title) وفي وصف الميتا (seoDesc) لتعزيز العلامة التجارية.
 قم بإرجاع كائن JSON فقط بالهيكل التالي بدقة ودون أي كلام خارجي على الإطلاق:
 {
-  "title": "عنوان SEO قوي ومقروء، يبدأ باسم المنتج أو المادة الفعالة، ويذكر التركيز/الحجم والفائدة أو الفئة الأساسية بشكل طبيعي",
+  "title": "عنوان SEO قوي ومقروء، يبدأ باسم المنتج أو المادة الفعالة، وينتهي دائماً باسم المتجر (Vitamins HUB)",
   "seoKeywords": "40 إلى 80 كلمة أو عبارة بحثية قصيرة وطويلة، عربية وإنجليزية، مفصولة بفواصل فقط، وتشمل أسماء بديلة ونوايا شراء ومرادفات وفوائد فعلية",
-  "seoDesc": "وصف ميتا مقنع ومنسق لغوياً، يوضح المنتج والفائدة الأساسية والتركيز أو الحجم إن وجد، ويشجع على الشراء بدون مبالغة"
+  "seoDesc": "وصف ميتا مقنع ومنسق لغوياً، يوضح المنتج ويشجع على الشراء ويحتوي على اسم المتجر Vitamins HUB بشكل طبيعي"
 }`
             },
             {

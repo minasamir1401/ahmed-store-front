@@ -45,21 +45,25 @@ async function handleGemini(body: GenerateRequest) {
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
 
-  const data = await response.json().catch(() => ({}))
-  if (!response.ok) {
-    return NextResponse.json({ error: data.error?.message || 'Gemini request failed' }, { status: response.status })
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      return NextResponse.json({ error: data.error?.message || 'Gemini request failed' }, { status: response.status || 500 })
+    }
+
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+    return NextResponse.json({
+      choices: [{ message: { content: text } }]
+    })
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Gemini network error: ' + error.message }, { status: 500 })
   }
-
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
-  return NextResponse.json({
-    choices: [{ message: { content: text } }]
-  })
 }
 
 async function handleOpenRouter(body: GenerateRequest) {
@@ -80,23 +84,27 @@ async function handleOpenRouter(body: GenerateRequest) {
     payload.model = model
   }
 
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'HTTP-Referer': 'https://mithaly.com',
-      'X-Title': 'Mithaly',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  })
+  try {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'HTTP-Referer': 'https://mithaly.com',
+        'X-Title': 'Mithaly',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
 
-  const data = await response.json().catch(() => ({}))
-  if (!response.ok) {
-    return NextResponse.json({ error: data.error?.message || data.error || 'OpenRouter request failed' }, { status: response.status })
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      return NextResponse.json({ error: data.error?.message || data.error || 'OpenRouter request failed' }, { status: response.status || 500 })
+    }
+
+    return NextResponse.json(data)
+  } catch (error: any) {
+    return NextResponse.json({ error: 'OpenRouter network error: ' + error.message }, { status: 500 })
   }
-
-  return NextResponse.json(data)
 }
 
 export async function POST(request: NextRequest) {

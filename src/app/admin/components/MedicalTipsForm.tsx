@@ -37,7 +37,7 @@ export default function MedicalTipsForm(props: any) {
         });
         if (resTitle.ok) {
           const data = await resTitle.json();
-          titleEn = data.text;
+          titleEn = data.translation || data.text || titleEn;
         }
       }
 
@@ -49,7 +49,7 @@ export default function MedicalTipsForm(props: any) {
         });
         if (resContent.ok) {
           const data = await resContent.json();
-          contentEn = data.text;
+          contentEn = data.translation || data.text || contentEn;
         }
       }
 

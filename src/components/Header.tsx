@@ -70,22 +70,8 @@ function HeaderContent() {
                 </div>
 
                 {/* Logo */}
-                <Link href="/" aria-label="VITAMINS HUB Homepage" className="flex items-center group flex-shrink-0 relative select-none">
-                  <span className="absolute -top-1.5 -left-1.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  <span className="absolute -top-1.5 -left-1.5 w-2 h-2 rounded-full bg-emerald-500" />
-                  <div className="flex flex-col justify-center leading-none">
-                    <div className="text-[10px] xs:text-lg md:text-2xl font-black tracking-tight flex items-center gap-0.5 font-[Outfit]" dir="ltr">
-                      <span className="text-slate-900 font-extrabold uppercase italic transition-colors duration-300 group-hover:text-emerald-600">
-                        VITAMINS
-                      </span>
-                      <span className="bg-gradient-to-r from-emerald-500 to-cyan-500 bg-clip-text text-transparent font-black uppercase italic px-0.5 rounded-md bg-emerald-500/5 border border-emerald-500/10 shadow-sm shadow-emerald-500/5">
-                        HUB
-                      </span>
-                    </div>
-                    <span className="text-[5px] xs:text-[8px] md:text-[9px] font-black text-slate-400 tracking-[0.15em] xs:tracking-[0.22em] uppercase font-sans mt-0.5">
-                      PREMIUM NUTRITION
-                    </span>
-                  </div>
+                <Link href="/" aria-label="VITAMINS HUB Homepage" className="flex items-center flex-shrink-0 relative select-none">
+                  <img src="/logo-header.jpg" alt="Vitamins Hub Logo" className="h-10 xs:h-12 md:h-14 w-auto object-contain" />
                 </Link>
 
                 {/* Nav Links (Desktop) */}
@@ -230,22 +216,8 @@ function HeaderContent() {
 
               {/* Drawer Header */}
               <div className="p-4 xs:p-6 flex items-center justify-between border-b border-[#e8f0ed] relative z-10">
-                <Link href="/" aria-label="Home" onClick={() => setIsMenuOpen(false)} className="flex items-center group select-none relative">
-                  <span className="absolute -top-1.5 -left-1.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  <span className="absolute -top-1.5 -left-1.5 w-2 h-2 rounded-full bg-emerald-500" />
-                  <div className="flex flex-col justify-center leading-none">
-                    <div className="text-sm xs:text-lg font-black tracking-tight flex items-center gap-0.5 font-[Outfit]" dir="ltr">
-                      <span className="text-slate-900 font-extrabold uppercase italic group-hover:text-emerald-600 transition-colors">
-                        VITAMINS
-                      </span>
-                      <span className="bg-gradient-to-r from-emerald-500 to-cyan-500 bg-clip-text text-transparent font-black uppercase italic px-0.5">
-                        HUB
-                      </span>
-                    </div>
-                    <span className="text-[6px] xs:text-[7px] font-black text-slate-450 tracking-[0.15em] xs:tracking-[0.2em] uppercase mt-0.5">
-                      PREMIUM NUTRITION
-                    </span>
-                  </div>
+                <Link href="/" aria-label="Home" onClick={() => setIsMenuOpen(false)} className="flex items-center select-none relative">
+                  <img src="/logo-header.jpg" alt="Vitamins Hub Logo" className="h-10 xs:h-12 w-auto object-contain" />
                 </Link>
                 <button
                   onClick={() => setIsMenuOpen(false)}

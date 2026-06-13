@@ -17,9 +17,8 @@ export default function Footer() {
           {/* About — spans full width on tiny screens */}
           <div className="col-span-2 md:col-span-1 space-y-3">
             {/* Logo */}
-            <div className="flex items-center gap-1 font-[Outfit]" dir="ltr">
-              <span className="text-xl font-extrabold uppercase italic text-slate-900">VITAMINS</span>
-              <span className="text-xl font-black uppercase italic bg-gradient-to-r from-emerald-500 to-cyan-500 bg-clip-text text-transparent px-1">HUB</span>
+            <div className="flex items-center" dir="ltr">
+              <img src="/logo-footer.jpg" alt="Vitamins Hub Logo" className="h-20 w-auto object-contain" />
             </div>
             <p className="text-xs text-gray-600 leading-relaxed">
               {t('footer_about_desc')}

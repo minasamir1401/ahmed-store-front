@@ -6,9 +6,9 @@ import type { Metadata } from 'next'
 import { cache } from 'react'
 
 interface PageParams {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 // Dynamic server-side SEO generation
@@ -26,7 +26,8 @@ const getTip = cache(async (id: string) => {
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   try {
-    const tip = await getTip(params.id)
+    const { id } = await params
+    const tip = await getTip(id)
     
     if (!tip) {
       return {
@@ -45,7 +46,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       title: `${post.title} | Vitamins HUB`,
       description: post.excerpt,
       alternates: {
-        canonical: `/health-tips/${params.id}`,
+        canonical: `/health-tips/${id}`,
       },
       openGraph: {
         title: `${post.title} | Vitamins HUB`,
@@ -63,10 +64,11 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 }
 
 export default async function ArticleDetailPage({ params }: PageParams) {
+  const { id } = await params
   let post = null
 
   try {
-    const tip = await getTip(params.id)
+    const tip = await getTip(id)
     if (tip) {
         post = {
           id: tip.id,
@@ -86,7 +88,7 @@ export default async function ArticleDetailPage({ params }: PageParams) {
   return (
     <>
       <Header />
-      <ArticleDetailClient post={post} params={params} />
+      <ArticleDetailClient post={post} params={{ id }} />
       <Footer />
     </>
   )

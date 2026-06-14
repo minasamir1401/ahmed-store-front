@@ -3,7 +3,7 @@ import { headers } from 'next/headers'
 /**
  * Dynamically resolves the absolute site URL on the server.
  * Priority:
- * 1. NEXT_PUBLIC_SITE_URL environment variable (if configured)
+ * 1. NEXT_PUBLIC_SITE_URL environment variable (يجب ضبطها في الإنتاج دائماً)
  * 2. Request headers (x-forwarded-host or host) + protocol
  * 3. Default fallback for build-time/compilation environment
  */
@@ -11,6 +11,15 @@ export async function getServerSiteUrl(): Promise<string> {
   const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL
   if (configuredUrl) {
     return configuredUrl.replace(/\/+$/, '')
+  }
+
+  // تحذير صريح في بيئة الإنتاج
+  if (process.env.NODE_ENV === 'production') {
+    console.error(
+      '[SEO WARNING] NEXT_PUBLIC_SITE_URL is not set! ' +
+      'Canonical URLs and Sitemap may be incorrect. ' +
+      'Set NEXT_PUBLIC_SITE_URL=https://yourdomain.com in production.'
+    )
   }
 
   try {

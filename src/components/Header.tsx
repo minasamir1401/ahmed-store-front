@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Search, ShoppingCart, User, Menu, X, Heart, Globe } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -71,7 +72,14 @@ function HeaderContent() {
 
                 {/* Logo */}
                 <Link href="/" aria-label="VITAMINS HUB Homepage" className="flex items-center flex-shrink-0 relative select-none">
-                  <img src="/logo-header.jpg" alt="Vitamins Hub Logo" className="h-10 xs:h-12 md:h-14 w-auto object-contain" />
+                  <Image
+                    src="/logo-header.jpg"
+                    alt="Vitamins Hub Logo"
+                    width={140}
+                    height={56}
+                    className="h-10 xs:h-12 md:h-14 w-auto object-contain"
+                    priority
+                  />
                 </Link>
 
                 {/* Nav Links (Desktop) */}
@@ -163,11 +171,16 @@ function HeaderContent() {
                   )}
                 </Link>
 
-                <Link href="/cart" aria-label={t('cart')} className="relative w-11 h-11 flex items-center justify-center bg-primary/10 rounded-full text-primary hover:bg-primary/20 transition-all">
-                  <ShoppingCart className="w-5 h-5 xs:w-6 xs:h-6" />
-                  <span className="absolute top-0.5 right-0.5 bg-black text-white text-[9px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
-                    {cartCount}
-                  </span>
+                <Link href="/cart" aria-label={`${t('cart')} (${cartCount})`} className="relative w-11 h-11 flex items-center justify-center bg-primary/10 rounded-full text-primary hover:bg-primary/20 transition-all">
+                  <ShoppingCart className="w-5 h-5 xs:w-6 xs:h-6" aria-hidden="true" />
+                  {cartCount > 0 && (
+                    <span
+                      className="absolute top-0.5 right-0.5 bg-black text-white text-[9px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white"
+                      aria-hidden="true"
+                    >
+                      {cartCount}
+                    </span>
+                  )}
                 </Link>
               </div>
             </div>
@@ -217,7 +230,13 @@ function HeaderContent() {
               {/* Drawer Header */}
               <div className="p-4 xs:p-6 flex items-center justify-between border-b border-[#e8f0ed] relative z-10">
                 <Link href="/" aria-label="Home" onClick={() => setIsMenuOpen(false)} className="flex items-center select-none relative">
-                  <img src="/logo-header.jpg" alt="Vitamins Hub Logo" className="h-10 xs:h-12 w-auto object-contain" />
+                  <Image
+                    src="/logo-header.jpg"
+                    alt="Vitamins Hub Logo"
+                    width={120}
+                    height={48}
+                    className="h-10 xs:h-12 w-auto object-contain"
+                  />
                 </Link>
                 <button
                   onClick={() => setIsMenuOpen(false)}

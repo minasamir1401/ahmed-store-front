@@ -12,6 +12,7 @@ import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { productImageAlt, productImageThumb, safeBrandImage } from '@/lib/product-images'
+import { trackViewContent, trackAddToCart } from '@/lib/tracking'
 
 // ── Animation variants ──────────────────────────────────────────────────
 const fadeUp: any = {
@@ -337,7 +338,15 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
 
   useEffect(() => {
     if (product) {
-      document.title = `${getLocalizedValue(language, product.title, product.titleEn, translate)} | Vitamins HUB`;
+      const displayTitle = getLocalizedValue(language, product.title, product.titleEn, translate);
+      document.title = `${displayTitle} | Vitamins HUB`;
+      
+      trackViewContent({
+        id: product.id,
+        title: displayTitle,
+        price: product.price,
+        image: product.image
+      });
     }
   }, [product, language])
 
@@ -567,6 +576,17 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
       quantity,
       size: selectedSize?.size
     })
+    
+    // Track AddToCart event
+    const displayTitle = getLocalizedValue(language, product.title, product.titleEn, translate) + (selectedSize ? ` (${selectedSize.size})` : '');
+    trackAddToCart({
+      id: product.id,
+      title: displayTitle,
+      price: currentPrice,
+      image: product.image,
+      quantity
+    });
+
     setIsAdded(true)
     setTimeout(() => setIsAdded(false), 2000)
   }

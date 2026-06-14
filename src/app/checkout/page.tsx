@@ -10,6 +10,7 @@ import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
 import { useModal } from '@/context/ModalContext'
 import { useLanguage } from '@/context/LanguageContext'
+import { trackInitiateCheckout, trackPurchase } from '@/lib/tracking'
 
 const governorates = [
   "القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "البحر الأحمر", "البحيرة", "الفيوم", "الغربية", "الإسماعيلية", "المنوفية", "المنيا", "القليوبية", "الوادي الجديد", "الشرقية", "السويس", "أسوان", "أسيوط", "بني سويف", "بورسعيد", "دمياط", "الأقصر", "قنا", "شمال سيناء", "سوهاج", "جنوب سيناء", "كفر الشيخ", "مطروح"
@@ -64,6 +65,20 @@ export default function CheckoutPage() {
       }))
     }
   }, [user])
+
+  const hasTrackedCheckout = React.useRef(false)
+  React.useEffect(() => {
+    if (cart && cart.length > 0 && !hasTrackedCheckout.current) {
+      hasTrackedCheckout.current = true
+      const trackedItems = cart.map(item => ({
+        id: String(item.id),
+        title: translate(item.title),
+        price: item.price,
+        quantity: item.quantity
+      }))
+      trackInitiateCheckout(trackedItems, cartTotal)
+    }
+  }, [cart, cartTotal])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -138,6 +153,21 @@ export default function CheckoutPage() {
         const parsedOrders = savedOrders ? JSON.parse(savedOrders) : []
         const localOrders = Array.isArray(parsedOrders) ? parsedOrders : []
         localStorage.setItem('vitamins_hub_orders', JSON.stringify([storedOrder, ...localOrders].slice(0, 20)))
+        
+        // Track Purchase event on Facebook, Google, TikTok, Snapchat
+        trackPurchase({
+          id: orderData.id || '',
+          orderNumber: orderData.orderNumber || 'ORD-XXXX',
+          total: total,
+          shippingFee: shippingFee + codFee,
+          items: cart.map(item => ({
+            productId: String(item.id),
+            title: translate(item.title),
+            price: item.price,
+            quantity: item.quantity
+          }))
+        });
+
         setPlacedOrder(orderData)
         setStep(3)
         clearCart()

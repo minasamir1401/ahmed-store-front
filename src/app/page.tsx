@@ -8,20 +8,7 @@ import { Loader2, Calendar, Clock, ChevronLeft } from 'lucide-react'
 import ProductCard from '@/components/ProductCard'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
-
-function SkeletonCard() {
-  return (
-    <div className="bg-white rounded-2xl overflow-hidden p-3 space-y-3" style={{ border: '1px solid #e8f0ed' }}>
-      <div className="aspect-square bg-slate-100 animate-pulse rounded-xl" />
-      <div className="space-y-2">
-        <div className="h-3.5 bg-slate-100 animate-pulse rounded-md w-full" />
-        <div className="h-3 bg-slate-100 animate-pulse rounded-md w-2/3" />
-        <div className="h-3.5 bg-slate-100 animate-pulse rounded-md w-1/3" />
-      </div>
-      <div className="h-9 bg-slate-100 animate-pulse rounded-xl w-full" />
-    </div>
-  )
-}
+import SkeletonCard from '@/components/ui/SkeletonCard'
 
 export default function Home() {
   const { t, language, translate, dir } = useLanguage()
@@ -31,15 +18,8 @@ export default function Home() {
   const [allProducts, setAllProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [siteUrl, setSiteUrl] = useState("")
   const [currentSlide, setCurrentSlide] = useState(0)
   const [articles, setArticles] = useState<any[]>([])
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setSiteUrl(window.location.origin)
-    }
-  }, [])
 
   // Safe parsing of slides list from hero data
   const slides = React.useMemo(() => {
@@ -68,20 +48,31 @@ export default function Home() {
     setLoading(true)
     setError(null)
 
-    const fetchJson = async (url: string) => {
-      const res = await fetch(url)
-      const contentType = res.headers.get('content-type') || ''
-      const isJson = contentType.includes('application/json')
-      const body = isJson ? await res.json() : await res.text()
+    // ── دالة مساعدة مع Timeout ──────────────────────────────────────────────
+    const fetchJson = async (url: string, timeoutMs = 12000) => {
+      const controller = new AbortController()
+      const timer = setTimeout(() => controller.abort(), timeoutMs)
+      try {
+        const res = await fetch(url, { signal: controller.signal })
+        clearTimeout(timer)
+        const contentType = res.headers.get('content-type') || ''
+        const isJson = contentType.includes('application/json')
+        const body = isJson ? await res.json() : await res.text()
 
-      if (!res.ok) {
-        const message = isJson
-          ? body?.error || body?.message
-          : `Request failed with status ${res.status}`
-        throw new Error(message || 'Unexpected API error')
+        if (!res.ok) {
+          const message = isJson
+            ? body?.error || body?.message
+            : `Request failed with status ${res.status}`
+          throw new Error(message || 'Unexpected API error')
+        }
+        return body
+      } catch (err: any) {
+        clearTimeout(timer)
+        if (err.name === 'AbortError') {
+          throw new Error(language === 'ar' ? 'انتهت مدة انتظار الطلب. يرجى المحاولة مرة أخرى.' : 'Request timed out. Please try again.')
+        }
+        throw err
       }
-
-      return body
     }
 
     Promise.all([
@@ -104,7 +95,7 @@ export default function Home() {
       })
       .catch(err => {
         console.error(err)
-        setError(language === 'ar' 
+        setError(language === 'ar'
           ? "عذراً، فشل تحميل المنتجات والبيانات. يرجى التأكد من اتصالك بالشبكة وإعادة المحاولة."
           : "Sorry, failed to load products and data. Please check your connection and try again."
         )
@@ -143,79 +134,8 @@ export default function Home() {
     <>
       <Header />
 
-      {/* JSON-LD Structured Data Schema for LocalBusiness & WebSite */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-        "@context": "https://schema.org",
-        "@graph": [
-          {
-            "@type": "WebSite",
-            "@id": `${siteUrl}/#website`,
-            "url": `${siteUrl}/`,
-            "name": "Vitamins HUB",
-            "description": language === 'ar' ? "متجر المكملات الغذائية والفيتامينات الأصلي الأول في مصر" : "The premier authentic food supplements and vitamins store in Egypt",
-            "publisher": {
-              "@id": `${siteUrl}/#organization`
-            },
-            "potentialAction": [
-              {
-                "@type": "SearchAction",
-                "target": {
-                  "@type": "EntryPoint",
-                  "urlTemplate": `${siteUrl}/products?search={search_term_string}`
-                },
-                "query-input": "required name=search_term_string"
-              }
-            ],
-            "inLanguage": language
-          },
-          {
-            "@type": "Store",
-            "@id": `${siteUrl}/#organization`,
-            "name": "Vitamins HUB Egypt",
-            "url": `${siteUrl}/`,
-            "logo": `${siteUrl}/logo-v2.png`,
-            "image": `${siteUrl}/logo-v2.png`,
-            "description": language === 'ar' 
-              ? "تسوق أفضل المكملات الغذائية، الفيتامينات، البروتينات، حوارق الدهون، ومنتجات الرشاقة الأصلية 100% في مصر مع Vitamins HUB."
-              : "Shop the best 100% original food supplements, vitamins, proteins, fat burners, and weight loss products in Egypt with Vitamins HUB.",
-            "telephone": "+201001234567",
-            "priceRange": "$$",
-            "address": {
-              "@type": "PostalAddress",
-              "streetAddress": language === 'ar' ? "شبرا، القاهرة" : "Shubra, Cairo",
-              "addressLocality": language === 'ar' ? "القاهرة" : "Cairo",
-              "addressRegion": language === 'ar' ? "القاهرة" : "Cairo",
-              "postalCode": "11511",
-              "addressCountry": "EG"
-            },
-            "geo": {
-              "@type": "GeoCoordinates",
-              "latitude": 30.0444,
-              "longitude": 31.2357
-            },
-            "openingHoursSpecification": {
-              "@type": "OpeningHoursSpecification",
-              "dayOfWeek": [
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday",
-                "Sunday"
-              ],
-              "opens": "00:00",
-              "closes": "23:59"
-            },
-            "sameAs": [
-              "https://www.facebook.com/vitaminshub",
-              "https://www.instagram.com/vitaminshub",
-              "https://twitter.com/vitaminshub"
-            ]
-          }
-        ]
-      }) }} />
-      <main className="flex-1 pb-20 md:pb-0 bg-white relative overflow-hidden w-full">
+      {/* JSON-LD Structured Data نُقل إلى layout.tsx ليُقرأ من الخادم */}
+      <main id="main-content" className="flex-1 pb-20 md:pb-0 bg-white relative overflow-hidden w-full">
         
         {/* Elite Ambient Glow Circles */}
         <div className="absolute top-20 right-10 w-96 h-96 bg-emerald-100 rounded-full blur-[110px] opacity-40 pointer-events-none animate-pulse-glow" />
@@ -287,7 +207,7 @@ export default function Home() {
                         <img 
                           src={slides[currentSlide].image || 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=700&q=80'} 
                           className="w-full h-full object-cover" 
-                          alt="Hero"
+                          alt={`${translate(slides[currentSlide]?.title || 'Vitamins HUB')} - Vitamins HUB`}
                         />
                         <div className={`absolute inset-0 z-1 ${
                           language === 'ar'
@@ -307,7 +227,7 @@ export default function Home() {
                             className={`h-2 rounded-full transition-all duration-350 cursor-pointer ${
                               currentSlide === i ? 'bg-primary w-6' : 'bg-slate-300 w-2 hover:bg-slate-400'
                             }`}
-                            aria-label={`Slide ${i + 1}`}
+                            aria-label={`${language === 'ar' ? 'الانتقال للشريحة' : 'Go to slide'} ${i + 1}: ${translate(slides[i]?.title || '')}`}
                           />
                         ))}
                       </div>
@@ -353,7 +273,7 @@ export default function Home() {
                       transition={{ duration: 1 }}
                       src={hero.image} 
                       className="w-full h-full object-cover" 
-                      alt="Hero"
+                      alt={`${translate(hero.title)} - Vitamins HUB`}
                     />
                     <div className={`absolute inset-0 z-1 ${
                       language === 'ar'

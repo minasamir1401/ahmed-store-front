@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ShoppingCart, Check, Heart, Star } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -9,6 +10,7 @@ import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { productImageAlt, productImageThumb } from '@/lib/product-images'
+import { trackAddToCart, trackAddToWishlist } from '@/lib/tracking'
 
 interface ProductCardProps {
   id: string
@@ -39,6 +41,11 @@ export default function ProductCard({ id, title, price, oldPrice, image, imageAl
     e.stopPropagation()
     
     addToCart({ id, title, price, image, quantity: 1 })
+    
+    // Track AddToCart event
+    const displayTitle = translate(title)
+    trackAddToCart({ id, title: displayTitle, price, image, quantity: 1 })
+
     setIsAdded(true)
     setTimeout(() => setIsAdded(false), 2000)
   }
@@ -46,6 +53,13 @@ export default function ProductCard({ id, title, price, oldPrice, image, imageAl
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    
+    // Track AddToWishlist event only when adding (not when removing)
+    if (!isFavorite) {
+      const displayTitle = translate(title)
+      trackAddToWishlist({ id, title: displayTitle, price, image })
+    }
+
     toggleWishlist({ id, title, price, image, categoryId: '' })
   }
 
@@ -126,17 +140,16 @@ export default function ProductCard({ id, title, price, oldPrice, image, imageAl
             </motion.div>
           )}
 
-          <motion.img
-            src={cardImage}
-            alt={imgAlt}
-            width={imageWidth || 400}
-            height={imageHeight || 400}
-            animate={{ scale: isHovered ? 1.08 : 1 }}
-            transition={{ duration: 0.45, ease: 'easeOut' }}
-            className="w-full h-full object-contain"
-            loading="lazy"
-            decoding="async"
-          />
+          <div className="relative w-full h-full">
+            <Image
+              src={cardImage}
+              alt={imgAlt}
+              fill
+              className="object-contain"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
+              loading="lazy"
+            />
+          </div>
 
           {/* Hover shine overlay */}
           <AnimatePresence>
@@ -161,11 +174,15 @@ export default function ProductCard({ id, title, price, oldPrice, image, imageAl
         </Link>
 
         {/* Stars mini */}
-        <div className="flex items-center justify-end gap-0.5">
+        <div
+          className="flex items-center justify-end gap-0.5"
+          role="img"
+          aria-label={language === 'ar' ? 'التقييم: 4.9 من 5 نجوم' : 'Rating: 4.9 out of 5 stars'}
+        >
           {[...Array(5)].map((_, i) => (
-            <Star key={i} size={8} className="text-amber-400 xs:w-[10px] xs:h-[10px]" fill="currentColor" />
+            <Star key={i} size={8} className="text-amber-400 xs:w-[10px] xs:h-[10px]" fill="currentColor" aria-hidden="true" />
           ))}
-          <span className="text-[8px] xs:text-[10px] text-gray-600 font-bold mr-0.5 xs:mr-1">(4.9)</span>
+          <span className="text-[8px] xs:text-[10px] text-gray-600 font-bold mr-0.5 xs:mr-1" aria-hidden="true">(4.9)</span>
         </div>
 
         {/* Price */}

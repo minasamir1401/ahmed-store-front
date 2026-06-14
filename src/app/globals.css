@@ -273,7 +273,7 @@ a, button { transition-duration: 200ms; }
   animation: borderPulse 3s ease-in-out infinite;
 }
 
-/* ── Custom loading animations for Vitamins HUB ── */
+/* ── Custom loading animations for The VitaHub ── */
 @keyframes shimmer-hub {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }

@@ -481,9 +481,9 @@ function LoginContent() {
               {!isLogin && (
                 <p className="text-[10px] text-center text-slate-400 leading-relaxed mt-6">
                   {language === 'ar' ? (
-                    <>بالتسجيل، أنت توافق على <Link href="/shipping" className="underline hover:text-slate-600">شروط الخدمة</Link> و <Link href="/returns" className="underline hover:text-slate-600">سياسة الخصوصية</Link> لـ Vitamins HUB.</>
+                    <>بالتسجيل، أنت توافق على <Link href="/shipping" className="underline hover:text-slate-600">شروط الخدمة</Link> و <Link href="/returns" className="underline hover:text-slate-600">سياسة الخصوصية</Link> لـ The VitaHub.</>
                   ) : (
-                    <>By registering, you agree to Vitamins HUB&apos;s <Link href="/shipping" className="underline hover:text-slate-600">Terms of Service</Link> & <Link href="/returns" className="underline hover:text-slate-600">Privacy Policy</Link>.</>
+                    <>By registering, you agree to The VitaHub&apos;s <Link href="/shipping" className="underline hover:text-slate-600">Terms of Service</Link> & <Link href="/returns" className="underline hover:text-slate-600">Privacy Policy</Link>.</>
                   )}
                 </p>
               )}

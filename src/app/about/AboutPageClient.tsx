@@ -42,7 +42,7 @@ export default function AboutPageClient() {
                 <Sparkles size={14} /> {t('about_badge')}
               </span>
               <h1 className="text-4xl md:text-6xl font-black text-gray-800 leading-tight">
-                {t('about_heading').split('Vitamins HUB')[0]} <span className="text-primary">Vitamins HUB</span>
+                {t('about_heading').split('The VitaHub')[0]} <span className="text-primary">The VitaHub</span>
               </h1>
               <p className="text-gray-500 max-w-2xl mx-auto text-lg font-medium">
                 {t('about_subheading')}

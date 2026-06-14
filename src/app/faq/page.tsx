@@ -3,8 +3,8 @@ import type { Metadata } from 'next'
 import FAQPageClient from './FAQPageClient'
 
 export const metadata: Metadata = {
-  title: 'الأسئلة الشائعة | Vitamins HUB',
-  description: 'إجابات على الأسئلة الشائعة حول الفيتامينات الأصلية، طرق الشحن والتوصيل، سياسة الإرجاع، وأصالة المكملات الغذائية في متجر Vitamins HUB.',
+  title: 'الأسئلة الشائعة | The VitaHub',
+  description: 'إجابات على الأسئلة الشائعة حول الفيتامينات الأصلية، طرق الشحن والتوصيل، سياسة الإرجاع، وأصالة المكملات الغذائية في متجر The VitaHub.',
   alternates: {
     canonical: '/faq',
   }

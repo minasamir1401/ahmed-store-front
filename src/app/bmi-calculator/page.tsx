@@ -3,7 +3,7 @@ import BMICalculatorClient from './BMICalculatorClient'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'حاسبة مؤشر كتلة الجسم الذكية BMI | Vitamins HUB',
+  title: 'حاسبة مؤشر كتلة الجسم الذكية BMI | The VitaHub',
   description: 'احسب مؤشر كتلة الجسم (BMI) بدقة متناهية مع حاسبتنا الذكية المدعومة بالذكاء الاصطناعي. احصل على نصائح غذائية وتوصيات مخصصة لمكملاتك الغذائية مجاناً.',
   keywords: ['حاسبة BMI', 'حساب مؤشر كتلة الجسم', 'الوزن المثالي', 'حاسبة الوزن الذكية', 'حساب كتلة الجسم مصر', 'تخسيس ورشاقة'],
   alternates: {
@@ -20,7 +20,7 @@ export default async function BMICalculatorPage() {
   const calculatorSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "حاسبة مؤشر كتلة الجسم الذكية BMI - Vitamins HUB",
+    "name": "حاسبة مؤشر كتلة الجسم الذكية BMI - The VitaHub",
     "url": `${siteUrl}/bmi-calculator`,
     "description": "أداة ذكية لحساب مؤشر كتلة الجسم وتقديم توصيات مخصصة للرشاقة والصحة والمكملات الغذائية.",
     "applicationCategory": "HealthApplication",
@@ -33,7 +33,7 @@ export default async function BMICalculatorPage() {
     },
     "author": {
       "@type": "Organization",
-      "name": "Vitamins HUB"
+      "name": "The VitaHub"
     }
   }
 

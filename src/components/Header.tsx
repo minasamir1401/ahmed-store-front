@@ -71,10 +71,10 @@ function HeaderContent() {
                 </div>
 
                 {/* Logo */}
-                <Link href="/" aria-label="VITAMINS HUB Homepage" className="flex items-center flex-shrink-0 relative select-none">
+                <Link href="/" aria-label="The VitaHub Homepage" className="flex items-center flex-shrink-0 relative select-none">
                   <Image
                     src="/logo-header.jpg"
-                    alt="Vitamins Hub Logo"
+                    alt="The VitaHub Logo"
                     width={140}
                     height={56}
                     className="h-10 xs:h-12 md:h-14 w-auto object-contain"
@@ -232,7 +232,7 @@ function HeaderContent() {
                 <Link href="/" aria-label="Home" onClick={() => setIsMenuOpen(false)} className="flex items-center select-none relative">
                   <Image
                     src="/logo-header.jpg"
-                    alt="Vitamins Hub Logo"
+                    alt="The VitaHub Logo"
                     width={120}
                     height={48}
                     className="h-10 xs:h-12 w-auto object-contain"

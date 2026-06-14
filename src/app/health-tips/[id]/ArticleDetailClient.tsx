@@ -131,8 +131,8 @@ export default function ArticleDetailClient({ post, params }: { post: any, param
   }, [post, language])
 
   useEffect(() => {
-    if (post) document.title = `${translate(post.title)} | Vitamins HUB`
-    else       document.title = language === 'ar' ? 'المقال غير موجود | Vitamins HUB' : 'Article Not Found | Vitamins HUB'
+    if (post) document.title = `${translate(post.title)} | The VitaHub`
+    else       document.title = language === 'ar' ? 'المقال غير موجود | The VitaHub' : 'Article Not Found | The VitaHub'
   }, [language, translate, post])
 
   useEffect(() => {

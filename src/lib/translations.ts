@@ -29,7 +29,7 @@ export const translations: Record<string, Record<string, string>> = {
     footer_contact_us: "تواصل معنا",
     footer_newsletter_placeholder: "بريدك الإلكتروني",
     footer_subscribe: "اشترك",
-    footer_rights: "جميع الحقوق محفوظة لـ Vitamins HUB © 2026",
+    footer_rights: "جميع الحقوق محفوظة لـ The VitaHub © 2026",
     footer_about_us: "من نحن",
     footer_shipping: "سياسة الشحن",
     footer_returns: "سياسة الإرجاع",
@@ -72,13 +72,13 @@ export const translations: Record<string, Record<string, string>> = {
     back_to_top: "الرجوع إلى الأعلى",
 
     // About Page
-    about_title: "عن Vitamins HUB | متجر المكملات الغذائية والأصلية الأول في مصر",
-    about_desc: "تعرف على قصة Vitamins HUB، متجر المكملات الغذائية والفيتامينات والبروتينات المستوردة والأصلية 100% في مصر.",
+    about_title: "عن The VitaHub | متجر المكملات الغذائية والأصلية الأول في مصر",
+    about_desc: "تعرف على قصة The VitaHub، متجر المكملات الغذائية والفيتامينات والبروتينات المستوردة والأصلية 100% في مصر.",
     about_badge: "من نحن",
-    about_heading: "قصتنا في Vitamins HUB",
+    about_heading: "قصتنا في The VitaHub",
     about_subheading: "شغفنا هو تمكينك من عيش حياة مفعمة بالصحة والنشاط عبر توفير حلول غذائية موثوقة وعالمية.",
     about_content_title: "المصدر الأول والأكثر موثوقية للمكملات الغذائية الأصلية في مصر.",
-    about_p1: "تأسست Vitamins HUB لسد الفجوة الكبيرة في سوق المكملات الغذائية في مصر، حيث يعاني الكثيرون من انتشار المنتجات المقلدة ومجهولة المصدر. نحن هنا لنمنحك راحة البال المطلقة.",
+    about_p1: "تأسست The VitaHub لسد الفجوة الكبيرة في سوق المكملات الغذائية في مصر، حيث يعاني الكثيرون من انتشار المنتجات المقلدة ومجهولة المصدر. نحن هنا لنمنحك راحة البال المطلقة.",
     about_p2: "لا نوفر فقط مكملات غذائية ممتازة، بل نقوم ببناء مجتمع صحي متكامل مدعوم بالمعرفة العلمية الدقيقة والاستشارات الطبية لمساعدتك في فهم احتياجات جسدك بدقة.",
     about_badge_100: "100% أصلي",
     about_badge_100_desc: "فحص دقيق ومستمر",
@@ -92,8 +92,8 @@ export const translations: Record<string, Record<string, string>> = {
     about_pillar3_desc: "فريقنا الطبي والرياضي مستعد دائماً لتقديم استشارات مجانية لمساعدتك في تحقيق أهدافك البدنية بأمان.",
 
     // BMI Page
-    bmi_title: "حاسبة كتلة الجسم BMI الذكية | Vitamins HUB",
-    bmi_desc: "احسب مؤشر كتلة الجسم (BMI) بدقة وتعرف على وزنك المثالي مع نصائح صحية مخصصة من فريق Vitamins HUB الطبي.",
+    bmi_title: "حاسبة كتلة الجسم BMI الذكية | The VitaHub",
+    bmi_desc: "احسب مؤشر كتلة الجسم (BMI) بدقة وتعرف على وزنك المثالي مع نصائح صحية مخصصة من فريق The VitaHub الطبي.",
     bmi_badge: "أداة طبية ذكية",
     bmi_heading: "حاسبة الوزن ومؤشر كتلة الجسم (BMI)",
     bmi_intro: "أدخل بياناتك للحصول على تحليل فوري لكتلة جسمك ونصائح مخصصة لتحسين صحتك ولياقتك البدنية.",
@@ -120,7 +120,7 @@ export const translations: Record<string, Record<string, string>> = {
     bmi_obese_tip: "من الضروري استشارة طبيب أو خبير تغذية لوضع نظام غذائي مخصص. ركز على تقليل النشويات والسكريات والدهون المشبعة، والبدء بممارسة تمارين خفيفة كالمشي. مكملات دعم الأيض وتقليل الشهية قد تكون مفيدة.",
 
     // Cart Page
-    cart_title: "عربة التسوق | Vitamins HUB",
+    cart_title: "عربة التسوق | The VitaHub",
     cart_empty: "عربة التسوق فارغة حالياً",
     cart_empty_desc: "تصفح منتجاتنا المميزة وأضف أفضل الفيتامينات والمكملات لعربتك الآن!",
     cart_back_shopping: "الذهاب للمتجر",
@@ -136,7 +136,7 @@ export const translations: Record<string, Record<string, string>> = {
     cart_clear: "تفريغ العربة",
 
     // Checkout Page
-    checkout_title: "إتمام الشراء | Vitamins HUB",
+    checkout_title: "إتمام الشراء | The VitaHub",
     checkout_heading: "إتمام عملية الشراء",
     checkout_billing_details: "تفاصيل الشحن والتوصيل",
     checkout_full_name: "الاسم بالكامل",
@@ -159,8 +159,8 @@ export const translations: Record<string, Record<string, string>> = {
     checkout_validation_error: "يرجى ملء جميع الحقول المطلوبة بشكل صحيح.",
 
     // FAQ Page
-    faq_title: "الأسئلة الشائعة | Vitamins HUB",
-    faq_desc: "إجابات على الأسئلة الشائعة حول جودة المنتجات، طرق الدفع والتوصيل وسياسات الاستبدال والإرجاع في Vitamins HUB.",
+    faq_title: "الأسئلة الشائعة | The VitaHub",
+    faq_desc: "إجابات على الأسئلة الشائعة حول جودة المنتجات، طرق الدفع والتوصيل وسياسات الاستبدال والإرجاع في The VitaHub.",
     faq_badge: "الأسئلة الشائعة",
     faq_heading: "الأسئلة الأكثر تكراراً",
     faq_sub: "كل ما تود معرفته عن خدماتنا ومنتجاتنا في مكان واحد.",
@@ -174,8 +174,8 @@ export const translations: Record<string, Record<string, string>> = {
     faq_a4: "نعم، نوفر دعماً طبياً ورياضياً متميزاً من خلال فريق متخصص من الأطباء وأخصائيي التغذية لمساعدتك في اختيار الفيتامينات والمكملات المناسبة لأهدافك واحتياجاتك مجاناً.",
 
     // Health Tips Page
-    tips_title: "نصائح طبية وصحية متميزة | Vitamins HUB",
-    tips_desc: "مقالات علمية ونصائح طبية مبسطة حول التغذية السليمة، التمرين البدني، واستخدام المكملات الغذائية بإشراف فريق Vitamins HUB.",
+    tips_title: "نصائح طبية وصحية متميزة | The VitaHub",
+    tips_desc: "مقالات علمية ونصائح طبية مبسطة حول التغذية السليمة، التمرين البدني، واستخدام المكملات الغذائية بإشراف فريق The VitaHub.",
     tips_badge: "المدونة الطبية والصحية",
     tips_heading: "نصائح وإرشادات صحية",
     tips_sub: "نشاركك أحدث المعارف الطبية والدراسات الموثوقة لتعيش حياة أفضل.",
@@ -184,7 +184,7 @@ export const translations: Record<string, Record<string, string>> = {
     tips_search: "ابحث في المقالات...",
 
     // Login / Register / Forgot
-    login_title: "تسجيل الدخول / إنشاء حساب | Vitamins HUB",
+    login_title: "تسجيل الدخول / إنشاء حساب | The VitaHub",
     login_heading: "تسجيل الدخول",
     login_email: "البريد الإلكتروني",
     login_password: "كلمة المرور",
@@ -196,21 +196,21 @@ export const translations: Record<string, Record<string, string>> = {
     register_btn: "تسجيل الحساب",
     register_have_account: "لديك حساب بالفعل؟",
     register_login_now: "سجل دخولك الآن",
-    forgot_title: "نسيت كلمة المرور | Vitamins HUB",
+    forgot_title: "نسيت كلمة المرور | The VitaHub",
     forgot_heading: "استعادة كلمة المرور",
     forgot_desc: "أدخل بريدك الإلكتروني المسجل وسنرسل لك رابطاً لإعادة تعيين كلمة المرور الخاصة بك.",
     forgot_btn: "إرسال رابط الاستعادة",
     forgot_back: "العودة لتسجيل الدخول",
 
     // Offers Page
-    offers_title: "أقوى العروض والخصومات الحصرية | Vitamins HUB",
+    offers_title: "أقوى العروض والخصومات الحصرية | The VitaHub",
     offers_desc: "تسوق أفضل المكملات الغذائية والفيتامينات بأقوى العروض والخصومات الحصرية في مصر. عروض متجددة وهدايا مجانية.",
     offers_badge: "عروض حصرية",
     offers_heading: "أحدث العروض والخصومات",
     offers_sub: "وفر أكثر مع مجموعاتنا وعروضنا الحصرية لفترة محدودة.",
 
     // Products / Category Page
-    products_title: "جميع المنتجات والمكملات | Vitamins HUB",
+    products_title: "جميع المنتجات والمكملات | The VitaHub",
     products_desc: "تسوق أفضل المكملات الغذائية والبروتينات والفيتامينات الأصلية المستوردة في مصر. فحص وتغليف ممتاز وتوصيل سريع.",
     products_search_results: "نتائج البحث عن:",
     products_all: "جميع المنتجات",
@@ -244,7 +244,7 @@ export const translations: Record<string, Record<string, string>> = {
     prod_specs_empty: "لا توجد مواصفات إضافية لهذا المنتج.",
 
     // Profile Page
-    profile_title: "حسابي الشخصي | Vitamins HUB",
+    profile_title: "حسابي الشخصي | The VitaHub",
     profile_heading: "لوحة التحكم الشخصية",
     profile_orders: "طلباتي السابقة",
     profile_details: "تفاصيل الحساب",
@@ -258,8 +258,8 @@ export const translations: Record<string, Record<string, string>> = {
     profile_email: "البريد الإلكتروني:",
 
     // Tracking Page
-    track_title: "تتبع حالة طلبك بدقة | Vitamins HUB",
-    track_desc: "أدخل رقم الهاتف المستخدم في الطلب لتتبع حالة شحن وتوصيل طلبيتك من Vitamins HUB مباشرة وفي ثوانٍ.",
+    track_title: "تتبع حالة طلبك بدقة | The VitaHub",
+    track_desc: "أدخل رقم الهاتف المستخدم في الطلب لتتبع حالة شحن وتوصيل طلبيتك من The VitaHub مباشرة وفي ثوانٍ.",
     track_badge: "أداة التتبع الذكية",
     track_heading: "تتبع حالة طلبك",
     track_sub: "أدخل رقم الهاتف الذي سجلت به الطلب لمشاهدة تفاصيل الشحن وحالته الحالية فوراً.",
@@ -276,19 +276,19 @@ export const translations: Record<string, Record<string, string>> = {
     track_order_status_cancelled: "تم إلغاء الطلب",
 
     // Wishlist Page
-    wishlist_title: "قائمة المفضلة الخاصة بك | Vitamins HUB",
-    wishlist_desc: "شاهد مكملاتك وفيتاميناتك المفضلة التي قمت بحفظها في Vitamins HUB وقم بإضافتها لعربة التسوق مباشرة.",
+    wishlist_title: "قائمة المفضلة الخاصة بك | The VitaHub",
+    wishlist_desc: "شاهد مكملاتك وفيتاميناتك المفضلة التي قمت بحفظها في The VitaHub وقم بإضافتها لعربة التسوق مباشرة.",
     wishlist_heading: "قائمة المفضلة",
     wishlist_empty: "قائمة المفضلة فارغة حالياً",
     wishlist_empty_desc: "احفظ منتجاتك المفضلة أثناء التسوق لتجدها هنا وتطلبها بسهولة في أي وقت!",
 
     // Policies (Shipping / Returns)
-    policy_shipping_title: "سياسة الشحن والتوصيل | Vitamins HUB",
+    policy_shipping_title: "سياسة الشحن والتوصيل | The VitaHub",
     policy_shipping_heading: "سياسة الشحن والتوصيل",
-    policy_shipping_content: "نحن في Vitamins HUB نحرص على تقديم أسرع وأسهل تجربة توصيل لعملائنا في مصر.\n\n- الشحن للقاهرة والجيزة يستغرق 24-48 ساعة عمل.\n- الشحن لباقي محافظات مصر يستغرق 2-4 أيام عمل.\n- تكلفة الشحن تختلف حسب المحافظة وتظهر في صفحة إتمام الطلب.\n- نوفر شحناً مجانياً بالكامل للطلبات التي تفوق قيمتها 2000 جنيه مصري.\n- يتم تخزين وتغليف المنتجات باحترافية كاملة لضمان وصولها لك بأعلى درجات الأمان والجودة.",
-    policy_returns_title: "سياسة الإرجاع والاستبدال | Vitamins HUB",
+    policy_shipping_content: "نحن في The VitaHub نحرص على تقديم أسرع وأسهل تجربة توصيل لعملائنا في مصر.\n\n- الشحن للقاهرة والجيزة يستغرق 24-48 ساعة عمل.\n- الشحن لباقي محافظات مصر يستغرق 2-4 أيام عمل.\n- تكلفة الشحن تختلف حسب المحافظة وتظهر في صفحة إتمام الطلب.\n- نوفر شحناً مجانياً بالكامل للطلبات التي تفوق قيمتها 2000 جنيه مصري.\n- يتم تخزين وتغليف المنتجات باحترافية كاملة لضمان وصولها لك بأعلى درجات الأمان والجودة.",
+    policy_returns_title: "سياسة الإرجاع والاستبدال | The VitaHub",
     policy_returns_heading: "سياسة الإرجاع والاستبدال",
-    policy_returns_content: "صحتك ورضاك هما أولويتنا القصوى في Vitamins HUB. لذلك نقدم سياسة إرجاع واستبدال مرنة:\n\n- يحق للعميل طلب إرجاع أو استبدال المنتج خلال 7 أيام من تاريخ الاستلام.\n- يشترط أن يكون المنتج في حالته الأصلية، غير مفتوح، ومغلفاً بغلافه الأصلي مع وجود ملصق الأمان وسليماً بالكامل.\n- المنتجات المفتوحة أو المستخدمة لا يمكن إرجاعها أو استبدالها حفاظاً على السلامة العامة والاشتراطات الصحية.\n- في حال وجود عيب مصنعي أو خطأ في الطلب من طرفنا، نتحمل كامل مصاريف الشحن للإرجاع والاستبدال.\n- يتم استرداد المبلغ المدفوع بنفس طريقة الدفع أو كحوالة بريدية أو محفظة إلكترونية بعد فحص المنتج والتأكد من سلامته.",
+    policy_returns_content: "صحتك ورضاك هما أولويتنا القصوى في The VitaHub. لذلك نقدم سياسة إرجاع واستبدال مرنة:\n\n- يحق للعميل طلب إرجاع أو استبدال المنتج خلال 7 أيام من تاريخ الاستلام.\n- يشترط أن يكون المنتج في حالته الأصلية، غير مفتوح، ومغلفاً بغلافه الأصلي مع وجود ملصق الأمان وسليماً بالكامل.\n- المنتجات المفتوحة أو المستخدمة لا يمكن إرجاعها أو استبدالها حفاظاً على السلامة العامة والاشتراطات الصحية.\n- في حال وجود عيب مصنعي أو خطأ في الطلب من طرفنا، نتحمل كامل مصاريف الشحن للإرجاع والاستبدال.\n- يتم استرداد المبلغ المدفوع بنفس طريقة الدفع أو كحوالة بريدية أو محفظة إلكترونية بعد فحص المنتج والتأكد من سلامته.",
   },
   en: {
     // Navigation
@@ -320,7 +320,7 @@ export const translations: Record<string, Record<string, string>> = {
     footer_contact_us: "Contact Us",
     footer_newsletter_placeholder: "Your Email Address",
     footer_subscribe: "Subscribe",
-    footer_rights: "All rights reserved to Vitamins HUB © 2026",
+    footer_rights: "All rights reserved to The VitaHub © 2026",
     footer_about_us: "About Us",
     footer_shipping: "Shipping Policy",
     footer_returns: "Returns Policy",
@@ -363,13 +363,13 @@ export const translations: Record<string, Record<string, string>> = {
     back_to_top: "Back to Top",
 
     // About Page
-    about_title: "About Vitamins HUB | Premier Vitamins & Supplements Store in Egypt",
-    about_desc: "Learn about the story of Vitamins HUB, the leading store for 100% original imported dietary supplements, vitamins, and proteins in Egypt.",
+    about_title: "About The VitaHub | Premier Vitamins & Supplements Store in Egypt",
+    about_desc: "Learn about the story of The VitaHub, the leading store for 100% original imported dietary supplements, vitamins, and proteins in Egypt.",
     about_badge: "About Us",
-    about_heading: "Our Story at Vitamins HUB",
+    about_heading: "Our Story at The VitaHub",
     about_subheading: "Our passion is to empower you to live a healthy, active life by providing trusted, world-class nutritional solutions.",
     about_content_title: "The premier and most trusted source for original supplements in Egypt.",
-    about_p1: "Vitamins HUB was founded to bridge the massive gap in the Egyptian supplement market, where many suffer from the spread of counterfeit and unknown-source products. We are here to give you absolute peace of mind.",
+    about_p1: "The VitaHub was founded to bridge the massive gap in the Egyptian supplement market, where many suffer from the spread of counterfeit and unknown-source products. We are here to give you absolute peace of mind.",
     about_p2: "We don't just provide premium supplements; we build an integrated healthy community supported by accurate scientific knowledge and medical advice to help you understand your body's needs precisely.",
     about_badge_100: "100% Original",
     about_badge_100_desc: "Rigorous ongoing inspection",
@@ -383,8 +383,8 @@ export const translations: Record<string, Record<string, string>> = {
     about_pillar3_desc: "Our medical and sports team is always ready to offer free consultations to help you safely achieve your physical goals.",
 
     // BMI Page
-    bmi_title: "Smart Body Mass Index (BMI) Calculator | Vitamins HUB",
-    bmi_desc: "Calculate your BMI accurately and learn your ideal weight with personalized health tips from Vitamins HUB medical team.",
+    bmi_title: "Smart Body Mass Index (BMI) Calculator | The VitaHub",
+    bmi_desc: "Calculate your BMI accurately and learn your ideal weight with personalized health tips from The VitaHub medical team.",
     bmi_badge: "Smart Medical Tool",
     bmi_heading: "Weight & BMI Calculator",
     bmi_intro: "Enter your details to get an instant analysis of your body mass index and personalized tips to improve your health.",
@@ -411,7 +411,7 @@ export const translations: Record<string, Record<string, string>> = {
     bmi_obese_tip: "It is essential to consult a doctor or nutritionist for a customized diet. Focus on reducing starches, sugars, and saturated fats, and start with light exercises like walking. Metabolism support and appetite reduction supplements may be helpful.",
 
     // Cart Page
-    cart_title: "Shopping Cart | Vitamins HUB",
+    cart_title: "Shopping Cart | The VitaHub",
     cart_empty: "Your shopping cart is currently empty",
     cart_empty_desc: "Browse our premium products and add the best vitamins and supplements to your cart now!",
     cart_back_shopping: "Go to Store",
@@ -427,7 +427,7 @@ export const translations: Record<string, Record<string, string>> = {
     cart_clear: "Clear Cart",
 
     // Checkout Page
-    checkout_title: "Checkout | Vitamins HUB",
+    checkout_title: "Checkout | The VitaHub",
     checkout_heading: "Checkout",
     checkout_billing_details: "Shipping & Delivery Details",
     checkout_full_name: "Full Name",
@@ -450,8 +450,8 @@ export const translations: Record<string, Record<string, string>> = {
     checkout_validation_error: "Please fill in all required fields correctly.",
 
     // FAQ Page
-    faq_title: "FAQ | Vitamins HUB",
-    faq_desc: "Answers to common questions about product quality, payment methods, delivery, and return/exchange policies at Vitamins HUB.",
+    faq_title: "FAQ | The VitaHub",
+    faq_desc: "Answers to common questions about product quality, payment methods, delivery, and return/exchange policies at The VitaHub.",
     faq_badge: "FAQ",
     faq_heading: "Frequently Asked Questions",
     faq_sub: "Everything you want to know about our services and products in one place.",
@@ -465,8 +465,8 @@ export const translations: Record<string, Record<string, string>> = {
     faq_a4: "Yes, we provide excellent medical and sports support through a specialized team of doctors and nutritionists to help you choose the right vitamins and supplements for your goals and needs free of charge.",
 
     // Health Tips Page
-    tips_title: "Premium Health & Medical Tips | Vitamins HUB",
-    tips_desc: "Scientific articles and simplified health tips on proper nutrition, physical exercise, and dietary supplements supervised by Vitamins HUB team.",
+    tips_title: "Premium Health & Medical Tips | The VitaHub",
+    tips_desc: "Scientific articles and simplified health tips on proper nutrition, physical exercise, and dietary supplements supervised by The VitaHub team.",
     tips_badge: "Medical & Health Blog",
     tips_heading: "Health Tips & Guidelines",
     tips_sub: "We share the latest medical knowledge and reliable studies to help you live a better life.",
@@ -475,7 +475,7 @@ export const translations: Record<string, Record<string, string>> = {
     tips_search: "Search articles...",
 
     // Login / Register / Forgot
-    login_title: "Login / Sign Up | Vitamins HUB",
+    login_title: "Login / Sign Up | The VitaHub",
     login_heading: "Login",
     login_email: "Email Address",
     login_password: "Password",
@@ -487,21 +487,21 @@ export const translations: Record<string, Record<string, string>> = {
     register_btn: "Register Account",
     register_have_account: "Already have an account?",
     register_login_now: "Log in now",
-    forgot_title: "Forgot Password | Vitamins HUB",
+    forgot_title: "Forgot Password | The VitaHub",
     forgot_heading: "Recover Password",
     forgot_desc: "Enter your registered email address and we will send you a link to reset your password.",
     forgot_btn: "Send Recovery Link",
     forgot_back: "Back to Login",
 
     // Offers Page
-    offers_title: "Best Offers & Exclusive Discounts | Vitamins HUB",
+    offers_title: "Best Offers & Exclusive Discounts | The VitaHub",
     offers_desc: "Shop the best dietary supplements and vitamins with the strongest exclusive offers in Egypt. Daily updates and free gifts.",
     offers_badge: "Exclusive Offers",
     offers_heading: "Latest Offers & Discounts",
     offers_sub: "Save more with our bundles and exclusive limited-time offers.",
 
     // Products / Category Page
-    products_title: "All Products & Supplements | Vitamins HUB",
+    products_title: "All Products & Supplements | The VitaHub",
     products_desc: "Shop the best imported original dietary supplements, proteins, and vitamins in Egypt. Rigorous packaging and fast delivery.",
     products_search_results: "Search results for:",
     products_all: "All Products",
@@ -535,7 +535,7 @@ export const translations: Record<string, Record<string, string>> = {
     prod_specs_empty: "No additional specifications available for this product.",
 
     // Profile Page
-    profile_title: "My Account | Vitamins HUB",
+    profile_title: "My Account | The VitaHub",
     profile_heading: "Personal Dashboard",
     profile_orders: "Order History",
     profile_details: "Account Details",
@@ -549,8 +549,8 @@ export const translations: Record<string, Record<string, string>> = {
     profile_email: "Email:",
 
     // Tracking Page
-    track_title: "Track Your Order Status | Vitamins HUB",
-    track_desc: "Enter the phone number used in the order to track the shipping and delivery status of your Vitamins HUB order instantly.",
+    track_title: "Track Your Order Status | The VitaHub",
+    track_desc: "Enter the phone number used in the order to track the shipping and delivery status of your The VitaHub order instantly.",
     track_badge: "Smart Tracking Tool",
     track_heading: "Track Your Order",
     track_sub: "Enter the phone number you registered the order with to view the shipping status and current details instantly.",
@@ -567,19 +567,19 @@ export const translations: Record<string, Record<string, string>> = {
     track_order_status_cancelled: "Order Cancelled",
 
     // Wishlist Page
-    wishlist_title: "Your Wishlist | Vitamins HUB",
-    wishlist_desc: "View your favorite supplements and vitamins saved in Vitamins HUB and add them directly to your shopping cart.",
+    wishlist_title: "Your Wishlist | The VitaHub",
+    wishlist_desc: "View your favorite supplements and vitamins saved in The VitaHub and add them directly to your shopping cart.",
     wishlist_heading: "My Wishlist",
     wishlist_empty: "Your wishlist is currently empty",
     wishlist_empty_desc: "Save your favorite products while shopping to find them here and order them easily at any time!",
 
     // Policies (Shipping / Returns)
-    policy_shipping_title: "Shipping & Delivery Policy | Vitamins HUB",
+    policy_shipping_title: "Shipping & Delivery Policy | The VitaHub",
     policy_shipping_heading: "Shipping & Delivery Policy",
-    policy_shipping_content: "At Vitamins HUB, we make sure to provide the fastest and easiest delivery experience for our customers in Egypt.\n\n- Shipping to Cairo and Giza takes 24-48 working hours.\n- Shipping to the rest of Egypt takes 2-4 working days.\n- Shipping cost varies by province and is detailed on the checkout page.\n- We offer fully free shipping for orders exceeding 2000 EGP.\n- Products are stored and packaged professionally to guarantee they reach you in the safest and highest quality condition.",
-    policy_returns_title: "Returns & Exchange Policy | Vitamins HUB",
+    policy_shipping_content: "At The VitaHub, we make sure to provide the fastest and easiest delivery experience for our customers in Egypt.\n\n- Shipping to Cairo and Giza takes 24-48 working hours.\n- Shipping to the rest of Egypt takes 2-4 working days.\n- Shipping cost varies by province and is detailed on the checkout page.\n- We offer fully free shipping for orders exceeding 2000 EGP.\n- Products are stored and packaged professionally to guarantee they reach you in the safest and highest quality condition.",
+    policy_returns_title: "Returns & Exchange Policy | The VitaHub",
     policy_returns_heading: "Returns & Exchange Policy",
-    policy_returns_content: "Your health and satisfaction are our top priority at Vitamins HUB. That's why we offer a flexible return and exchange policy:\n\n- Customers have the right to request a return or exchange within 7 days of receipt.\n- The product must be in its original condition, unopened, in its original packaging with safety seals intact.\n- Opened or used products cannot be returned or exchanged due to health and safety regulations.\n- If there is a manufacturing defect or an error in the order on our part, we cover all return and exchange shipping costs.\n- Refunds are processed to the original payment method, postal transfer, or mobile wallet after checking product integrity.",
+    policy_returns_content: "Your health and satisfaction are our top priority at The VitaHub. That's why we offer a flexible return and exchange policy:\n\n- Customers have the right to request a return or exchange within 7 days of receipt.\n- The product must be in its original condition, unopened, in its original packaging with safety seals intact.\n- Opened or used products cannot be returned or exchanged due to health and safety regulations.\n- If there is a manufacturing defect or an error in the order on our part, we cover all return and exchange shipping costs.\n- Refunds are processed to the original payment method, postal transfer, or mobile wallet after checking product integrity.",
   }
 };
 

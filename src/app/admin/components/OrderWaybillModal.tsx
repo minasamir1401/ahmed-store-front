@@ -20,7 +20,7 @@ export default function OrderWaybillModal({ order, onClose }: any) {
         <div className="p-6 space-y-4 print:p-0" dir="rtl">
           <div className="flex items-center justify-between border-b border-slate-300 pb-3">
             <div>
-              <div className="text-lg font-black text-emerald-600">Vitamins HUB</div>
+              <div className="text-lg font-black text-emerald-600">The VitaHub</div>
               <div className="text-[8px] font-black text-slate-400 uppercase tracking-wider mt-0.5">مكملات غذائية وفيتامينات أصلية</div>
             </div>
             <div className="text-right">
@@ -34,7 +34,7 @@ export default function OrderWaybillModal({ order, onClose }: any) {
           <div className="grid grid-cols-2 gap-3 border border-slate-200 rounded-xl overflow-hidden text-[11px] leading-normal">
             <div className="p-3 bg-slate-50/50 space-y-1">
               <span className="text-[8px] font-black text-slate-400 uppercase tracking-wider block">المرسل (الشاحن):</span>
-              <div className="font-black text-slate-800">Vitamins HUB</div>
+              <div className="font-black text-slate-800">The VitaHub</div>
               <div className="text-[9px] text-slate-500 font-medium">القاهرة، جمهورية مصر العربية</div>
               <div className="text-[9px] text-slate-500 font-medium">هاتف: 01270029230</div>
             </div>

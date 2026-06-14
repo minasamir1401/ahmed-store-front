@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     
     if (!tip) {
       return {
-        title: 'المقال غير موجود | Vitamins HUB',
+        title: 'المقال غير موجود | The VitaHub',
         description: 'المقال الذي تبحث عنه غير متوفر حالياً.',
       }
     }
@@ -43,13 +43,13 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     }
 
     return {
-      title: `${post.title} | Vitamins HUB`,
+      title: `${post.title} | The VitaHub`,
       description: post.excerpt,
       alternates: {
         canonical: `/health-tips/${id}`,
       },
       openGraph: {
-        title: `${post.title} | Vitamins HUB`,
+        title: `${post.title} | The VitaHub`,
         description: post.excerpt,
         type: 'article',
         images: [{ url: post.image }]
@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     }
   } catch (err) {
     return {
-      title: 'المقال غير موجود | Vitamins HUB',
+      title: 'المقال غير موجود | The VitaHub',
       description: 'المقال الذي تبحث عنه غير متوفر حالياً.',
     }
   }

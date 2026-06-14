@@ -1,10 +1,10 @@
-const BACKEND_URL = process.env.BACKEND_URL || 'https://ahmed-api.red-gate.tech';
+const BACKEND_URL = process.env.BACKEND_URL || 'https://api.the-vitahub.com';
 
 const nextConfig = {
   output: 'standalone',
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: 'ahmed-api.red-gate.tech' },
+      { protocol: 'https', hostname: 'api.the-vitahub.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'placehold.co' },
       { protocol: 'https', hostname: 'logo.clearbit.com' },

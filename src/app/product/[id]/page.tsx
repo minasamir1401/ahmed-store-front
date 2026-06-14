@@ -31,7 +31,7 @@ const productSeoTitle = (product: any) => {
 }
 
 const productSeoDescription = (product: any) => {
-  return product.seoDesc || product.seoDescEn || product.desc || product.descEn || `اشتري ${product.title} من Vitamins HUB مع توصيل سريع ومنتجات أصلية.`
+  return product.seoDesc || product.seoDescEn || product.desc || product.descEn || `اشتري ${product.title} من The VitaHub مع توصيل سريع ومنتجات أصلية.`
 }
 
 // Elite dynamic SEO metadata generation on the server
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   
   if (!product) {
     return {
-      title: 'المنتج غير موجود | Vitamins HUB',
+      title: 'المنتج غير موجود | The VitaHub',
       description: 'المنتج الذي تبحث عنه غير متوفر حالياً.',
     }
   }
@@ -68,7 +68,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       title,
       description,
       url: canonicalUrl,
-      siteName: 'Vitamins HUB',
+      siteName: 'The VitaHub',
       locale: 'ar_EG',
       type: 'website',
       images: [
@@ -121,7 +121,7 @@ export default async function ProductPage({ params }: PageParams) {
       "mpn": product.id,
       "brand": {
         "@type": "Brand",
-        "name": product.brand?.name || 'Vitamins HUB'
+        "name": product.brand?.name || 'The VitaHub'
       },
       "offers": {
         "@type": "Offer",
@@ -133,7 +133,7 @@ export default async function ProductPage({ params }: PageParams) {
         "availability": "https://schema.org/InStock",
         "seller": {
           "@type": "Organization",
-          "name": "Vitamins HUB"
+          "name": "The VitaHub"
         }
       }
     }

@@ -3,8 +3,8 @@ import type { Metadata } from 'next'
 import AboutPageClient from './AboutPageClient'
 
 export const metadata: Metadata = {
-  title: 'عن Vitamins HUB | متجر المكملات الغذائية والأصلية الأول في مصر',
-  description: 'تعرف على قصة Vitamins HUB، متجر المكملات الغذائية والفيتامينات والبروتينات المستوردة والأصلية 100% في مصر. رؤيتنا، قيمنا، والتزامنا بصحتك ورشاقتك.',
+  title: 'عن The VitaHub | متجر المكملات الغذائية والأصلية الأول في مصر',
+  description: 'تعرف على قصة The VitaHub، متجر المكملات الغذائية والفيتامينات والبروتينات المستوردة والأصلية 100% في مصر. رؤيتنا، قيمنا، والتزامنا بصحتك ورشاقتك.',
   alternates: {
     canonical: '/about',
   }
@@ -22,13 +22,13 @@ export default async function AboutPage() {
         "@type": "AboutPage",
         "@id": `${siteUrl}/about/#webpage`,
         "url": `${siteUrl}/about`,
-        "name": "عن Vitamins HUB | قصة نجاحنا وقيمنا الصحية",
-        "description": "تعرف على Vitamins HUB، المتجر الرائد للمكملات الغذائية المستوردة الأصلية في مصر."
+        "name": "عن The VitaHub | قصة نجاحنا وقيمنا الصحية",
+        "description": "تعرف على The VitaHub، المتجر الرائد للمكملات الغذائية المستوردة الأصلية في مصر."
       },
       {
         "@type": "Organization",
         "@id": `${siteUrl}/#organization`,
-        "name": "Vitamins HUB",
+        "name": "The VitaHub",
         "url": `${siteUrl}/`,
         "logo": {
           "@type": "ImageObject",

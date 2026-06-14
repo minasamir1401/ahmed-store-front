@@ -47,7 +47,7 @@ export default function BrandsPage() {
   }
 
   useEffect(() => {
-    document.title = language === 'ar' ? 'الماركات التجارية | Vitamins HUB' : 'Brands | Vitamins HUB'
+    document.title = language === 'ar' ? 'الماركات التجارية | The VitaHub' : 'Brands | The VitaHub'
     fetchBrands()
   }, [language])
 

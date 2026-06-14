@@ -20,7 +20,7 @@ export default function HealthTipsPage() {
   }, [posts, searchQuery])
 
   React.useEffect(() => {
-    const BACKEND_API = process.env.NEXT_PUBLIC_API_URL || 'https://ahmed-api.red-gate.tech'
+    const BACKEND_API = process.env.NEXT_PUBLIC_API_URL || 'https://api.the-vitahub.com'
     fetch(BACKEND_API + '/api/medical-tips')
       .then(res => res.json())
       .then(data => {
@@ -63,8 +63,8 @@ export default function HealthTipsPage() {
               </div>
             <p className="text-gray-500 max-w-2xl mx-auto">
               {language === 'ar' 
-                ? 'نصائح صحية، معلومات عن المنتجات، وكل ما يهم صحتك ونشاطك البدني من خبراء Vitamins HUB' 
-                : 'Health tips, product information, and everything about your health and physical fitness from Vitamins HUB experts'}
+                ? 'نصائح صحية، معلومات عن المنتجات، وكل ما يهم صحتك ونشاطك البدني من خبراء The VitaHub' 
+                : 'Health tips, product information, and everything about your health and physical fitness from The VitaHub experts'}
             </p>
           </div>
         </section>

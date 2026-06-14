@@ -1,4 +1,4 @@
-// Global tracking utilities for Vitamins HUB
+// Global tracking utilities for The VitaHub
 // Supports Meta Pixel (fbq), Google Analytics (gtag), TikTok Pixel (ttq), and Snapchat Pixel (snaptr)
 
 export interface TrackedProduct {

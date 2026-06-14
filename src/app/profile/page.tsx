@@ -277,8 +277,8 @@ export default function ProfilePage() {
                 <div className="mt-6 pt-6 border-t border-white/20">
                   <p className="text-[10px] font-bold opacity-70">
                     {language === 'ar'
-                      ? 'شكراً لثقتك في عائلة Vitamins HUB. نحن نسعى دائماً لتقديم الأفضل لصحتك ورشاقتك.'
-                      : 'Thank you for your trust in the Vitamins HUB family. We always strive to deliver the best for your health and fitness.'
+                      ? 'شكراً لثقتك في عائلة The VitaHub. نحن نسعى دائماً لتقديم الأفضل لصحتك ورشاقتك.'
+                      : 'Thank you for your trust in the The VitaHub family. We always strive to deliver the best for your health and fitness.'
                     }
                   </p>
                 </div>

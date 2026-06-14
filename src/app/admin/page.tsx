@@ -242,7 +242,7 @@ export default function AdminDashboard() {
           </div>
           <div className="min-w-0">
             <h1 className="text-base font-black text-white leading-none">لوحة التحكم</h1>
-            <span className="text-[9px] text-emerald-400 font-bold block mt-1">Vitamins HUB • Premium Healthcare Control</span>
+            <span className="text-[9px] text-emerald-400 font-bold block mt-1">The VitaHub • Premium Healthcare Control</span>
           </div>
         </div>
         <button onClick={handleLogout} className="text-xs font-black text-red-400 bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-xl hover:bg-red-500 hover:text-white transition-all cursor-pointer">خروج</button>
@@ -563,7 +563,7 @@ export default function AdminDashboard() {
               {/* Waybill Header */}
               <div className="flex items-center justify-between border-b border-slate-300 pb-3">
                 <div>
-                  <div className="text-lg font-black text-emerald-600">Vitamins HUB</div>
+                  <div className="text-lg font-black text-emerald-600">The VitaHub</div>
                   <div className="text-[8px] font-black text-slate-400 uppercase tracking-wider mt-0.5">مكملات غذائية وفيتامينات أصلية</div>
                 </div>
                 <div className="text-right">
@@ -581,7 +581,7 @@ export default function AdminDashboard() {
                 {/* Shipper */}
                 <div className="p-3 bg-slate-50/50 space-y-1">
                   <span className="text-[8px] font-black text-slate-400 uppercase tracking-wider block">المرسل (الشاحن):</span>
-                  <div className="font-black text-slate-800">Vitamins HUB</div>
+                  <div className="font-black text-slate-800">The VitaHub</div>
                   <div className="text-[9px] text-slate-500 font-medium">القاهرة، جمهورية مصر العربية</div>
                   <div className="text-[9px] text-slate-500 font-medium">هاتف: 01270029230</div>
                 </div>

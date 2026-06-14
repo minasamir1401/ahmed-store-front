@@ -18,7 +18,7 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1 space-y-3">
             {/* Logo */}
             <div className="flex items-center" dir="ltr">
-              <img src="/logo-footer.jpg" alt="Vitamins Hub Logo" className="h-20 w-auto object-contain" />
+              <img src="/logo-footer.jpg" alt="The VitaHub Logo" className="h-20 w-auto object-contain" />
             </div>
             <p className="text-xs text-gray-600 leading-relaxed">
               {t('footer_about_desc')}

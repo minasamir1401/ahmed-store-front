@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   
   if (!brand) {
     return {
-      title: 'الشركة غير موجودة | Vitamins HUB',
+      title: 'الشركة غير موجودة | The VitaHub',
       description: 'الشركة التي تبحث عنها غير متوفرة حالياً.',
     }
   }
@@ -42,13 +42,13 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const siteUrl = await getServerSiteUrl()
 
   return {
-    title: `مكملات وفيتامينات شركة ${brand.name} الأصلية | Vitamins HUB`,
+    title: `مكملات وفيتامينات شركة ${brand.name} الأصلية | The VitaHub`,
     description: `تسوق جميع منتجات ومكملات شركة ${brand.name} الأصلية 100% في مصر. بروتينات، فيتامينات، وأقوى حوارق الدهون من ${brand.name} مع توصيل سريع.`,
     alternates: {
       canonical: `/brands/${resolvedParams.id}`,
     },
     openGraph: {
-      title: `مكملات وفيتامينات شركة ${brand.name} الأصلية | Vitamins HUB`,
+      title: `مكملات وفيتامينات شركة ${brand.name} الأصلية | The VitaHub`,
       description: `تسوق جميع منتجات ومكملات شركة ${brand.name} الأصلية 100% في مصر.`,
       url: `${siteUrl}/brands/${resolvedParams.id}`,
       type: 'website',
@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     },
     twitter: {
       card: 'summary',
-      title: `مكملات وفيتامينات شركة ${brand.name} الأصلية | Vitamins HUB`,
+      title: `مكملات وفيتامينات شركة ${brand.name} الأصلية | The VitaHub`,
       description: `تسوق جميع منتجات ومكملات شركة ${brand.name} الأصلية 100% في مصر.`,
       images: [brand.image || '/logo-v2.png'],
     }
@@ -82,7 +82,7 @@ export default async function BrandDetailPage({ params }: PageParams) {
       "@id": `${siteUrl}/brands/${resolvedParams.id}/#collection`,
       "name": `مكملات وفيتامينات شركة ${brand.name} الأصلية`,
       "url": `${siteUrl}/brands/${resolvedParams.id}`,
-      "description": `مجموعة منتجات ومكملات شركة ${brand.name} المتاحة للشراء في مصر عبر متجر Vitamins HUB.`,
+      "description": `مجموعة منتجات ومكملات شركة ${brand.name} المتاحة للشراء في مصر عبر متجر The VitaHub.`,
       "about": {
         "@type": "Brand",
         "name": brand.name,

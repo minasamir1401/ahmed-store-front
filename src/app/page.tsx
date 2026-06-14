@@ -207,7 +207,7 @@ export default function Home() {
                         <img 
                           src={slides[currentSlide].image || 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=700&q=80'} 
                           className="w-full h-full object-cover" 
-                          alt={`${translate(slides[currentSlide]?.title || 'Vitamins HUB')} - Vitamins HUB`}
+                          alt={`${translate(slides[currentSlide]?.title || 'The VitaHub')} - The VitaHub`}
                         />
                         <div className={`absolute inset-0 z-1 ${
                           language === 'ar'
@@ -273,7 +273,7 @@ export default function Home() {
                       transition={{ duration: 1 }}
                       src={hero.image} 
                       className="w-full h-full object-cover" 
-                      alt={`${translate(hero.title)} - Vitamins HUB`}
+                      alt={`${translate(hero.title)} - The VitaHub`}
                     />
                     <div className={`absolute inset-0 z-1 ${
                       language === 'ar'

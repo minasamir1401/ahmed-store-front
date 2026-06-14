@@ -339,7 +339,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
   useEffect(() => {
     if (product) {
       const displayTitle = getLocalizedValue(language, product.title, product.titleEn, translate);
-      document.title = `${displayTitle} | Vitamins HUB`;
+      document.title = `${displayTitle} | The VitaHub`;
       
       trackViewContent({
         id: product.id,
@@ -1061,7 +1061,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                 </motion.div>
               )}
 
-              {/* ── Vitamins HUB Golden Guarantees ── */}
+              {/* ── The VitaHub Golden Guarantees ── */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -1071,7 +1071,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
               >
                 <div className="flex items-center gap-2">
                   <span className="w-1.5 h-6 bg-primary rounded-full inline-block" />
-                  <h3 className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-widest">{language === 'ar' ? 'ضمانات الجودة في Vitamins HUB' : 'Quality Guarantees at Vitamins HUB'}</h3>
+                  <h3 className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-widest">{language === 'ar' ? 'ضمانات الجودة في The VitaHub' : 'Quality Guarantees at The VitaHub'}</h3>
                 </div>
 
                 <div className="space-y-4">

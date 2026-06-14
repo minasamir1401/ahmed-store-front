@@ -19,9 +19,9 @@ export default function BrandDetailPageClient({ params, initialBrand, initialPro
 
   useEffect(() => {
     if (brand) {
-      document.title = `${translate(brand.name)} | Vitamins HUB`
+      document.title = `${translate(brand.name)} | The VitaHub`
     } else {
-      document.title = language === 'ar' ? 'الشركة غير موجودة | Vitamins HUB' : 'Brand Not Found | Vitamins HUB'
+      document.title = language === 'ar' ? 'الشركة غير موجودة | The VitaHub' : 'Brand Not Found | The VitaHub'
     }
   }, [brand, language, translate])
 

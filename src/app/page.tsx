@@ -521,8 +521,9 @@ export default function Home() {
                     language === 'ar' ? 'ar-EG' : 'en-US', 
                     { year: 'numeric', month: 'long', day: 'numeric' }
                   )
-                  const postTitle = translate(post.title)
-                  const postExcerpt = post.content ? translate(post.content).substring(0, 120) + '...' : ''
+                  const postTitle = language === 'en' ? (post.titleEn || translate(post.title)) : post.title
+                  const postContent = language === 'en' ? (post.contentEn || translate(post.content)) : post.content
+                  const postExcerpt = postContent ? postContent.substring(0, 120) + '...' : ''
                   const postImage = post.image || 'https://placehold.co/800x400/e8f0ed/2e7d5e?text=Health+Tip'
 
                   return (

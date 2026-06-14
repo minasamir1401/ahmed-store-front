@@ -1,6 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2, CheckCircle2, Upload, Plus, Trash2 } from 'lucide-react';
 
+const getLocalizedValue = (value: string) => {
+  if (!value) return { ar: '', en: '' };
+  const trimmed = value.trim();
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      return {
+        ar: parsed.ar || '',
+        en: parsed.en || ''
+      };
+    } catch (e) {}
+  }
+  return { ar: value, en: '' };
+};
+
+const makeLocalizedValue = (ar: string, en: string) => {
+  return JSON.stringify({ ar: ar.trim(), en: en.trim() });
+};
+
 export default function HeroTab(props: any) {
   const { 
     formData, setFormData, handleSave, loading, uploading, handleFileUpload
@@ -74,6 +93,14 @@ export default function HeroTab(props: any) {
     setSlides(newSlides);
   };
 
+  const handleSlideChangeLocalized = (index: number, field: string, subfield: 'ar' | 'en', val: string) => {
+    const newSlides = [...slides];
+    const currentLoc = getLocalizedValue(newSlides[index][field]);
+    currentLoc[subfield] = val;
+    newSlides[index][field] = JSON.stringify(currentLoc);
+    setSlides(newSlides);
+  };
+
   const handleSlideImageUpload = async (file: File, slideIndex: number) => {
     if (!file) return;
     setSlideUploading(slideIndex);
@@ -142,14 +169,26 @@ export default function HeroTab(props: any) {
                   <span className="text-xs font-bold text-slate-500">إعدادات الشريحة</span>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-slate-400 block mr-1">العنوان الرئيسي</label>
-                  <input type="text" value={slide.title || ''} onChange={e => handleSlideChange(index, 'title', e.target.value)} className="w-full bg-white focus:bg-white border border-slate-200 focus:border-emerald-500/50 rounded-2xl py-3 px-4 text-xs font-bold outline-none transition-all text-slate-700" placeholder="مثال: العناية تبدأ من هنا" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-slate-400 block mr-1">العنوان الرئيسي (عربي)</label>
+                    <input type="text" value={getLocalizedValue(slide.title).ar} onChange={e => handleSlideChangeLocalized(index, 'title', 'ar', e.target.value)} className="w-full bg-white focus:bg-white border border-slate-200 focus:border-emerald-500/50 rounded-2xl py-3 px-4 text-xs font-bold outline-none transition-all text-slate-700" placeholder="مثال: العناية تبدأ من هنا" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-indigo-400 block mr-1">العنوان الرئيسي (إنجليزي)</label>
+                    <input type="text" value={getLocalizedValue(slide.title).en} onChange={e => handleSlideChangeLocalized(index, 'title', 'en', e.target.value)} className="w-full bg-white focus:bg-white border border-slate-200 focus:border-indigo-500/50 rounded-2xl py-3 px-4 text-xs font-bold outline-none transition-all text-slate-705 dir-ltr text-left" placeholder="English Title..." />
+                  </div>
                 </div>
                 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-slate-400 block mr-1">العنوان الفرعي</label>
-                  <input type="text" value={slide.subtitle || ''} onChange={e => handleSlideChange(index, 'subtitle', e.target.value)} className="w-full bg-white focus:bg-white border border-slate-200 focus:border-emerald-500/50 rounded-2xl py-3 px-4 text-xs font-bold outline-none transition-all text-slate-700" placeholder="مثال: مجموعة مختارة من أفضل المنتجات" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-slate-400 block mr-1">العنوان الفرعي (عربي)</label>
+                    <input type="text" value={getLocalizedValue(slide.subtitle).ar} onChange={e => handleSlideChangeLocalized(index, 'subtitle', 'ar', e.target.value)} className="w-full bg-white focus:bg-white border border-slate-200 focus:border-emerald-500/50 rounded-2xl py-3 px-4 text-xs font-bold outline-none transition-all text-slate-700" placeholder="مثال: مجموعة مختارة من أفضل المنتجات" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-indigo-400 block mr-1">العنوان الفرعي (إنجليزي)</label>
+                    <input type="text" value={getLocalizedValue(slide.subtitle).en} onChange={e => handleSlideChangeLocalized(index, 'subtitle', 'en', e.target.value)} className="w-full bg-white focus:bg-white border border-slate-200 focus:border-indigo-500/50 rounded-2xl py-3 px-4 text-xs font-bold outline-none transition-all text-slate-705 dir-ltr text-left" placeholder="English Subtitle..." />
+                  </div>
                 </div>
                 
                 <div className="space-y-1">
@@ -168,10 +207,14 @@ export default function HeroTab(props: any) {
                   {slide.image && <img src={slide.image} className="mt-2 h-24 w-full object-cover rounded-2xl border border-slate-200" alt="Slide Preview" />}
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-400 block mr-1">نص الزر</label>
-                    <input type="text" value={slide.buttonText || ''} onChange={e => handleSlideChange(index, 'buttonText', e.target.value)} className="w-full bg-white focus:bg-white border border-slate-200 focus:border-emerald-500/50 rounded-2xl py-3 px-4 text-xs font-bold outline-none transition-all text-slate-700" placeholder="مثال: تسوق الآن" />
+                    <label className="text-[10px] font-black text-slate-400 block mr-1">نص الزر (عربي)</label>
+                    <input type="text" value={getLocalizedValue(slide.buttonText).ar} onChange={e => handleSlideChangeLocalized(index, 'buttonText', 'ar', e.target.value)} className="w-full bg-white focus:bg-white border border-slate-200 focus:border-emerald-500/50 rounded-2xl py-3 px-4 text-xs font-bold outline-none transition-all text-slate-700" placeholder="مثال: تسوق الآن" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-indigo-400 block mr-1">نص الزر (إنجليزي)</label>
+                    <input type="text" value={getLocalizedValue(slide.buttonText).en} onChange={e => handleSlideChangeLocalized(index, 'buttonText', 'en', e.target.value)} className="w-full bg-white focus:bg-white border border-slate-200 focus:border-indigo-500/50 rounded-2xl py-3 px-4 text-xs font-bold outline-none transition-all text-slate-705 dir-ltr text-left" placeholder="e.g. Shop Now" />
                   </div>
                   <div className="space-y-1">
                     <label className="text-[10px] font-black text-slate-400 block mr-1">رابط الزر</label>
@@ -192,8 +235,29 @@ export default function HeroTab(props: any) {
             {/* Box 1 */}
             <div className="space-y-3">
                <h5 className="text-[10px] font-black text-emerald-600 tracking-wider">البانر الجانبي العلوي (العروض والخصومات)</h5>
-               <input type="text" placeholder="عنوان البانر" value={formData.side1Title || ''} onChange={e => setFormData({...formData, side1Title: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold" />
-               <input type="text" placeholder="الوصف والخصم" value={formData.side1Desc || ''} onChange={e => setFormData({...formData, side1Desc: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold" />
+               
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-1">
+                   <label className="text-[9px] font-black text-slate-400 block mr-1">عنوان البانر (عربي)</label>
+                   <input type="text" placeholder="عنوان البانر عربي" value={getLocalizedValue(formData.side1Title).ar} onChange={e => setFormData({...formData, side1Title: makeLocalizedValue(e.target.value, getLocalizedValue(formData.side1Title).en)})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold" />
+                 </div>
+                 <div className="space-y-1">
+                   <label className="text-[9px] font-black text-indigo-400 block mr-1">عنوان البانر (إنجليزي)</label>
+                   <input type="text" placeholder="Banner Title English" value={getLocalizedValue(formData.side1Title).en} onChange={e => setFormData({...formData, side1Title: makeLocalizedValue(getLocalizedValue(formData.side1Title).ar, e.target.value)})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold dir-ltr text-left" />
+                 </div>
+               </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-1">
+                   <label className="text-[9px] font-black text-slate-400 block mr-1">الوصف والخصم (عربي)</label>
+                   <input type="text" placeholder="الوصف والخصم عربي" value={getLocalizedValue(formData.side1Desc).ar} onChange={e => setFormData({...formData, side1Desc: makeLocalizedValue(e.target.value, getLocalizedValue(formData.side1Desc).en)})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold" />
+                 </div>
+                 <div className="space-y-1">
+                   <label className="text-[9px] font-black text-indigo-400 block mr-1">الوصف والخصم (إنجليزي)</label>
+                   <input type="text" placeholder="Description & Discount English" value={getLocalizedValue(formData.side1Desc).en} onChange={e => setFormData({...formData, side1Desc: makeLocalizedValue(getLocalizedValue(formData.side1Desc).ar, e.target.value)})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold dir-ltr text-left" />
+                 </div>
+               </div>
+
                <div className="space-y-1">
                   <label className="text-[9px] font-black text-slate-400 block mr-1">
                     رابط صورة البانر 1 <span className="text-emerald-500 font-bold ml-1">(المقاس الموصى به: 800x400)</span>
@@ -216,8 +280,29 @@ export default function HeroTab(props: any) {
             {/* Box 2 */}
             <div className="space-y-3">
                <h5 className="text-[10px] font-black text-emerald-600 tracking-wider">البانر الجانبي السفلي (الأقسام)</h5>
-               <input type="text" placeholder="عنوان البانر" value={formData.side2Title || ''} onChange={e => setFormData({...formData, side2Title: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold" />
-               <input type="text" placeholder="الوصف والخصم" value={formData.side2Desc || ''} onChange={e => setFormData({...formData, side2Desc: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold" />
+               
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-1">
+                   <label className="text-[9px] font-black text-slate-400 block mr-1">عنوان البانر (عربي)</label>
+                   <input type="text" placeholder="عنوان البانر عربي" value={getLocalizedValue(formData.side2Title).ar} onChange={e => setFormData({...formData, side2Title: makeLocalizedValue(e.target.value, getLocalizedValue(formData.side2Title).en)})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold" />
+                 </div>
+                 <div className="space-y-1">
+                   <label className="text-[9px] font-black text-indigo-400 block mr-1">عنوان البانر (إنجليزي)</label>
+                   <input type="text" placeholder="Banner Title English" value={getLocalizedValue(formData.side2Title).en} onChange={e => setFormData({...formData, side2Title: makeLocalizedValue(getLocalizedValue(formData.side2Title).ar, e.target.value)})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold dir-ltr text-left" />
+                 </div>
+               </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-1">
+                   <label className="text-[9px] font-black text-slate-400 block mr-1">الوصف والخصم (عربي)</label>
+                   <input type="text" placeholder="الوصف والخصم عربي" value={getLocalizedValue(formData.side2Desc).ar} onChange={e => setFormData({...formData, side2Desc: makeLocalizedValue(e.target.value, getLocalizedValue(formData.side2Desc).en)})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold" />
+                 </div>
+                 <div className="space-y-1">
+                   <label className="text-[9px] font-black text-indigo-400 block mr-1">الوصف والخصم (إنجليزي)</label>
+                   <input type="text" placeholder="Description & Discount English" value={getLocalizedValue(formData.side2Desc).en} onChange={e => setFormData({...formData, side2Desc: makeLocalizedValue(getLocalizedValue(formData.side2Desc).ar, e.target.value)})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold dir-ltr text-left" />
+                 </div>
+               </div>
+
                <div className="space-y-1">
                   <label className="text-[9px] font-black text-slate-400 block mr-1">
                     رابط صورة البانر 2 <span className="text-emerald-500 font-bold ml-1">(المقاس الموصى به: 800x400)</span>

@@ -74,9 +74,9 @@ export async function generateMetadata(): Promise<Metadata> {
       images: ["/logo-v2.png?v=5"],
     },
     icons: {
-      icon: "/logo-v2.png?v=5",
-      shortcut: "/logo-v2.png?v=5",
-      apple: "/logo-v2.png?v=5",
+      icon: "/logo-header.jpg",
+      shortcut: "/logo-header.jpg",
+      apple: "/logo-header.jpg",
     },
     verification: {
       google: "HQafwMSqWBmmU1Y1QVxosnsDRkdLHXUdt1KEZrTRIIc",

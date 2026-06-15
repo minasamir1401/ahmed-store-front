@@ -17,7 +17,7 @@ const getProduct = cache(async (id: string) => {
 
   const targetUrl = `${baseUrl.replace(/\/+$/, '')}/api/products/${id}`
   try {
-    const res = await fetch(targetUrl, { next: { revalidate: 3600 } })
+    const res = await fetch(targetUrl, { next: { revalidate: 60 } })
     if (res.ok) return await res.json()
   } catch (e) {
     console.error(`Failed server-side fetch for product ${id} from ${targetUrl}:`, e)

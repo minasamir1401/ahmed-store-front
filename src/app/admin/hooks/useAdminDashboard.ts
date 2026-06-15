@@ -529,7 +529,7 @@ export function useAdminDashboard() {
           model: 'google/gemma-4-31b-it:free',
           models: [
             'google/gemma-4-31b-it:free',
-            'qwen/qwen3-next-80b-a3b-instruct:free',
+            'openai/gpt-oss-120b:free',
             'openrouter/free'
           ],
           messages: [
@@ -673,7 +673,7 @@ export function useAdminDashboard() {
           model: 'google/gemma-4-31b-it:free',
           models: [
             'google/gemma-4-31b-it:free',
-            'qwen/qwen3-next-80b-a3b-instruct:free',
+            'openai/gpt-oss-120b:free',
             'openrouter/free'
           ],
           messages: [
@@ -912,7 +912,7 @@ export function useAdminDashboard() {
           model: 'google/gemma-4-31b-it:free',
           models: [
             'google/gemma-4-31b-it:free',
-            'qwen/qwen3-next-80b-a3b-instruct:free',
+            'openai/gpt-oss-120b:free',
             'openrouter/free'
           ],
           messages: [

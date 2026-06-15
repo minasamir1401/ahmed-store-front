@@ -29,7 +29,8 @@ export async function GET(request: NextRequest, context: { params: Promise<{ pat
   let lastError: any
 
   for (const baseUrl of backendBaseUrls) {
-    const targetUrl = `${baseUrl}/uploads/${params.path.join('/')}${query}`
+    const encodedPath = params.path.map((segment) => encodeURIComponent(segment)).join('/')
+    const targetUrl = `${baseUrl}/uploads/${encodedPath}${query}`
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
 

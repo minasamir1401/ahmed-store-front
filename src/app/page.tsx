@@ -9,6 +9,7 @@ import ProductCard from '@/components/ProductCard'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import SkeletonCard from '@/components/ui/SkeletonCard'
+import { newestProducts } from '@/lib/product-display'
 
 export default function Home() {
   const { t, language, translate, dir } = useLanguage()
@@ -85,10 +86,11 @@ export default function Home() {
       })
     ])
       .then(([productsData, heroData, categoriesData, articlesData]) => {
-        setProducts(productsData.slice(0, 6))
+        const orderedProducts = newestProducts(Array.isArray(productsData) ? productsData : [])
+        setProducts(orderedProducts.slice(0, 6))
         setHero(heroData)
         setCategories(Array.isArray(categoriesData) ? categoriesData : [])
-        setAllProducts(Array.isArray(productsData) ? productsData : [])
+        setAllProducts(orderedProducts)
         setArticles(Array.isArray(articlesData) ? articlesData.slice(0, 3) : [])
         setError(null)
         setLoading(false)

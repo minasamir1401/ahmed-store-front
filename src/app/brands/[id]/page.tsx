@@ -2,6 +2,7 @@ import BrandDetailPageClient from './BrandDetailPageClient'
 import type { Metadata } from 'next'
 import { cache } from 'react'
 import { getServerSiteUrl } from '@/lib/seo'
+import { absoluteProductImageUrl } from '@/lib/product-images'
 
 interface PageParams {
   params: Promise<{
@@ -40,10 +41,12 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   }
 
   const siteUrl = await getServerSiteUrl()
+  const brandImage = brand.image ? absoluteProductImageUrl(brand.image, siteUrl) : `${siteUrl}/logo-header.jpg`
 
   return {
     title: `مكملات وفيتامينات شركة ${brand.name} الأصلية | The VitaHub`,
     description: `تسوق جميع منتجات ومكملات شركة ${brand.name} الأصلية 100% في مصر. بروتينات، فيتامينات، وأقوى حوارق الدهون من ${brand.name} مع توصيل سريع.`,
+    metadataBase: new URL(siteUrl),
     alternates: {
       canonical: `/brands/${resolvedParams.id}`,
     },
@@ -54,7 +57,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       type: 'website',
       images: [
         {
-          url: brand.image || '/logo-header.jpg',
+          url: brandImage,
           alt: brand.name,
         }
       ]
@@ -63,7 +66,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       card: 'summary',
       title: `مكملات وفيتامينات شركة ${brand.name} الأصلية | The VitaHub`,
       description: `تسوق جميع منتجات ومكملات شركة ${brand.name} الأصلية 100% في مصر.`,
-      images: [brand.image || '/logo-header.jpg'],
+      images: [brandImage],
     }
   }
 }
@@ -86,7 +89,7 @@ export default async function BrandDetailPage({ params }: PageParams) {
       "about": {
         "@type": "Brand",
         "name": brand.name,
-        "image": brand.image
+        "image": brand.image ? absoluteProductImageUrl(brand.image, siteUrl) : `${siteUrl}/logo-header.jpg`
       },
       "mainEntity": {
         "@type": "ItemList",
@@ -96,7 +99,7 @@ export default async function BrandDetailPage({ params }: PageParams) {
           "position": index + 1,
           "url": `${siteUrl}/product/${prod.id}`,
           "name": prod.title,
-          "image": prod.image
+          "image": prod.image ? absoluteProductImageUrl(prod.image, siteUrl) : `${siteUrl}/logo-header.jpg`
         }))
       }
     }

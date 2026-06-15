@@ -21,6 +21,9 @@ export default function ProductsForm(props: any) {
                         {/* Image Columns */}
                         <div className="lg:col-span-1 space-y-6">
                           <label className="text-[10px] font-black text-emerald-600 uppercase tracking-widest block mr-1">الصورة الرئيسية</label>
+                          <div className="rounded-2xl bg-emerald-50 border border-emerald-100 px-4 py-3 text-[10px] font-bold text-emerald-800 leading-relaxed">
+                            هذه هي الصورة التي ستظهر في Google ونتائج البحث وكروت المنتجات. لا تضع هنا صورة منتج آخر أو صورة من المعرض.
+                          </div>
                           <div className="aspect-square bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
                             {formData.image ? (
                               <>

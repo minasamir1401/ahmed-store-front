@@ -1108,7 +1108,11 @@ export function useAdminDashboard() {
         payload.usageEn = payload.usageEn || ''
         payload.imageAlt = payload.imageAlt || payload.title || ''
 
-        payload.imageAlt = payload.imageAlt || payload.title || ''
+        if (!payload.image) {
+          await showAlert('يجب رفع الصورة الرئيسية للمنتج قبل الحفظ لأنها الصورة المستخدمة في Google وSEO وكروت المنتجات.', 'الصورة الرئيسية مطلوبة')
+          setLoading(false)
+          return
+        }
 
         if (payload.price) {
           const p = parseFloat(payload.price)

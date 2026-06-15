@@ -1,8 +1,7 @@
 import ProductPageClient from './ProductPageClient'
 import type { Metadata } from 'next'
-import { headers } from 'next/headers'
 import { cache } from 'react'
-import { absoluteProductImageUrl, productImageAlt } from '@/lib/product-images'
+import { absoluteProductImageUrl, productImageAlt, productMainImage } from '@/lib/product-images'
 import { getServerSiteUrl as getSiteUrl } from '@/lib/seo'
 
 interface PageParams {
@@ -26,12 +25,34 @@ const getProduct = cache(async (id: string) => {
   return null
 })
 
+const cleanSeoText = (value: string) => {
+  return value
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+const limitSeoText = (value: string, maxLength: number) => {
+  const text = cleanSeoText(value)
+  if (text.length <= maxLength) return text
+
+  const sliced = text.slice(0, maxLength).trim()
+  const lastSpace = sliced.lastIndexOf(' ')
+  return `${(lastSpace > 40 ? sliced.slice(0, lastSpace) : sliced).trim()}...`
+}
+
 const productSeoTitle = (product: any) => {
-  return product.titleEn ? `${product.title} | ${product.titleEn}` : product.title
+  const brandName = product.brand?.name ? ` | ${product.brand.name}` : ''
+  return limitSeoText(`${product.title}${brandName}`, 62)
 }
 
 const productSeoDescription = (product: any) => {
-  return product.seoDesc || product.seoDescEn || product.desc || product.descEn || `اشتري ${product.title} من The VitaHub مع توصيل سريع ومنتجات أصلية.`
+  const description = product.seoDesc || product.desc || product.seoDescEn || product.descEn || `اشتري ${product.title} من The VitaHub مع توصيل سريع ومنتجات أصلية 100%.`
+  return limitSeoText(description, 155)
+}
+
+const productSeoImage = (product: any, siteUrl: string) => {
+  return absoluteProductImageUrl(productMainImage(product.image), siteUrl) || `${siteUrl}/logo-header.jpg`
 }
 
 // Elite dynamic SEO metadata generation on the server
@@ -47,7 +68,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   }
 
   const siteUrl = await getSiteUrl()
-  const imageUrl = absoluteProductImageUrl(product.image, siteUrl) || `${siteUrl}/logo-header.jpg`
+  const imageUrl = productSeoImage(product, siteUrl)
   const imageAlt = productImageAlt(product, product.title)
   const title = productSeoTitle(product)
   const description = productSeoDescription(product)
@@ -74,9 +95,11 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       images: [
         {
           url: imageUrl,
+          secureUrl: imageUrl,
           width: product.imageWidth || 800,
           height: product.imageHeight || 800,
           alt: imageAlt,
+          type: 'image/jpeg',
         }
       ]
     },
@@ -99,11 +122,7 @@ export default async function ProductPage({ params }: PageParams) {
   let breadcrumbData: any = null
 
   if (product) {
-    const additionalImages = product.images ? product.images.split(',').map((img: string) => img.trim()).filter((i: string) => i) : []
-    const allImages = [product.image, ...additionalImages].filter(Boolean).map((img: string) => absoluteProductImageUrl(img, siteUrl))
-    if (allImages.length === 0) {
-      allImages.push(`${siteUrl}/logo-header.jpg`)
-    }
+    const seoImage = productSeoImage(product, siteUrl)
     
     let specs: any[] = []
     try {
@@ -117,9 +136,9 @@ export default async function ProductPage({ params }: PageParams) {
       "@context": "https://schema.org/",
       "@type": "Product",
       "name": product.title,
-      "image": allImages,
+      "image": [seoImage],
       "alternateName": product.imageAlt || product.titleEn || product.title,
-      "description": product.seoDescEn || product.seoDesc || product.descEn || product.desc || '',
+      "description": productSeoDescription(product),
       "sku": skuValue,
       "mpn": product.id,
       "brand": {

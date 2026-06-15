@@ -1,33 +1,63 @@
 import { MetadataRoute } from 'next'
 import { getServerSiteUrl } from '@/lib/seo'
 
+type SitemapChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]['changeFrequency']>
+
+type ProductSitemapItem = {
+  id: string
+  updatedAt?: string
+  createdAt?: string
+  image?: string | null
+  imageAlt?: string | null
+  title?: string | null
+  titleEn?: string | null
+}
+
+type BrandSitemapItem = {
+  id: string
+  updatedAt?: string
+  createdAt?: string
+}
+
+type TipSitemapItem = {
+  id: string
+  updatedAt?: string
+  createdAt?: string
+}
+
+const absoluteUrl = (baseUrl: string, path: string) => `${baseUrl}${path}`
+
+const changedAt = (item: { updatedAt?: string; createdAt?: string }) => {
+  return item.updatedAt ? new Date(item.updatedAt) : new Date(item.createdAt || Date.now())
+}
+
+const sitemapEntry = (url: string, changeFrequency: SitemapChangeFrequency, priority: number, lastModified = new Date()) => ({
+  url,
+  lastModified,
+  changeFrequency,
+  priority,
+})
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = await getServerSiteUrl()
 
   const routes = [
-    { url: '', changefreq: 'daily', priority: 1.00 },
-    { url: '/products', changefreq: 'daily', priority: 0.90 },
-    { url: '/categories', changefreq: 'weekly', priority: 0.80 },
-    { url: '/offers', changefreq: 'daily', priority: 0.85 },
-    { url: '/brands', changefreq: 'weekly', priority: 0.80 },
-    { url: '/health-tips', changefreq: 'daily', priority: 0.80 },
-    { url: '/bmi-calculator', changefreq: 'monthly', priority: 0.70 },
-    { url: '/about', changefreq: 'monthly', priority: 0.60 },
-    { url: '/faq', changefreq: 'monthly', priority: 0.50 },
-    { url: '/shipping', changefreq: 'monthly', priority: 0.50 },
-    { url: '/returns', changefreq: 'monthly', priority: 0.50 },
-    { url: '/track', changefreq: 'monthly', priority: 0.50 },
+    sitemapEntry(absoluteUrl(baseUrl, ''), 'daily', 1.00),
+    sitemapEntry(absoluteUrl(baseUrl, '/products'), 'daily', 0.95),
+    sitemapEntry(absoluteUrl(baseUrl, '/categories'), 'weekly', 0.80),
+    sitemapEntry(absoluteUrl(baseUrl, '/offers'), 'daily', 0.90),
+    sitemapEntry(absoluteUrl(baseUrl, '/brands'), 'weekly', 0.80),
+    sitemapEntry(absoluteUrl(baseUrl, '/health-tips'), 'daily', 0.80),
+    sitemapEntry(absoluteUrl(baseUrl, '/bmi-calculator'), 'monthly', 0.70),
+    sitemapEntry(absoluteUrl(baseUrl, '/about'), 'monthly', 0.60),
+    sitemapEntry(absoluteUrl(baseUrl, '/faq'), 'monthly', 0.50),
+    sitemapEntry(absoluteUrl(baseUrl, '/shipping'), 'monthly', 0.50),
+    sitemapEntry(absoluteUrl(baseUrl, '/returns'), 'monthly', 0.50),
+    sitemapEntry(absoluteUrl(baseUrl, '/track'), 'monthly', 0.50),
   ]
 
-  const staticRoutes = routes.map((route) => ({
-    url: `${baseUrl}${route.url}`,
-    lastModified: new Date(),
-    changeFrequency: route.changefreq as any,
-    priority: route.priority,
-  }))
-
   const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL
-  if (!backendUrl) return staticRoutes
+  if (!backendUrl) return routes
 
   try {
     const [productsRes, brandsRes, tipsRes] = await Promise.all([
@@ -37,32 +67,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ])
 
     const productsData = productsRes.ok ? await productsRes.json() : { items: [] }
-    const products = Array.isArray(productsData.items) ? productsData.items : (Array.isArray(productsData) ? productsData : [])
-    const brands = brandsRes.ok ? await brandsRes.json() : []
-    const tips = tipsRes.ok ? await tipsRes.json() : []
+    const products: ProductSitemapItem[] = Array.isArray(productsData.items) ? productsData.items : (Array.isArray(productsData) ? productsData : [])
+    const brandsData = brandsRes.ok ? await brandsRes.json() : []
+    const tipsData = tipsRes.ok ? await tipsRes.json() : []
+    const brands: BrandSitemapItem[] = Array.isArray(brandsData) ? brandsData : []
+    const tips: TipSitemapItem[] = Array.isArray(tipsData) ? tipsData : []
 
     return [
-      ...staticRoutes,
-      ...products.map((product: any) => ({
-        url: `${baseUrl}/product/${product.id}`,
-        lastModified: product.updatedAt ? new Date(product.updatedAt) : new Date(),
-        changeFrequency: 'weekly' as const,
-        priority: 0.7
-      })),
-      ...(Array.isArray(brands) ? brands : []).map((brand: any) => ({
-        url: `${baseUrl}/brands/${brand.id}`,
-        lastModified: brand.createdAt ? new Date(brand.createdAt) : new Date(),
-        changeFrequency: 'weekly' as const,
-        priority: 0.65
-      })),
-      ...(Array.isArray(tips) ? tips : []).map((tip: any) => ({
-        url: `${baseUrl}/health-tips/${tip.id}`,
-        lastModified: tip.updatedAt ? new Date(tip.updatedAt) : new Date(tip.createdAt || Date.now()),
-        changeFrequency: 'monthly' as const,
-        priority: 0.6
-      }))
+      ...routes,
+      ...products.map((product) => sitemapEntry(
+        absoluteUrl(baseUrl, `/product/${product.id}`),
+        'daily',
+        0.90,
+        changedAt(product)
+      )),
+      ...brands.map((brand) => sitemapEntry(
+        absoluteUrl(baseUrl, `/brands/${brand.id}`),
+        'weekly',
+        0.70,
+        changedAt(brand)
+      )),
+      ...tips.map((tip) => sitemapEntry(
+        absoluteUrl(baseUrl, `/health-tips/${tip.id}`),
+        'monthly',
+        0.60,
+        changedAt(tip)
+      ))
     ]
   } catch {
-    return staticRoutes
+    return routes
   }
 }

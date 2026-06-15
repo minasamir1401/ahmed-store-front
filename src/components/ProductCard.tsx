@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { productImageAlt, productImageThumb } from '@/lib/product-images'
+import { productImageAlt, productMainImage } from '@/lib/product-images'
 import { trackAddToCart, trackAddToWishlist } from '@/lib/tracking'
 
 interface ProductCardProps {
@@ -75,7 +75,7 @@ export default function ProductCard({ id, title, price, oldPrice, image, imageAl
 
   const discountPercent = oldPrice && price ? Math.round(((oldPrice - price) / oldPrice) * 100) : null
   const imgAlt = productImageAlt({ imageAlt, title }, translate(title))
-  const cardImage = productImageThumb(image) || 'https://placehold.co/400x400?text=No+Image'
+  const cardImage = productMainImage(image) || 'https://placehold.co/400x400?text=No+Image'
 
   return (
     <motion.div

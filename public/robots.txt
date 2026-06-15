@@ -1,2 +1,17 @@
 User-agent: *
 Allow: /
+Allow: /product/
+Allow: /products
+Allow: /api/images/
+Allow: /uploads/
+Disallow: /api/*
+Allow: /api/images/*
+Disallow: /admin
+Disallow: /cart
+Disallow: /checkout
+Disallow: /profile
+Disallow: /login
+Disallow: /forgot
+Disallow: /wishlist
+
+Sitemap: https://the-vitahub.com/sitemap.xml

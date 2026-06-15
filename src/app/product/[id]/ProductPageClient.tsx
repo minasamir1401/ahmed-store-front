@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
+import { newestProducts } from '@/lib/product-display'
 import { Star, ShieldCheck, Truck, RotateCcw, Plus, Minus, Heart, ShoppingCart, Check, ChevronLeft, CheckCircle2, Building2, Sparkles, Droplet, Sun, Activity, Info, Moon, Dumbbell, Flame, Calendar, Clock } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { useRouter } from 'next/navigation'
@@ -351,11 +352,13 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
   }, [product, language])
 
   useEffect(() => {
-    // If we already have initialProduct, we don't need to show full page loaders
-    // but we can still fetch to keep client state fresh (hydration update)
     fetch(`/api/products/${productId}`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Not found')
+        return res.json()
+      })
       .then(data => {
+        if (data && data.error) throw new Error(data.error)
         setProduct(data)
         if (!activeImage) setActiveImage(data.image)
         setLoading(false)
@@ -367,7 +370,10 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
           }
         } catch { /* ignore */ }
       })
-      .catch(() => setLoading(false))
+      .catch(() => {
+        if (!initialProduct) setProduct(null)
+        setLoading(false)
+      })
   }, [productId])
 
   useEffect(() => {
@@ -378,7 +384,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
-          const filtered = data.filter((p: any) => p.categoryId === product.categoryId && p.id !== product.id)
+          const filtered = newestProducts(data.filter((p: any) => p.categoryId === product.categoryId && p.id !== product.id))
           setSimilarProducts(filtered.slice(0, 4))
         }
       })

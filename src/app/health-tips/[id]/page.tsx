@@ -4,6 +4,8 @@ import Footer from '@/components/Footer'
 import ArticleDetailClient from './ArticleDetailClient'
 import type { Metadata } from 'next'
 import { cache } from 'react'
+import { absoluteProductImageUrl } from '@/lib/product-images'
+import { getServerSiteUrl } from '@/lib/seo'
 
 interface PageParams {
   params: Promise<{
@@ -36,15 +38,19 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       }
     }
 
+    const siteUrl = await getServerSiteUrl()
+    const tipImage = tip.image ? absoluteProductImageUrl(tip.image, siteUrl) : `${siteUrl}/logo-header.jpg`
+
     const post = {
       title: tip.title,
       excerpt: tip.content ? tip.content.substring(0, 120) + '...' : '',
-      image: tip.image || 'https://placehold.co/800x400/e8f0ed/2e7d5e?text=Health+Tip',
+      image: tipImage,
     }
 
     return {
       title: `${post.title} | The VitaHub`,
       description: post.excerpt,
+      metadataBase: new URL(siteUrl),
       alternates: {
         canonical: `/health-tips/${id}`,
       },

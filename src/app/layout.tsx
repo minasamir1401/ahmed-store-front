@@ -37,9 +37,6 @@ export async function generateMetadata(): Promise<Metadata> {
     ],
     authors: [{ name: "The VitaHub Team", url: siteUrl }],
     metadataBase: new URL(siteUrl),
-    alternates: {
-      canonical: siteUrl,
-    },
     robots: {
       index: true,
       follow: true,
@@ -108,6 +105,7 @@ async function JsonLdSchema() {
         "alternateName": ["ذا فيتا هوب", "ذا فيتاهوب", "فيتا هوب", "VitaHub"],
         "description": "متجر المكملات الغذائية والفيتامينات الأصلي الأول في مصر",
         "publisher": { "@id": `${siteUrl}/#organization` },
+        "inLanguage": ["ar-EG", "en"],
         "potentialAction": [
           {
             "@type": "SearchAction",
@@ -117,19 +115,35 @@ async function JsonLdSchema() {
             },
             "query-input": "required name=search_term_string"
           }
-        ],
-        "inLanguage": "ar"
+        ]
       },
       {
         "@type": "Store",
         "@id": `${siteUrl}/#organization`,
         "name": "The VitaHub Egypt",
+        "alternateName": ["The VitaHub", "ذا فيتا هوب", "فيتا هوب"],
         "url": `${siteUrl}/`,
         "logo": `${siteUrl}/logo-header.jpg`,
         "image": `${siteUrl}/logo-header.jpg`,
         "description": "تسوق أفضل المكملات الغذائية، الفيتامينات، البروتينات، حوارق الدهون، ومنتجات الرشاقة الأصلية 100% في مصر مع The VitaHub.",
         "telephone": "+201001234567",
+        "email": "support@the-vitahub.com",
         "priceRange": "$$",
+        "areaServed": {
+          "@type": "Country",
+          "name": "Egypt"
+        },
+        "currenciesAccepted": "EGP",
+        "paymentAccepted": ["InstaPay", "Cash", "Mobile Wallet"],
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "منتجات The VitaHub",
+          "itemListElement": [
+            { "@type": "OfferCatalog", "name": "فيتامينات ومكملات غذائية" },
+            { "@type": "OfferCatalog", "name": "بروتين ومكملات رياضية" },
+            { "@type": "OfferCatalog", "name": "صحة ورشاقة" }
+          ]
+        },
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "شبرا، القاهرة",

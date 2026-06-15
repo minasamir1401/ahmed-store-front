@@ -13,10 +13,19 @@ export const productImageThumb = (src?: string | null) => {
   return src.includes('/api/images/') && !src.endsWith('/thumb') ? `${src}/thumb` : src
 }
 
+export const productMainImage = (src?: string | null) => {
+  if (!src) return ''
+  return src.endsWith('/thumb') ? src.slice(0, -6) : src
+}
+
 export const absoluteProductImageUrl = (src: string | null | undefined, siteUrl: string) => {
   if (!src) return ''
   if (/^https?:\/\//i.test(src)) return src
-  return `${siteUrl.replace(/\/+$/, '')}${src.startsWith('/') ? src : `/${src}`}`
+  
+  // URL Encode the path to prevent SEO crawlers (like Google/Facebook) from rejecting URLs with spaces or Arabic characters
+  const encodedPath = src.split('/').map(segment => encodeURIComponent(segment)).join('/')
+  
+  return `${siteUrl.replace(/\/+$/, '')}${encodedPath.startsWith('/') ? encodedPath : `/${encodedPath}`}`
 }
 
 export const safeBrandImage = (src?: string | null) => {

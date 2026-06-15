@@ -1,15 +1,14 @@
 import React from 'react'
 import BMICalculatorClient from './BMICalculatorClient'
 import type { Metadata } from 'next'
+import { publicPageMetadata } from '@/lib/site-metadata'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = publicPageMetadata({
   title: 'حاسبة مؤشر كتلة الجسم الذكية BMI | The VitaHub',
   description: 'احسب مؤشر كتلة الجسم (BMI) بدقة متناهية مع حاسبتنا الذكية المدعومة بالذكاء الاصطناعي. احصل على نصائح غذائية وتوصيات مخصصة لمكملاتك الغذائية مجاناً.',
   keywords: ['حاسبة BMI', 'حساب مؤشر كتلة الجسم', 'الوزن المثالي', 'حاسبة الوزن الذكية', 'حساب كتلة الجسم مصر', 'تخسيس ورشاقة'],
-  alternates: {
-    canonical: '/bmi-calculator',
-  }
-}
+  path: '/bmi-calculator',
+})
 
 import { getServerSiteUrl } from '@/lib/seo'
 

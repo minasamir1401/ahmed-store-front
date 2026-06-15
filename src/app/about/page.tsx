@@ -1,14 +1,14 @@
 import React from 'react'
 import type { Metadata } from 'next'
 import AboutPageClient from './AboutPageClient'
+import { publicPageMetadata } from '@/lib/site-metadata'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = publicPageMetadata({
   title: 'عن The VitaHub | متجر المكملات الغذائية والأصلية الأول في مصر',
   description: 'تعرف على قصة The VitaHub، متجر المكملات الغذائية والفيتامينات والبروتينات المستوردة والأصلية 100% في مصر. رؤيتنا، قيمنا، والتزامنا بصحتك ورشاقتك.',
-  alternates: {
-    canonical: '/about',
-  }
-}
+  path: '/about',
+  keywords: ['The VitaHub', 'ذا فيتا هوب', 'متجر مكملات غذائية', 'مكملات أصلية مصر'],
+})
 
 import { getServerSiteUrl } from '@/lib/seo'
 

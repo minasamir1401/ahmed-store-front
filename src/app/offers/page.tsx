@@ -8,6 +8,7 @@ import { Percent, Clock, Loader2, Tag, Sparkles, Flame, Check, ArrowRight, Arrow
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
+import { newestProducts } from '@/lib/product-display'
 
 function SkeletonCard() {
   return (
@@ -88,8 +89,9 @@ export default function OffersPage() {
           const discountPercent = p.oldPrice && p.price ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0
           return (p.oldPrice && p.oldPrice > p.price) || (p.discountType && p.discountValue) || discountPercent > 0
         })
-        setProducts(discounted)
-        setFilteredProducts(discounted)
+        const orderedDiscounted = newestProducts(discounted)
+        setProducts(orderedDiscounted)
+        setFilteredProducts(orderedDiscounted)
         setError(null)
         setLoading(false)
       })

@@ -8,6 +8,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { SlidersHorizontal, PackageSearch, X, ChevronDown, LayoutGrid, Tag, ArrowUpDown, SlidersVertical } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
+import { sortProductsForDisplay } from '@/lib/product-display'
 
 // ── Skeleton Card ──────────────────────────────────────────────────────────
 function SkeletonCard() {
@@ -172,7 +173,7 @@ function FilterSidebar({
   const [openSort, setOpenSort] = React.useState(true)
 
   const sortOptions = [
-    { value: 'default', label: language === 'ar' ? 'الافتراضي' : 'Default' },
+    { value: 'default', label: language === 'ar' ? 'الأحدث أولاً' : 'Newest First' },
     { value: 'price-asc', label: language === 'ar' ? 'السعر: الأقل أولاً' : 'Price: Low to High' },
     { value: 'price-desc', label: language === 'ar' ? 'السعر: الأعلى أولاً' : 'Price: High to Low' },
   ]
@@ -459,7 +460,7 @@ function ProductsContent() {
       const prodData = await prodRes.json()
       const catData = await catRes.json()
 
-      setProducts(prodData.items || [])
+      setProducts(sortProductsForDisplay(prodData.items || [], sort))
       setTotalProducts(prodData.total || 0)
       setCategories(catData)
 

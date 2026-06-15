@@ -7,6 +7,7 @@ import ProductCard from '@/components/ProductCard'
 import { Building2, Loader2, Package, ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
+import { newestProducts } from '@/lib/product-display'
 
 export default function BrandDetailPageClient({ params, initialBrand, initialProducts }: { params: { id: string }, initialBrand: any, initialProducts: any[] }) {
   const brandId = params.id
@@ -36,7 +37,7 @@ export default function BrandDetailPageClient({ params, initialBrand, initialPro
       const allProds = await prodRes.json()
       
       const currentBrand = allBrands.find((b: any) => b.id === brandId)
-      const brandProds = allProds.filter((p: any) => p.brandId === brandId)
+      const brandProds = newestProducts(allProds.filter((p: any) => p.brandId === brandId))
       
       setBrand(currentBrand)
       setProducts(brandProds)

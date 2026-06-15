@@ -8,7 +8,7 @@ import { headers } from 'next/headers'
  * 3. Default fallback for build-time/compilation environment
  */
 export async function getServerSiteUrl(): Promise<string> {
-  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL
+  const configuredUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL
   if (configuredUrl) {
     return configuredUrl.replace(/\/+$/, '')
   }

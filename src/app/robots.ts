@@ -20,7 +20,10 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         '/faq',
         '/shipping',
         '/returns',
-        '/track'
+        '/track',
+        '/api/images/',
+        '/uploads/',
+        '/_next/image'
       ],
       disallow: [
         '/admin',

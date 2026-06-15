@@ -1,14 +1,14 @@
 import React from 'react'
 import type { Metadata } from 'next'
 import FAQPageClient from './FAQPageClient'
+import { publicPageMetadata } from '@/lib/site-metadata'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = publicPageMetadata({
   title: 'الأسئلة الشائعة | The VitaHub',
   description: 'إجابات على الأسئلة الشائعة حول الفيتامينات الأصلية، طرق الشحن والتوصيل، سياسة الإرجاع، وأصالة المكملات الغذائية في متجر The VitaHub.',
-  alternates: {
-    canonical: '/faq',
-  }
-}
+  path: '/faq',
+  keywords: ['أسئلة المكملات الغذائية', 'أصالة الفيتامينات', 'شحن مكملات مصر', 'The VitaHub FAQ'],
+})
 
 import { getServerSiteUrl } from '@/lib/seo'
 
@@ -36,7 +36,7 @@ export default async function FAQPage() {
     }
   ]
 
-  const siteUrl = await getServerSiteUrl()
+  await getServerSiteUrl()
 
   const faqSchema = {
     "@context": "https://schema.org",

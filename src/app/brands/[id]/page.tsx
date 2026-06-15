@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       type: 'website',
       images: [
         {
-          url: brand.image || '/logo-v2.png',
+          url: brand.image || '/logo-header.jpg',
           alt: brand.name,
         }
       ]
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       card: 'summary',
       title: `مكملات وفيتامينات شركة ${brand.name} الأصلية | The VitaHub`,
       description: `تسوق جميع منتجات ومكملات شركة ${brand.name} الأصلية 100% في مصر.`,
-      images: [brand.image || '/logo-v2.png'],
+      images: [brand.image || '/logo-header.jpg'],
     }
   }
 }

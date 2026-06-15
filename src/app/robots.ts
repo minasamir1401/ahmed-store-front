@@ -10,6 +10,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       allow: [
         '/',
         '/products',
+        '/product/',
         '/categories',
         '/offers',
         '/brands',

@@ -60,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       images: [
         {
-          url: "/logo-v2.png?v=5",
+          url: "/logo-header.jpg",
           width: 800,
           height: 600,
           alt: "The VitaHub Premium Supplements"
@@ -71,11 +71,11 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title: "The VitaHub | متجر المكملات الغذائية والفيتامينات الأصلي في مصر",
       description: "تسوق أفضل المكملات الغذائية، الفيتامينات، البروتينات، حوارق الدهون، ومنتجات الرشاقة الأصلية 100% في مصر مع The VitaHub. توصيل سريع ودعم طبي متخصص.",
-      images: ["/logo-v2.png?v=5"],
+      images: ["/logo-header.jpg"],
     },
     icons: {
-      icon: "/logo-header.jpg",
-      shortcut: "/logo-header.jpg",
+      icon: "/favicon.ico",
+      shortcut: "/favicon.ico",
       apple: "/logo-header.jpg",
     },
     verification: {
@@ -124,8 +124,8 @@ async function JsonLdSchema() {
         "@id": `${siteUrl}/#organization`,
         "name": "The VitaHub Egypt",
         "url": `${siteUrl}/`,
-        "logo": `${siteUrl}/logo-v2.png`,
-        "image": `${siteUrl}/logo-v2.png`,
+        "logo": `${siteUrl}/logo-header.jpg`,
+        "image": `${siteUrl}/logo-header.jpg`,
         "description": "تسوق أفضل المكملات الغذائية، الفيتامينات، البروتينات، حوارق الدهون، ومنتجات الرشاقة الأصلية 100% في مصر مع The VitaHub.",
         "telephone": "+201001234567",
         "priceRange": "$$",

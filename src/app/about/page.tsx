@@ -32,7 +32,7 @@ export default async function AboutPage() {
         "url": `${siteUrl}/`,
         "logo": {
           "@type": "ImageObject",
-          "url": `${siteUrl}/logo-v2.png`
+          "url": `${siteUrl}/logo-header.jpg`
         },
         "description": "المنصة الأولى الموثوقة لبيع المكملات الغذائية والفيتامينات والبروتينات الأصلية 100% في مصر.",
         "foundingDate": "2024",

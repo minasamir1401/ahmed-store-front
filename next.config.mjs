@@ -2,6 +2,9 @@ const BACKEND_URL = process.env.BACKEND_URL || 'https://api.the-vitahub.com';
 
 const nextConfig = {
   output: 'standalone',
+  experimental: {
+    proxyTimeout: 120000,
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'api.the-vitahub.com' },

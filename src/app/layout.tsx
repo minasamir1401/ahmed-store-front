@@ -26,13 +26,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: {
-      default: "The VitaHub | متجر المكملات الغذائية والفيتامينات الأصلي في مصر",
+      default: "The VitaHub | ذا فيتا هوب | متجر المكملات الغذائية والفيتامينات الأصلي في مصر",
       template: "%s | The VitaHub"
     },
-    description: "تسوق أفضل المكملات الغذائية، الفيتامينات، البروتينات، حوارق الدهون، ومنتجات الرشاقة الأصلية 100% في مصر مع The VitaHub. توصيل سريع ودعم طبي متخصص.",
+    description: "تسوق أفضل المكملات الغذائية، الفيتامينات، البروتينات، حوارق الدهون، ومنتجات الرشاقة الأصلية 100% في مصر مع The VitaHub (ذا فيتا هوب). توصيل سريع ودعم طبي متخصص.",
     keywords: [
       "فيتامينات", "مكملات غذائية", "بروتينات مصر", "مكملات جيم", "Vitamins Egypt",
-      "فيتامينات أصلية", "واي بروتين", "كرياتين", "The VitaHub", "متجر مكملات غذائية",
+      "فيتامينات أصلية", "واي بروتين", "كرياتين", "The VitaHub", "ذا فيتا هوب", "ذا فيتاهوب", "فيتا هوب", "فيتاهوب", "VitaHub", "متجر مكملات غذائية",
       "صحة ورشاقة", "مكملات مستوردة", "شراء فيتامينات مصر", "أوميجا 3", "فيتامين د"
     ],
     authors: [{ name: "The VitaHub Team", url: siteUrl }],
@@ -105,6 +105,7 @@ async function JsonLdSchema() {
         "@id": `${siteUrl}/#website`,
         "url": `${siteUrl}/`,
         "name": "The VitaHub",
+        "alternateName": ["ذا فيتا هوب", "ذا فيتاهوب", "فيتا هوب", "VitaHub"],
         "description": "متجر المكملات الغذائية والفيتامينات الأصلي الأول في مصر",
         "publisher": { "@id": `${siteUrl}/#organization` },
         "potentialAction": [

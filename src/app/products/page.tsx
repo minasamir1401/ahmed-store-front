@@ -423,6 +423,9 @@ function ProductsContent() {
   const [priceRange, setPriceRange] = React.useState<[number, number]>([0, 5000])
   const [priceValue, setPriceValue] = React.useState<[number, number]>([0, 5000])
 
+  const isPriceModified = React.useRef(false)
+  const prevPriceValue = React.useRef<[number, number]>([0, 5000])
+
   // Pagination states
   const [currentPage, setCurrentPage] = React.useState(1)
   const [totalProducts, setTotalProducts] = React.useState(0)
@@ -438,11 +441,14 @@ function ProductsContent() {
     try {
       const q = searchParams.get('search') || ''
       const catQuery = cats.length > 0 ? `&categoryId=${cats.join(',')}` : ''
-      const minP = price[0]
-      const maxP = price[1]
+      
+      // Send price filters only if the user has modified them
+      const minP = isPriceModified.current ? price[0] : ''
+      const maxP = isPriceModified.current ? price[1] : ''
+      const priceQuery = minP !== '' || maxP !== '' ? `&minPrice=${minP}&maxPrice=${maxP}` : ''
 
       const [prodRes, catRes] = await Promise.all([
-        fetch(`/api/products?page=${page}&limit=${LIMIT}&minPrice=${minP}&maxPrice=${maxP}&sortBy=${sort}${catQuery}${q ? `&q=${encodeURIComponent(q)}` : ''}`),
+        fetch(`/api/products?page=${page}&limit=${LIMIT}${priceQuery}&sortBy=${sort}${catQuery}${q ? `&q=${encodeURIComponent(q)}` : ''}`),
         fetch('/api/categories')
       ])
 
@@ -456,6 +462,17 @@ function ProductsContent() {
       setProducts(prodData.items || [])
       setTotalProducts(prodData.total || 0)
       setCategories(catData)
+
+      // Dynamically update maximum price based on actual store items
+      if (prodData.maxPrice && prodData.maxPrice !== priceRange[1]) {
+        const newMax = prodData.maxPrice
+        setPriceRange([0, newMax])
+        setPriceValue(prev => {
+          const isMaxAtOldDefault = prev[1] === priceRange[1]
+          return [prev[0], isMaxAtOldDefault ? newMax : prev[1]]
+        })
+      }
+
       setError(null)
     } catch (err) {
       console.error(err)
@@ -467,6 +484,14 @@ function ProductsContent() {
 
   // Fetch data on parameters change
   React.useEffect(() => {
+    const priceChanged = priceValue[0] !== prevPriceValue.current[0] || priceValue[1] !== prevPriceValue.current[1]
+    prevPriceValue.current = priceValue
+
+    // Skip redundant fetch if priceValue was updated automatically to match the backend's dynamic maxPrice
+    if (priceChanged && !isPriceModified.current) {
+      return
+    }
+
     fetchData(currentPage, selectedCats, priceValue, sortBy)
   }, [currentPage, selectedCats, priceValue, sortBy, searchParams.get('search')])
 
@@ -482,18 +507,23 @@ function ProductsContent() {
     )
   }
 
+  const handlePriceChange = (val: [number, number]) => {
+    isPriceModified.current = true
+    setPriceValue(val)
+  }
+
   // Reset all filters
   const resetFilters = () => {
     setSelectedCats([])
     setSortBy('default')
+    isPriceModified.current = false
     setPriceValue(priceRange)
   }
 
   const searchQuery = searchParams.get('search') || ''
 
   const hasFilters = selectedCats.length > 0 ||
-    priceValue[0] > priceRange[0] ||
-    priceValue[1] < priceRange[1] ||
+    (isPriceModified.current && (priceValue[0] > priceRange[0] || priceValue[1] < priceRange[1])) ||
     sortBy !== 'default'
 
   const filterProps = {
@@ -502,7 +532,7 @@ function ProductsContent() {
     onToggleCat: toggleCat,
     priceRange,
     priceValue,
-    onPriceChange: setPriceValue,
+    onPriceChange: handlePriceChange,
     sortBy,
     onSortChange: setSortBy,
     totalFiltered: totalProducts,

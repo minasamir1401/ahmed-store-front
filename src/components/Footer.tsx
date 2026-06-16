@@ -9,7 +9,7 @@ export default function Footer() {
   const { t, dir } = useLanguage()
 
   return (
-    <footer className="bg-[#f7f7f7] border-t border-gray-200 pt-10 pb-24 md:pb-8 mt-auto">
+    <footer data-nosnippet className="bg-[#f7f7f7] border-t border-gray-200 pt-10 pb-24 md:pb-8 mt-auto">
       <div className="max-w-screen-xl mx-auto px-2 xs:px-4" dir={dir}>
 
         {/* Main grid */}

@@ -48,7 +48,7 @@ function HeaderContent() {
 
   return (
     <>
-      <header className={cn(
+      <header data-nosnippet className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
         isScrolled ? "shadow-lg" : ""
       )}>

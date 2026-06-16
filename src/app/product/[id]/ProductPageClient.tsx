@@ -673,6 +673,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
               {/* Thumbnails */}
               {allImages.length > 1 && (
                 <motion.div
+                  data-nosnippet
                   variants={stagger}
                   initial="hidden"
                   animate="show"
@@ -1578,7 +1579,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
 
       {/* Similar Products Section */}
       {similarProducts.length > 0 && (
-        <section className="py-12 sm:py-24 bg-slate-50/30 border-t border-slate-100/60">
+        <section data-nosnippet className="py-12 sm:py-24 bg-slate-50/30 border-t border-slate-100/60">
           <div className="max-w-screen-xl mx-auto px-4" dir={dir}>
             <motion.div 
               initial={{ opacity: 0 }}
@@ -1605,7 +1606,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
 
       {/* Recommended Articles Section */}
       {recommendedArticles.length > 0 && (
-        <section className="py-12 sm:py-24 bg-white border-t border-slate-100/60">
+        <section data-nosnippet className="py-12 sm:py-24 bg-white border-t border-slate-100/60">
           <div className="max-w-screen-xl mx-auto px-4" dir={dir}>
             <motion.div 
               initial={{ opacity: 0 }}

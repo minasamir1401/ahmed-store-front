@@ -6,7 +6,8 @@ export default function AdminSettingsTab(props: any) {
     formData, setFormData, handleSave, loading, uploading, handleFileUpload,
     items, adminEmail, setAdminEmail, adminName, setAdminName, adminPassword, setAdminPassword,
     adminSaveLoading, handleAdminSave, isLoggedIn, setIsLoggedIn, showLogin,
-    activeTab, tabs, backupLoading, restoreLoading, handleDownloadBackup, handleRestoreBackup
+    activeTab, tabs, backupLoading, restoreLoading, handleDownloadBackup, handleRestoreBackup,
+    cleanLoading, handleCleanBase64Images
   } = props;
 
   return (
@@ -116,6 +117,34 @@ export default function AdminSettingsTab(props: any) {
                             {restoreLoading ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />} رفع واستعادة نسخة احتياطية (.zip)
                           </button>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Base64 Database Image Cleanup Section */}
+                  <div className="bg-white border border-slate-100 rounded-[2.5rem] p-6 md:p-10 space-y-6 shadow-sm max-w-xl mx-auto relative overflow-hidden mt-8">
+                    <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-red-500 to-amber-500" />
+                    
+                    <div className="text-center space-y-2 mb-6">
+                      <div className="bg-red-50 w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-red-500">
+                        <Trash2 size={22} />
+                      </div>
+                      <h3 className="text-lg font-black text-slate-800">تنظيف قاعدة البيانات</h3>
+                      <p className="text-[10px] text-slate-400 font-bold">حذف كافة الصور المخزنة بصيغة Base64 الطويلة واستبدالها بصور افتراضية لتسريع الموقع</p>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100/50 space-y-2 text-right">
+                        <span className="text-[11px] font-black text-slate-700 block">إجراء فوري لتخفيف حجم قاعدة البيانات</span>
+                        <p className="text-[9px] text-slate-400 leading-relaxed font-semibold">يقوم هذا الفحص بمرور شامل على كافة الجداول والمنتجات، ويبحث عن أي صور مشفرة محلياً (Base64) ويقوم بتنظيفها فوراً لتقليص مساحة الاستضافة وزيادة سرعة الاستجابة.</p>
+                        <button 
+                          type="button"
+                          onClick={handleCleanBase64Images}
+                          disabled={cleanLoading || backupLoading || restoreLoading}
+                          className="mt-2 w-full bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white py-3 rounded-xl font-black text-xs shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] transition-all cursor-pointer"
+                        >
+                          {cleanLoading ? <Loader2 className="animate-spin" size={14} /> : <Trash2 size={14} />} تنظيف صور Base64 بالكامل
+                        </button>
                       </div>
                     </div>
                   </div>

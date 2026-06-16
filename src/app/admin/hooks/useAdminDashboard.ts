@@ -35,6 +35,7 @@ export function useAdminDashboard() {
   const [brandUploading, setBrandUploading] = useState(false)
   const [backupLoading, setBackupLoading] = useState(false)
   const [restoreLoading, setRestoreLoading] = useState(false)
+  const [cleanLoading, setCleanLoading] = useState(false)
   const [aiProvider, setAiProvider] = useState<AIProvider>('openrouter')
 
   const handleAiProviderChange = (provider: AIProvider) => {
@@ -1021,6 +1022,37 @@ export function useAdminDashboard() {
     }
   }
 
+  const handleCleanBase64Images = async () => {
+    if (!(await showConfirm('تحذير: سيتم البحث في كامل قاعدة البيانات وحذف كافة الصور بصيغة Base64 واستبدالها بصور افتراضية. هل تريد الاستمرار؟', 'تأكيد تنظيف قاعدة البيانات'))) {
+      return
+    }
+
+    setCleanLoading(true)
+    addLog('جاري تنظيف قاعدة البيانات من صور Base64...')
+    try {
+      const res = await fetchWithAdminAuth(`${BACKEND_API}/api/admin/clean-base64-images`, {
+        method: 'POST'
+      }, null)
+
+      if (res.ok) {
+        const data = await res.json()
+        await showAlert(`تم تنظيف قاعدة البيانات بنجاح! تم تحديث عدد ${data.count || 0} سجل.`, 'تنظيف ناجح')
+        addLog(`تم تنظيف قاعدة البيانات بنجاح ✅ (تم تحديث ${data.count || 0} سجل)`)
+        fetchStats()
+        fetchData()
+      } else {
+        const err = await res.json().catch(() => ({}))
+        await showAlert('فشل تنظيف قاعدة البيانات: ' + (err.error || 'خطأ غير معروف'), 'خطأ')
+        addLog('خطأ في تنظيف قاعدة البيانات')
+      }
+    } catch (err: any) {
+      await showAlert('خطأ في الاتصال بالخادم: ' + err.message, 'خطأ')
+      addLog('خطأ في التنظيف')
+    } finally {
+      setCleanLoading(false)
+    }
+  }
+
   const handleSaveAdminSettings = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -1284,6 +1316,8 @@ export function useAdminDashboard() {
     restoreLoading,
     handleDownloadBackup,
     handleRestoreBackup,
+    cleanLoading,
+    handleCleanBase64Images,
     aiProvider,
     handleAiProviderChange,
     tabs: ADMIN_TABS

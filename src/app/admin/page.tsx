@@ -109,6 +109,8 @@ export default function AdminDashboard() {
     restoreLoading,
     handleDownloadBackup,
     handleRestoreBackup,
+    cleanLoading,
+    handleCleanBase64Images,
     tabs
   } = useAdminDashboard()
 
@@ -197,7 +199,9 @@ export default function AdminDashboard() {
     backupLoading,
     restoreLoading,
     handleDownloadBackup,
-    handleRestoreBackup
+    handleRestoreBackup,
+    cleanLoading,
+    handleCleanBase64Images
   }
 
   const getTabIcon = (iconKey?: string) => {

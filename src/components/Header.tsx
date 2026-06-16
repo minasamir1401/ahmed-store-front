@@ -25,7 +25,7 @@ function HeaderContent() {
   const { language, toggleLanguage, t } = useLanguage()
 
   React.useEffect(() => {
-    setSearchQuery(searchParams?.get('search') || '')
+    queueMicrotask(() => setSearchQuery(searchParams?.get('search') || ''))
   }, [searchParams])
 
   React.useEffect(() => {

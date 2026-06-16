@@ -1147,6 +1147,7 @@ export function useAdminDashboard() {
       if (res.ok) {
         setIsModalOpen(false)
         await fetchData()
+        if (activeTab === 'products') addLog('تم حفظ المنتج، والخادم الخلفي يتولى إشعار Google Indexing وتسجيل النتيجة')
         await showAlert('تم الحفظ بنجاح! ✅', 'حفظ ناجح')
       } else {
         const errData = await res.json()
@@ -1165,14 +1166,16 @@ export function useAdminDashboard() {
     const auth = localStorage.getItem('mithaly_admin_auth')
     const token = localStorage.getItem('mithaly_admin_token')
     if (auth === 'true' && token) {
-      setIsLoggedIn(true)
-      setAdminToken(token)
+      queueMicrotask(() => {
+        setIsLoggedIn(true)
+        setAdminToken(token)
+      })
     }
   }, [])
 
   useEffect(() => {
     if (activeTab === 'whatsapp' && isLoggedIn) {
-      fetchWhatsappStatus()
+      queueMicrotask(() => fetchWhatsappStatus())
       const interval = setInterval(fetchWhatsappStatus, 3000)
       return () => clearInterval(interval)
     }
@@ -1180,8 +1183,10 @@ export function useAdminDashboard() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      fetchData()
-      fetchMeta()
+      queueMicrotask(() => {
+        fetchData()
+        fetchMeta()
+      })
     }
   }, [activeTab, isLoggedIn])
 

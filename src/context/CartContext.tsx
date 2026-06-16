@@ -34,14 +34,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // 1. Load initial cart from localStorage
   useEffect(() => {
     const savedCart = localStorage.getItem('vitamins_hub_cart')
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart))
-      } catch (e) {
-        console.error('Failed to parse cart from localStorage', e)
+    queueMicrotask(() => {
+      if (savedCart) {
+        try {
+          setCart(JSON.parse(savedCart))
+        } catch (e) {
+          console.error('Failed to parse cart from localStorage', e)
+        }
       }
-    }
-    setIsLoaded(true)
+      setIsLoaded(true)
+    })
   }, [])
 
   // 2. Fetch cart from backend when token becomes available (user logs in)

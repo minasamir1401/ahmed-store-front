@@ -29,12 +29,6 @@ export default function ProfilePage() {
     }
   }, [user, authLoading, router])
 
-  useEffect(() => {
-    if (token) {
-      fetchOrders()
-    }
-  }, [token])
-
   const fetchOrders = async () => {
     try {
       const res = await fetch('/api/my-orders', {
@@ -50,6 +44,12 @@ export default function ProfilePage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (token) {
+      queueMicrotask(() => fetchOrders())
+    }
+  }, [token])
 
   const handleCancelOrder = async (orderId: string) => {
     const confirmText = language === 'ar'

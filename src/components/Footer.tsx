@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useLanguage } from '@/context/LanguageContext'
 
 export default function Footer() {
@@ -18,7 +19,7 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1 space-y-3">
             {/* Logo */}
             <div className="flex items-center" dir="ltr">
-              <img src="/logo-footer.jpg" alt="The VitaHub Logo" className="h-20 w-auto object-contain" />
+              <Image src="/logo-footer.jpg" alt="The VitaHub Logo" width={160} height={80} className="h-20 w-auto object-contain" />
             </div>
             <p className="text-xs text-gray-600 leading-relaxed">
               {t('footer_about_desc')}

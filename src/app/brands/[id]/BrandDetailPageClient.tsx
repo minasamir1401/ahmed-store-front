@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
+import Image from 'next/image'
 import { Building2, Loader2, Package, ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
@@ -78,8 +79,8 @@ export default function BrandDetailPageClient({ params, initialBrand, initialPro
         {/* Brand Hero */}
         <div className="bg-white border-b border-[#e8f0ed]">
           <div className="max-w-screen-xl mx-auto px-4 py-12 flex flex-col items-center">
-             <div className="w-32 h-32 bg-[#f0f7f4] rounded-[2.5rem] p-6 mb-6 shadow-sm border border-gray-50 overflow-hidden flex items-center justify-center">
-                {brand.image ? <img src={brand.image} className="w-full h-full object-contain mix-blend-multiply" alt={translate(brand.name)} /> : <Building2 size={40} className="text-primary" />}
+             <div className="w-32 h-32 bg-[#f0f7f4] rounded-[2.5rem] p-6 mb-6 shadow-sm border border-gray-50 overflow-hidden flex items-center justify-center relative">
+                {brand.image ? <Image src={brand.image} width={128} height={128} className="w-full h-full object-contain mix-blend-multiply" alt={translate(brand.name)} sizes="128px" priority /> : <Building2 size={40} className="text-primary" />}
              </div>
              <h1 className="text-3xl font-black text-gray-800">{translate(brand.name)}</h1>
              <p className="text-gray-400 font-bold mt-2">

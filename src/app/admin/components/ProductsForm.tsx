@@ -157,7 +157,7 @@ export default function ProductsForm(props: any) {
                                           {b.name}
                                         </button>
                                       )) : (
-                                        <div className="px-6 py-3 text-[10px] text-slate-400 font-bold italic">سيتم إنشاء ماركة جديدة باسم "{brandSearch}"</div>
+                                        <div className="px-6 py-3 text-[10px] text-slate-400 font-bold italic">سيتم إنشاء ماركة جديدة باسم &quot;{brandSearch}&quot;</div>
                                       )}
                                     </div>
                                   )}

@@ -8,6 +8,9 @@ interface PageParams {
   params: Promise<{
     id: string
   }>
+  searchParams: Promise<{
+    lang?: string
+  }>
 }
 
 // Fetch brand details and related products server-side
@@ -29,66 +32,105 @@ const getBrandData = cache(async (brandId: string) => {
 })
 
 // Dynamic brand page SEO generation on the server
-export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageParams): Promise<Metadata> {
   const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+  const isEn = resolvedSearchParams.lang === 'en'
+  const siteUrl = await getServerSiteUrl()
+  const canonicalUrl = `${siteUrl}/brands/${resolvedParams.id}`
+
   const { brand } = await getBrandData(resolvedParams.id)
   
   if (!brand) {
     return {
-      title: 'الشركة غير موجودة | The VitaHub',
-      description: 'الشركة التي تبحث عنها غير متوفرة حالياً.',
+      title: isEn ? 'Brand Not Found | The VitaHub' : 'الشركة غير موجودة | The VitaHub',
+      description: isEn ? 'The brand you are looking for is currently unavailable.' : 'الشركة التي تبحث عنها غير متوفرة حالياً.',
+      metadataBase: new URL(siteUrl),
+      alternates: {
+        canonical: canonicalUrl,
+        languages: {
+          'ar-EG': canonicalUrl,
+          'en-EG': `${canonicalUrl}?lang=en`,
+          'x-default': canonicalUrl
+        }
+      }
     }
   }
 
-  const siteUrl = await getServerSiteUrl()
+  const brandName = isEn ? (brand.nameEn || brand.name) : brand.name
   const brandImage = brand.image ? absoluteProductImageUrl(brand.image, siteUrl) : `${siteUrl}/logo-header.jpg`
+  
+  const title = isEn
+    ? `Original ${brandName} Supplements & Vitamins | The VitaHub Egypt`
+    : `مكملات وفيتامينات شركة ${brandName} الأصلية | The VitaHub`
+
+  const description = isEn
+    ? `Shop all 100% original ${brandName} supplements and vitamins in Egypt. Proteins, vitamins, and fat burners from ${brandName} with fast delivery.`
+    : `تسوق جميع منتجات ومكملات شركة ${brandName} الأصلية 100% في مصر. بروتينات، فيتامينات، وأقوى حوارق الدهون من ${brandName} مع توصيل سريع.`
 
   return {
-    title: `مكملات وفيتامينات شركة ${brand.name} الأصلية | The VitaHub`,
-    description: `تسوق جميع منتجات ومكملات شركة ${brand.name} الأصلية 100% في مصر. بروتينات، فيتامينات، وأقوى حوارق الدهون من ${brand.name} مع توصيل سريع.`,
+    title,
+    description,
     metadataBase: new URL(siteUrl),
     alternates: {
-      canonical: `/brands/${resolvedParams.id}`,
+      canonical: canonicalUrl,
+      languages: {
+        'ar-EG': canonicalUrl,
+        'en-EG': `${canonicalUrl}?lang=en`,
+        'x-default': canonicalUrl
+      }
     },
     openGraph: {
-      title: `مكملات وفيتامينات شركة ${brand.name} الأصلية | The VitaHub`,
-      description: `تسوق جميع منتجات ومكملات شركة ${brand.name} الأصلية 100% في مصر.`,
-      url: `${siteUrl}/brands/${resolvedParams.id}`,
+      title,
+      description,
+      url: canonicalUrl,
       type: 'website',
+      locale: isEn ? 'en_US' : 'ar_EG',
+      siteName: 'The VitaHub',
       images: [
         {
           url: brandImage,
-          alt: brand.name,
+          secureUrl: brandImage,
+          width: 600,
+          height: 600,
+          alt: brandName,
         }
       ]
     },
     twitter: {
-      card: 'summary',
-      title: `مكملات وفيتامينات شركة ${brand.name} الأصلية | The VitaHub`,
-      description: `تسوق جميع منتجات ومكملات شركة ${brand.name} الأصلية 100% في مصر.`,
+      card: 'summary_large_image',
+      title,
+      description,
       images: [brandImage],
     }
   }
 }
 
-export default async function BrandDetailPage({ params }: PageParams) {
+export default async function BrandDetailPage({ params, searchParams }: PageParams) {
   const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+  const isEn = resolvedSearchParams.lang === 'en'
   const { brand, products } = await getBrandData(resolvedParams.id)
   const siteUrl = await getServerSiteUrl()
 
-  // Construct structured data (CollectionPage JSON-LD) on server-side
   let collectionSchema: any = null
+  let breadcrumbSchema: any = null
+
   if (brand) {
+    const brandName = isEn ? (brand.nameEn || brand.name) : brand.name
+
     collectionSchema = {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
       "@id": `${siteUrl}/brands/${resolvedParams.id}/#collection`,
-      "name": `مكملات وفيتامينات شركة ${brand.name} الأصلية`,
+      "name": isEn ? `Original ${brandName} Supplements & Vitamins` : `مكملات وفيتامينات شركة ${brandName} الأصلية`,
       "url": `${siteUrl}/brands/${resolvedParams.id}`,
-      "description": `مجموعة منتجات ومكملات شركة ${brand.name} المتاحة للشراء في مصر عبر متجر The VitaHub.`,
+      "description": isEn 
+        ? `Collection of ${brandName} supplements and vitamins available in Egypt at The VitaHub.`
+        : `مجموعة منتجات ومكملات شركة ${brandName} المتاحة للشراء في مصر عبر متجر The VitaHub.`,
       "about": {
         "@type": "Brand",
-        "name": brand.name,
+        "name": brandName,
         "image": brand.image ? absoluteProductImageUrl(brand.image, siteUrl) : `${siteUrl}/logo-header.jpg`
       },
       "mainEntity": {
@@ -97,11 +139,36 @@ export default async function BrandDetailPage({ params }: PageParams) {
         "itemListElement": products.map((prod: any, index: number) => ({
           "@type": "ListItem",
           "position": index + 1,
-          "url": `${siteUrl}/product/${prod.id}`,
-          "name": prod.title,
+          "url": `${siteUrl}/product/${prod.id}${isEn ? '?lang=en' : ''}`,
+          "name": isEn ? (prod.titleEn || prod.title) : prod.title,
           "image": prod.image ? absoluteProductImageUrl(prod.image, siteUrl) : `${siteUrl}/logo-header.jpg`
         }))
       }
+    }
+
+    breadcrumbSchema = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": isEn ? "Home" : "الرئيسية",
+          "item": `${siteUrl}/${isEn ? '?lang=en' : ''}`
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": isEn ? "Brands" : "الشركات",
+          "item": `${siteUrl}/brands${isEn ? '?lang=en' : ''}`
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": brandName,
+          "item": `${siteUrl}/brands/${brand.id}${isEn ? '?lang=en' : ''}`
+        }
+      ]
     }
   }
 
@@ -111,6 +178,12 @@ export default async function BrandDetailPage({ params }: PageParams) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+        />
+      )}
+      {breadcrumbSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
         />
       )}
       <BrandDetailPageClient params={resolvedParams} initialBrand={brand} initialProducts={products} />

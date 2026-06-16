@@ -1,24 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Cairo, Outfit } from "next/font/google";
 import "./globals.css";
 import FloatingActions from "@/components/FloatingActions";
 import BottomNav from "@/components/BottomNav";
 import { getServerSiteUrl } from "@/lib/seo";
-
-// ─── Google Fonts via next/font (أسرع من @import — لا يوجد Render Blocking) ──
-const cairo = Cairo({
-  subsets: ["arabic", "latin"],
-  weight: ["300", "400", "600", "700", "900"],
-  display: "swap",
-  variable: "--font-cairo",
-});
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  weight: ["400", "600", "800", "900"],
-  display: "swap",
-  variable: "--font-outfit",
-});
 
 // ─── Metadata ──────────────────────────────────────────────────────────────
 export async function generateMetadata(): Promise<Metadata> {
@@ -168,6 +152,21 @@ async function JsonLdSchema() {
           "https://www.instagram.com/vitaminshub",
           "https://twitter.com/vitaminshub"
         ]
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "@id": `${siteUrl}/#site-navigation`,
+        "name": ["الرئيسية", "المنتجات", "الأقسام", "العروض", "العلامات التجارية", "نصائح طبية", "الشحن", "الاسترجاع"],
+        "url": [
+          `${siteUrl}/`,
+          `${siteUrl}/products`,
+          `${siteUrl}/categories`,
+          `${siteUrl}/offers`,
+          `${siteUrl}/brands`,
+          `${siteUrl}/health-tips`,
+          `${siteUrl}/shipping`,
+          `${siteUrl}/returns`
+        ]
       }
     ]
   };
@@ -205,9 +204,12 @@ export default async function RootLayout({
     <html
       lang="ar"
       dir="rtl"
-      className={`${cairo.variable} ${outfit.variable} h-full antialiased`}
+      className="h-full antialiased"
     >
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet" />
         <JsonLdSchema />
       </head>
       <body className="min-h-full flex flex-col font-cairo overflow-x-hidden">

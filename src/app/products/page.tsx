@@ -409,6 +409,7 @@ function ProductsContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const initialCategory = searchParams.get('category')
+  const searchQuery = searchParams.get('search') || ''
 
   const [products, setProducts] = React.useState<any[]>([])
   const [categories, setCategories] = React.useState<any[]>([])
@@ -424,7 +425,7 @@ function ProductsContent() {
   const [priceRange, setPriceRange] = React.useState<[number, number]>([0, 5000])
   const [priceValue, setPriceValue] = React.useState<[number, number]>([0, 5000])
 
-  const isPriceModified = React.useRef(false)
+  const [isPriceModified, setIsPriceModified] = React.useState(false)
   const prevPriceValue = React.useRef<[number, number]>([0, 5000])
 
   // Pagination states
@@ -444,8 +445,8 @@ function ProductsContent() {
       const catQuery = cats.length > 0 ? `&categoryId=${cats.join(',')}` : ''
       
       // Send price filters only if the user has modified them
-      const minP = isPriceModified.current ? price[0] : ''
-      const maxP = isPriceModified.current ? price[1] : ''
+      const minP = isPriceModified ? price[0] : ''
+      const maxP = isPriceModified ? price[1] : ''
       const priceQuery = minP !== '' || maxP !== '' ? `&minPrice=${minP}&maxPrice=${maxP}` : ''
 
       const [prodRes, catRes] = await Promise.all([
@@ -489,17 +490,17 @@ function ProductsContent() {
     prevPriceValue.current = priceValue
 
     // Skip redundant fetch if priceValue was updated automatically to match the backend's dynamic maxPrice
-    if (priceChanged && !isPriceModified.current) {
+    if (priceChanged && !isPriceModified) {
       return
     }
 
     fetchData(currentPage, selectedCats, priceValue, sortBy)
-  }, [currentPage, selectedCats, priceValue, sortBy, searchParams.get('search')])
+  }, [currentPage, selectedCats, priceValue, sortBy, isPriceModified, searchQuery])
 
   // Reset page to 1 on filter/search parameters change
   React.useEffect(() => {
-    setCurrentPage(1)
-  }, [selectedCats, priceValue, sortBy, searchParams.get('search')])
+    queueMicrotask(() => setCurrentPage(1))
+  }, [selectedCats, priceValue, sortBy, searchQuery])
 
   // Toggle category
   const toggleCat = (id: string) => {
@@ -509,7 +510,7 @@ function ProductsContent() {
   }
 
   const handlePriceChange = (val: [number, number]) => {
-    isPriceModified.current = true
+    setIsPriceModified(true)
     setPriceValue(val)
   }
 
@@ -517,14 +518,12 @@ function ProductsContent() {
   const resetFilters = () => {
     setSelectedCats([])
     setSortBy('default')
-    isPriceModified.current = false
+    setIsPriceModified(false)
     setPriceValue(priceRange)
   }
 
-  const searchQuery = searchParams.get('search') || ''
-
   const hasFilters = selectedCats.length > 0 ||
-    (isPriceModified.current && (priceValue[0] > priceRange[0] || priceValue[1] < priceRange[1])) ||
+    (isPriceModified && (priceValue[0] > priceRange[0] || priceValue[1] < priceRange[1])) ||
     sortBy !== 'default'
 
   const filterProps = {

@@ -9,8 +9,8 @@ export default function FloatingActions() {
   const [showBackToTop, setShowBackToTop] = React.useState(false)
   const [stickyBarVisible, setStickyBarVisible] = React.useState(false)
   const pathname = usePathname()
-  if (pathname?.startsWith('/admin')) return null
   const isProductPage = pathname?.startsWith('/product/')
+  const isAdmin = pathname?.startsWith('/admin')
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -30,7 +30,7 @@ export default function FloatingActions() {
   }, [])
 
   React.useEffect(() => {
-    setStickyBarVisible(false)
+    queueMicrotask(() => setStickyBarVisible(false))
   }, [pathname])
 
   // Determine the bottom position based on the device and sticky bar status
@@ -44,6 +44,8 @@ export default function FloatingActions() {
     }
     return 'bottom-20 max-[340px]:bottom-[76px] md:bottom-8'
   }, [isProductPage, stickyBarVisible])
+
+  if (isAdmin) return null
 
   return (
     <div className={`fixed left-6 max-[340px]:left-3 flex flex-col gap-3 max-[340px]:gap-2 z-40 transition-all duration-300 print:hidden ${bottomClass}`}>

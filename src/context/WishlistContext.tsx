@@ -27,14 +27,16 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   // Load from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('vitamins_hub_wishlist')
-    if (saved) {
-      try {
-        setWishlist(JSON.parse(saved))
-      } catch (e) {
-        console.error("Failed to load wishlist", e)
+    queueMicrotask(() => {
+      if (saved) {
+        try {
+          setWishlist(JSON.parse(saved))
+        } catch (e) {
+          console.error("Failed to load wishlist", e)
+        }
       }
-    }
-    setIsLoaded(true)
+      setIsLoaded(true)
+    })
   }, [])
 
   // Save to localStorage whenever it changes

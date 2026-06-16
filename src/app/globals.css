@@ -4,6 +4,8 @@
 @tailwind utilities;
 
 :root {
+  --font-cairo: 'Cairo', sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
   --background: #ffffff;
   --foreground: #1a1a1a;
   --primary: #2e7d5e;

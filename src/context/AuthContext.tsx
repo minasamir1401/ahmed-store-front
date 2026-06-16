@@ -27,11 +27,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const savedToken = localStorage.getItem('vitamins_hub_auth_token')
     const savedUser = localStorage.getItem('vitamins_hub_auth_user')
-    if (savedToken && savedUser) {
-      setToken(savedToken)
-      setUser(JSON.parse(savedUser))
-    }
-    setLoading(false)
+    queueMicrotask(() => {
+      if (savedToken && savedUser) {
+        setToken(savedToken)
+        setUser(JSON.parse(savedUser))
+      }
+      setLoading(false)
+    })
   }, [])
 
   const login = (newToken: string, newUser: User) => {

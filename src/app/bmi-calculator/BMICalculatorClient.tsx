@@ -265,7 +265,7 @@ export default function BMICalculatorClient() {
                             className="space-y-6"
                           >
                              <div className={`bg-primary/5 p-6 rounded-3xl border border-primary/10 text-gray-700 leading-relaxed whitespace-pre-line font-medium italic ${isRtl ? 'text-right' : 'text-left'}`}>
-                                "{aiAdvice}"
+                                &quot;{aiAdvice}&quot;
                              </div>
                              
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

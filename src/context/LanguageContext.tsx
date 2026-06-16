@@ -22,24 +22,38 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith('/admin') || false;
 
-  // Initialize lang and dir state on mount
+  // Initialize lang and dir state on mount and url changes
   useEffect(() => {
     if (isAdmin) {
-      setLanguageState('ar');
       document.documentElement.lang = 'ar';
       document.documentElement.dir = 'rtl';
+      queueMicrotask(() => setLanguageState('ar'));
       return;
     }
+    
+    // Check URL search parameters first
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlLang = params.get('lang') as Language;
+      if (urlLang === 'ar' || urlLang === 'en') {
+        localStorage.setItem('vitamins_hub_lang', urlLang);
+        document.documentElement.lang = urlLang;
+        document.documentElement.dir = urlLang === 'ar' ? 'rtl' : 'ltr';
+        queueMicrotask(() => setLanguageState(urlLang));
+        return;
+      }
+    }
+
     const saved = localStorage.getItem('vitamins_hub_lang') as Language;
     if (saved && (saved === 'ar' || saved === 'en')) {
-      setLanguageState(saved);
       document.documentElement.lang = saved;
       document.documentElement.dir = saved === 'ar' ? 'rtl' : 'ltr';
+      queueMicrotask(() => setLanguageState(saved));
     } else {
       document.documentElement.lang = 'ar';
       document.documentElement.dir = 'rtl';
     }
-  }, [isAdmin]);
+  }, [isAdmin, pathname]);
 
   const setLanguage = (lang: Language) => {
     if (isAdmin) {

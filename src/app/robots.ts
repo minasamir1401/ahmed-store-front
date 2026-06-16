@@ -20,7 +20,6 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         '/faq',
         '/shipping',
         '/returns',
-        '/track',
         '/api/images/',
         '/uploads/',
         '/_next/image'
@@ -30,6 +29,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         '/cart',
         '/checkout',
         '/profile',
+        '/track',
         '/login',
         '/forgot',
         '/wishlist',

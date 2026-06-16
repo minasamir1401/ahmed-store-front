@@ -1,23 +1,57 @@
 import ProductPageClient from './ProductPageClient'
 import type { Metadata } from 'next'
 import { cache } from 'react'
-import { absoluteProductImageUrl, productImageAlt, productMainImage } from '@/lib/product-images'
+import { absoluteProductImageUrl, productImageAlt, productImageVersion, productMainImage, withImageVersion } from '@/lib/product-images'
 import { getServerSiteUrl as getSiteUrl } from '@/lib/seo'
 
 interface PageParams {
   params: Promise<{
     id: string
   }>
+  searchParams: Promise<{
+    lang?: string
+  }>
 }
 
-// Robust server-side proxy fetching
-const getProduct = cache(async (id: string) => {
+type ProductSpec = {
+  label?: string
+  value?: unknown
+}
+
+type ProductData = {
+  id: string
+  title: string
+  titleEn?: string | null
+  desc?: string | null
+  descEn?: string | null
+  seoDesc?: string | null
+  seoDescEn?: string | null
+  seoKeywords?: string | null
+  seoKeywordsEn?: string | null
+  image?: string | null
+  imageAlt?: string | null
+  imageWidth?: number | null
+  imageHeight?: number | null
+  updatedAt?: string | null
+  imageUpdatedAt?: string | null
+  price: number
+  productSpecs?: string | null
+  specifications?: string | null
+  categoryId?: string | null
+  category?: { name?: string | null; nameEn?: string | null } | null
+  brand?: { name?: string | null } | null
+}
+
+type JsonLd = Record<string, unknown>
+
+// Server-side fetching with cache
+const getProduct = cache(async (id: string): Promise<ProductData | null> => {
   const baseUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL
   if (!baseUrl) return null
 
   const targetUrl = `${baseUrl.replace(/\/+$/, '')}/api/products/${id}`
   try {
-    const res = await fetch(targetUrl, { next: { revalidate: 60 } })
+    const res = await fetch(targetUrl, { cache: 'no-store' })
     if (res.ok) return await res.json()
   } catch (e) {
     console.error(`Failed server-side fetch for product ${id} from ${targetUrl}:`, e)
@@ -41,38 +75,56 @@ const limitSeoText = (value: string, maxLength: number) => {
   return `${(lastSpace > 40 ? sliced.slice(0, lastSpace) : sliced).trim()}...`
 }
 
-const productSeoTitle = (product: any) => {
+const productSeoTitle = (product: ProductData, isEn: boolean) => {
+  const title = isEn ? (product.titleEn || product.title) : product.title
   const brandName = product.brand?.name ? ` | ${product.brand.name}` : ''
-  return limitSeoText(`${product.title}${brandName}`, 62)
+  return limitSeoText(`${title}${brandName}`, 62)
 }
 
-const productSeoDescription = (product: any) => {
-  const description = product.seoDesc || product.desc || product.seoDescEn || product.descEn || `اشتري ${product.title} من The VitaHub مع توصيل سريع ومنتجات أصلية 100%.`
+const productSeoDescription = (product: ProductData, isEn: boolean) => {
+  if (isEn) {
+    const description = product.seoDescEn || product.descEn || `Buy ${product.titleEn || product.title} from The VitaHub Egypt with fast delivery and 100% original products.`
+    return limitSeoText(description, 155)
+  }
+  const description = product.seoDesc || product.desc || `اشتري ${product.title} من The VitaHub مع توصيل سريع ومنتجات أصلية 100%.`
   return limitSeoText(description, 155)
 }
 
-const productSeoImage = (product: any, siteUrl: string) => {
-  return absoluteProductImageUrl(productMainImage(product.image), siteUrl) || `${siteUrl}/logo-header.jpg`
+const productSeoImage = (product: ProductData, siteUrl: string) => {
+  const imageUrl = absoluteProductImageUrl(productMainImage(product.image), siteUrl) || `${siteUrl}/logo-header.jpg`
+  return withImageVersion(imageUrl, productImageVersion(product))
 }
 
-// Elite dynamic SEO metadata generation on the server
-export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
+// dynamic SEO metadata generation on the server
+export async function generateMetadata({ params, searchParams }: PageParams): Promise<Metadata> {
   const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+  const isEn = resolvedSearchParams.lang === 'en'
+  const siteUrl = await getSiteUrl()
+  const canonicalUrl = `${siteUrl}/product/${resolvedParams.id}`
+  
   const product = await getProduct(resolvedParams.id)
   
   if (!product) {
     return {
-      title: 'المنتج غير موجود | The VitaHub',
-      description: 'المنتج الذي تبحث عنه غير متوفر حالياً.',
+      title: isEn ? 'Product Not Found | The VitaHub' : 'المنتج غير موجود | The VitaHub',
+      description: isEn ? 'The product you are looking for is currently unavailable.' : 'المنتج الذي تبحث عنه غير متوفر حالياً.',
+      metadataBase: new URL(siteUrl),
+      alternates: {
+        canonical: canonicalUrl,
+        languages: {
+          'ar-EG': canonicalUrl,
+          'en-EG': `${canonicalUrl}?lang=en`,
+          'x-default': canonicalUrl
+        }
+      }
     }
   }
 
-  const siteUrl = await getSiteUrl()
   const imageUrl = productSeoImage(product, siteUrl)
   const imageAlt = productImageAlt(product, product.title)
-  const title = productSeoTitle(product)
-  const description = productSeoDescription(product)
-  const canonicalUrl = `${siteUrl}/product/${resolvedParams.id}`
+  const title = productSeoTitle(product, isEn)
+  const description = productSeoDescription(product, isEn)
 
   return {
     title,
@@ -84,13 +136,18 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     metadataBase: new URL(siteUrl),
     alternates: {
       canonical: canonicalUrl,
+      languages: {
+        'ar-EG': canonicalUrl,
+        'en-EG': `${canonicalUrl}?lang=en`,
+        'x-default': canonicalUrl
+      }
     },
     openGraph: {
       title,
       description,
       url: canonicalUrl,
       siteName: 'The VitaHub',
-      locale: 'ar_EG',
+      locale: isEn ? 'en_US' : 'ar_EG',
       type: 'website',
       images: [
         {
@@ -112,58 +169,49 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   }
 }
 
-export default async function ProductPage({ params }: PageParams) {
+export default async function ProductPage({ params, searchParams }: PageParams) {
   const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+  const isEn = resolvedSearchParams.lang === 'en'
   const product = await getProduct(resolvedParams.id)
   const siteUrl = await getSiteUrl()
 
-  // Construct structured data (Product JSON-LD) on server-side
-  let structuredData: any = null
-  let breadcrumbData: any = null
+  let structuredData: JsonLd | null = null
+  let breadcrumbData: JsonLd | null = null
 
   if (product) {
     const seoImage = productSeoImage(product, siteUrl)
     
-    let specs: any[] = []
+    let specs: ProductSpec[] = []
     try {
       const raw = product.productSpecs ? JSON.parse(product.productSpecs) : (product.specifications ? JSON.parse(product.specifications) : null)
-      if (Array.isArray(raw)) { specs = raw }
+      if (Array.isArray(raw)) {
+        specs = raw
+      } else if (raw && typeof raw === 'object') {
+        specs = Object.entries(raw).map(([label, value]) => ({ label, value }))
+      }
     } catch {}
     
-    const skuValue = specs.find((s: any) => s.label?.includes('SKU'))?.value || product.id
+    const specLabel = (spec: ProductSpec) => typeof spec.label === 'string' ? spec.label.toUpperCase() : ''
+    const specText = (value: unknown) => typeof value === 'string' || typeof value === 'number' ? String(value) : undefined
+    const skuValue = specText(specs.find((s) => specLabel(s).includes('SKU'))?.value) || product.id
+    const gtinValue = specText(specs.find((s) => specLabel(s).includes('GTIN') || specLabel(s).includes('BARCODE') || (s.label || '').includes('باركود'))?.value)
+    const mpnValue = specText(specs.find((s) => specLabel(s).includes('MPN') || specLabel(s).includes('MODEL') || (s.label || '').includes('موديل'))?.value) || product.id
 
     structuredData = {
       "@context": "https://schema.org/",
       "@type": "Product",
-      "name": product.title,
+      "name": isEn ? (product.titleEn || product.title) : product.title,
       "image": [seoImage],
       "alternateName": product.imageAlt || product.titleEn || product.title,
-      "description": productSeoDescription(product),
+      "description": productSeoDescription(product, isEn),
       "sku": skuValue,
-      "mpn": product.id,
+      "mpn": mpnValue,
+      ...(gtinValue ? { "gtin": gtinValue } : {}),
       "brand": {
         "@type": "Brand",
         "name": product.brand?.name || 'The VitaHub'
       },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "28"
-      },
-      "review": [
-        {
-          "@type": "Review",
-          "author": {
-            "@type": "Person",
-            "name": "عميل متجر ذا فيتا هوب"
-          },
-          "reviewRating": {
-            "@type": "Rating",
-            "ratingValue": "5"
-          },
-          "reviewBody": "منتج ممتاز وأصلي 100%، التوصيل سريع والتغليف ممتاز."
-        }
-      ],
       "offers": {
         "@type": "Offer",
         "url": `${siteUrl}/product/${product.id}`,
@@ -207,12 +255,14 @@ export default async function ProductPage({ params }: PageParams) {
           "@type": "MerchantReturnPolicy",
           "applicableCountry": "EG",
           "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnPeriod",
-          "merchantReturnDays": 7,
+          "merchantReturnDays": 14,
           "returnMethod": "https://schema.org/ReturnByMail",
           "returnFees": "https://schema.org/FreeReturn"
         }
       }
     }
+
+    const catName = isEn ? (product.category?.nameEn || product.category?.name || "Supplements") : (product.category?.name || "المكملات الغذائية")
 
     breadcrumbData = {
       "@context": "https://schema.org",
@@ -221,26 +271,26 @@ export default async function ProductPage({ params }: PageParams) {
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "الرئيسية",
-          "item": `${siteUrl}/`
+          "name": isEn ? "Home" : "الرئيسية",
+          "item": `${siteUrl}/${isEn ? '?lang=en' : ''}`
         },
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "المنتجات",
-          "item": `${siteUrl}/products`
+          "name": isEn ? "Products" : "المنتجات",
+          "item": `${siteUrl}/products${isEn ? '?lang=en' : ''}`
         },
         {
           "@type": "ListItem",
           "position": 3,
-          "name": product.category?.name || "المكملات الغذائية",
-          "item": `${siteUrl}/products?category=${product.categoryId || ''}`
+          "name": catName,
+          "item": `${siteUrl}/categories${isEn ? '?lang=en' : ''}`
         },
         {
           "@type": "ListItem",
           "position": 4,
-          "name": product.title,
-          "item": `${siteUrl}/product/${product.id}`
+          "name": isEn ? (product.titleEn || product.title) : product.title,
+          "item": `${siteUrl}/product/${product.id}${isEn ? '?lang=en' : ''}`
         }
       ]
     }

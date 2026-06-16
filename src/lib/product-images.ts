@@ -4,6 +4,11 @@ type ProductImageSource = {
   title?: string | null
 }
 
+type VersionedImageSource = {
+  updatedAt?: string | null
+  imageUpdatedAt?: string | null
+}
+
 export const productImageAlt = (product: ProductImageSource, fallback = 'Product image') => {
   return product?.imageAlt || product?.titleEn || product?.title || fallback
 }
@@ -26,6 +31,19 @@ export const absoluteProductImageUrl = (src: string | null | undefined, siteUrl:
   const encodedPath = src.split('/').map(segment => encodeURIComponent(segment)).join('/')
   
   return `${siteUrl.replace(/\/+$/, '')}${encodedPath.startsWith('/') ? encodedPath : `/${encodedPath}`}`
+}
+
+export const productImageVersion = (product?: VersionedImageSource | null) => {
+  const value = product?.imageUpdatedAt || product?.updatedAt
+  if (!value) return ''
+
+  const time = new Date(value).getTime()
+  return Number.isFinite(time) ? String(time) : ''
+}
+
+export const withImageVersion = (src: string, version?: string | null) => {
+  if (!src || !version || /^data:/i.test(src)) return src
+  return `${src}${src.includes('?') ? '&' : '?'}v=${encodeURIComponent(version)}`
 }
 
 export const safeBrandImage = (src?: string | null) => {

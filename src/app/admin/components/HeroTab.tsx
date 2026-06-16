@@ -43,7 +43,7 @@ export default function HeroTab(props: any) {
         const parsed = JSON.parse(formData.slides);
         if (Array.isArray(parsed) && parsed.length > 0) {
           if (JSON.stringify(parsed) !== JSON.stringify(slides)) {
-            setSlides(parsed);
+            queueMicrotask(() => setSlides(parsed));
           }
           return;
         }
@@ -54,15 +54,15 @@ export default function HeroTab(props: any) {
     
     // Fallback: migrate old static hero to slides if slides are empty
     if (!formData.slides && (formData.title || formData.image) && slides.length === 0) {
-      setSlides([{
+      queueMicrotask(() => setSlides([{
         title: formData.title || '',
         subtitle: formData.subtitle || '',
         image: formData.image || '',
         buttonText: formData.buttonText || '',
         buttonLink: formData.buttonLink || ''
-      }]);
+      }]));
     } else if (!formData.slides && slides.length === 0) {
-      setSlides([{ title: '', subtitle: '', image: '', buttonText: '', buttonLink: '' }]);
+      queueMicrotask(() => setSlides([{ title: '', subtitle: '', image: '', buttonText: '', buttonLink: '' }]));
     }
   }, [formData.slides, formData.title, formData.image]); // Run when formData changes
 

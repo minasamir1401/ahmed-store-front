@@ -86,7 +86,7 @@ export default function WhatsappTab(props: any) {
                               <li>وجه كاميرا الهاتف نحو الرمز الموضح بجانبك لمسحه.</li>
                             </ol>
                             <p className="text-[10px] text-amber-600 font-bold bg-amber-50 p-2.5 rounded-xl border border-amber-200/50">
-                              💡 ملاحظة: بعد المسح بنجاح، ستتحول الشاشة تلقائياً للحالة "متصل" خلال ثوانٍ.
+                              💡 ملاحظة: بعد المسح بنجاح، ستتحول الشاشة تلقائياً للحالة &quot;متصل&quot; خلال ثوانٍ.
                             </p>
                           </div>
                         </div>

@@ -44,7 +44,7 @@ export default function CheckoutPage() {
     const saved = localStorage.getItem('vitamins_hub_checkout_data')
     if (saved) {
       try {
-        setFormData(JSON.parse(saved))
+        queueMicrotask(() => setFormData(JSON.parse(saved)))
       } catch (e) { console.error(e) }
     }
   }, [])
@@ -57,12 +57,12 @@ export default function CheckoutPage() {
   // Pre-populate with user info if logged in
   React.useEffect(() => {
     if (user) {
-      setFormData(prev => ({
+      queueMicrotask(() => setFormData(prev => ({
         ...prev,
         name: prev.name || user.name || '',
         email: prev.email || user.email || '',
         phone: prev.phone || user.phone || ''
-      }))
+      })))
     }
   }, [user])
 

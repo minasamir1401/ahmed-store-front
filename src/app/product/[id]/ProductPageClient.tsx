@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
+import Image from 'next/image'
 import { newestProducts } from '@/lib/product-display'
 import { Star, ShieldCheck, Truck, RotateCcw, Plus, Minus, Heart, ShoppingCart, Check, ChevronLeft, CheckCircle2, Building2, Sparkles, Droplet, Sun, Activity, Info, Moon, Dumbbell, Flame, Calendar, Clock } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
@@ -12,7 +13,7 @@ import Link from 'next/link'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { productImageAlt, productImageThumb, safeBrandImage } from '@/lib/product-images'
+import { productImageAlt, productImageThumb, productImageVersion, safeBrandImage, withImageVersion } from '@/lib/product-images'
 import { trackViewContent, trackAddToCart } from '@/lib/tracking'
 
 // ── Animation variants ──────────────────────────────────────────────────
@@ -145,14 +146,16 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
   // Sync states when dbCalculator is loaded
   useEffect(() => {
     if (dbCalculator && dbCalculator.enabled) {
-      if (dbCalculator.genderTarget === 'female') {
-        setSelectedGender('female')
-      } else {
-        setSelectedGender('male')
-      }
-      if (dbCalculator.rules && dbCalculator.rules.length > 0) {
-        setSelectedGoal(dbCalculator.rules[0].value)
-      }
+      queueMicrotask(() => {
+        if (dbCalculator.genderTarget === 'female') {
+          setSelectedGender('female')
+        } else {
+          setSelectedGender('male')
+        }
+        if (dbCalculator.rules && dbCalculator.rules.length > 0) {
+          setSelectedGoal(dbCalculator.rules[0].value)
+        }
+      })
     }
   }, [product?.dosageCalculator])
 
@@ -183,7 +186,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
     }
   }
 
-  let activeRule = dbCalculator?.rules?.find((r: any) => r.value === selectedGoal) || dbCalculator?.rules?.[0]
+  const activeRule = dbCalculator?.rules?.find((r: any) => r.value === selectedGoal) || dbCalculator?.rules?.[0]
   let dbRecommendedValue = ''
   let dbCapsuleRecommendation = ''
   let dbHealthTip = ''
@@ -418,7 +421,8 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
 
   // Parse data
   const additionalImages = product.images ? product.images.split(',').map((img: string) => img.trim()).filter((i: string) => i) : []
-  const allImages = [product.image, ...additionalImages].filter(Boolean)
+  const imageVersion = productImageVersion(product)
+  const allImages = [product.image, ...additionalImages].filter(Boolean).map((src: string) => withImageVersion(src, imageVersion))
   const mainImageAlt = productImageAlt(product, getLocalizedValue(language, product.title, product.titleEn, translate))
   const mainImageWidth = product.imageWidth || 800
   const mainImageHeight = product.imageHeight || 800
@@ -655,7 +659,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                     className="aspect-square rounded-2xl sm:rounded-[3rem] bg-[#f0f7f4] overflow-hidden border border-[#e8f0ed] p-4 sm:p-12 flex items-center justify-center relative shadow-sm group"
                   >
-                    <img src={activeImage} width={mainImageWidth} height={mainImageHeight} className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" alt={mainImageAlt} fetchPriority="high" decoding="async" />
+                    <Image src={activeImage} width={typeof mainImageWidth === 'number' ? mainImageWidth : parseInt(mainImageWidth)} height={typeof mainImageHeight === 'number' ? mainImageHeight : parseInt(mainImageHeight)} className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" alt={mainImageAlt} priority sizes="(max-width: 768px) 100vw, 800px" />
                     {/* Discount badge on image */}
                     {discountPercent && (
                       <div className="absolute top-3 left-3 xs:top-5 xs:left-5 bg-red-500 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-md">
@@ -683,7 +687,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                       whileTap={{ scale: 0.95 }}
                       className={`aspect-square rounded-xl xs:rounded-2xl bg-[#f0f7f4] border-2 cursor-pointer transition-all p-1.5 max-[340px]:p-1 xs:p-3 overflow-hidden ${activeImage === img ? 'border-primary shadow-md shadow-primary/10' : 'border-[#e8f0ed] hover:border-primary/50'}`}
                     >
-                      <img src={productImageThumb(img) || img} width={160} height={160} className="w-full h-full object-contain mix-blend-multiply" alt={`${mainImageAlt} ${i + 1}`} loading="lazy" decoding="async" />
+                      <Image src={productImageThumb(img) || img} width={160} height={160} className="w-full h-full object-contain mix-blend-multiply" alt={`${mainImageAlt} ${i + 1}`} sizes="160px" />
                     </motion.div>
                   ))}
                 </motion.div>
@@ -696,9 +700,9 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                   <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] max-[340px]:text-[9px] font-black uppercase tracking-wider">{getLocalizedValue(language, product.category?.name, product.category?.nameEn, translate)}</span>
                   {product.brand && (
                     <Link href={`/brands/${product.brand.id}`} className="flex items-center gap-2 bg-gray-50 text-gray-700 pr-1 pl-3 py-1 rounded-full text-[11px] max-[340px]:text-[10px] font-black border border-gray-100 hover:border-primary/30 hover:bg-white transition-all shadow-sm">
-                      {product.brand.image ? (
-                        <img src={safeBrandImage(product.brand.image)} alt={getLocalizedValue(language, product.brand.name, product.brand.nameEn, translate)} className="w-6 h-6 rounded-full object-cover bg-white border border-gray-100" />
-                      ) : (
+                    {product.brand.image ? (
+                      <Image src={safeBrandImage(product.brand.image)} alt={getLocalizedValue(language, product.brand.name, product.brand.nameEn, translate)} width={24} height={24} className="w-6 h-6 rounded-full object-cover bg-white border border-gray-100" />
+                    ) : (
                         <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary"><Building2 size={12} /></div>
                       )}
                       <span>{getLocalizedValue(language, product.brand.name, product.brand.nameEn, translate)}</span>
@@ -1145,7 +1149,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                 {product.brand && (
                   <Link href={`/brands/${product.brand.id}`} className="flex items-center gap-2 bg-gray-50 text-gray-700 pr-1 pl-3 py-1 rounded-full text-[11px] max-[340px]:text-[10px] font-black border border-gray-100 hover:border-primary/30 hover:bg-white transition-all shadow-sm">
                     {product.brand.image ? (
-                      <img src={safeBrandImage(product.brand.image)} alt={getLocalizedValue(language, product.brand.name, product.brand.nameEn, translate)} className="w-6 h-6 rounded-full object-cover bg-white border border-gray-100" />
+                      <Image src={safeBrandImage(product.brand.image)} alt={getLocalizedValue(language, product.brand.name, product.brand.nameEn, translate)} width={24} height={24} className="w-6 h-6 rounded-full object-cover bg-white border border-gray-100" />
                     ) : (
                       <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary"><Building2 size={12} /></div>
                     )}
@@ -1637,10 +1641,12 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     className="bg-white rounded-3xl overflow-hidden shadow-sm border border-[#e8f0ed] group hover:shadow-xl transition-all duration-500 flex flex-col h-full"
                   >
                     <div className="relative aspect-video overflow-hidden bg-emerald-50">
-                      <img 
+                      <Image 
                         src={postImage} 
                         alt={postTitle} 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-700" 
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
                       />
                       <div className={`absolute top-4 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full ${language === 'ar' ? 'right-4' : 'left-4'}`}>
                         {language === 'ar' ? 'نصيحة طبية' : 'Health Tip'}
@@ -1684,7 +1690,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
             className="fixed bottom-[68px] lg:bottom-6 left-1.5 right-1.5 max-[340px]:left-1 max-[340px]:right-1 xs:left-3 xs:right-3 sm:left-auto sm:right-6 sm:w-96 lg:right-8 z-50"
           >
             <div className="w-full bg-white rounded-[1.5rem] xs:rounded-[2rem] shadow-2xl border border-slate-100 p-1.5 max-[340px]:p-1 xs:p-4 flex items-center gap-1.5 max-[340px]:gap-1 xs:gap-4">
-              <img src={productImageThumb(product.image) || product.image} alt={mainImageAlt} width={72} height={72} className="w-9 h-9 max-[340px]:w-8 max-[340px]:h-8 rounded-xl xs:rounded-2xl object-contain bg-[#f0f7f4] p-1 border border-slate-100 flex-shrink-0" loading="lazy" decoding="async" />
+              <Image src={productImageThumb(product.image) || product.image} alt={mainImageAlt} width={72} height={72} className="w-9 h-9 max-[340px]:w-8 max-[340px]:h-8 rounded-xl xs:rounded-2xl object-contain bg-[#f0f7f4] p-1 border border-slate-100 flex-shrink-0" sizes="72px" />
               <div className="flex-1 min-w-0">
                 <p className="text-[9px] xs:text-xs font-bold text-gray-500 truncate">{getLocalizedValue(language, product.title, product.titleEn, translate)}</p>
                 <p className="text-xs max-[340px]:text-[11px] xs:text-lg font-black text-primary">{currentPrice} {t('currency')}</p>

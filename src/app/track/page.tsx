@@ -27,13 +27,6 @@ export default function TrackOrderPage() {
     document.title = t('track_title')
   }, [language, t])
 
-  // Automatically load the latest order if the user is logged in
-  useEffect(() => {
-    if (token) {
-      fetchLatestOrder()
-    }
-  }, [token])
-
   const fetchLatestOrder = async () => {
     setLoading(true)
     setError('')
@@ -54,6 +47,13 @@ export default function TrackOrderPage() {
       setLoading(false)
     }
   }
+
+  // Automatically load the latest order if the user is logged in
+  useEffect(() => {
+    if (token) {
+      queueMicrotask(() => fetchLatestOrder())
+    }
+  }, [token])
 
   const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault()

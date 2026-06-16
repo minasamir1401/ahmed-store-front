@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { Calendar, Clock, ChevronRight, Share2, Star, BookOpen, Heart, Leaf, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import ShareButton from './ShareButton'
 import { useLanguage } from '@/context/LanguageContext'
 import ProductCard from '@/components/ProductCard'
@@ -200,7 +201,7 @@ export default function ArticleDetailClient({ post, params }: { post: any, param
       <div className="relative w-full overflow-hidden" style={{ minHeight: '52vh' }}>
         {/* Background image with overlay */}
         {formattedPost.image
-          ? <img src={formattedPost.image} alt={translate(formattedPost.title)} className="absolute inset-0 w-full h-full object-cover" />
+          ? <Image src={formattedPost.image} alt={translate(formattedPost.title)} fill priority className="absolute inset-0 w-full h-full object-cover" sizes="100vw" />
           : <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-teal-500 to-cyan-400" />
         }
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
@@ -250,7 +251,7 @@ export default function ArticleDetailClient({ post, params }: { post: any, param
 
           {/* Lead / excerpt card */}
           <div className={`relative bg-gradient-to-r ${isRtl ? 'from-emerald-50 to-teal-50 border-r-4' : 'from-teal-50 to-emerald-50 border-l-4'} border-emerald-400 rounded-3xl px-6 md:px-10 py-6 mb-8 shadow-sm`}>
-            <div className={`absolute top-5 ${isRtl ? 'right-5' : 'left-5'} text-emerald-200 select-none text-7xl font-serif leading-none`}>"</div>
+            <div className={`absolute top-5 ${isRtl ? 'right-5' : 'left-5'} text-emerald-200 select-none text-7xl font-serif leading-none`}>&ldquo;</div>
             <p className={`relative text-gray-700 text-lg md:text-xl font-semibold leading-relaxed italic ${isRtl ? 'text-right pr-6' : 'text-left pl-6'}`}>
               {translate(formattedPost.excerpt)}
             </p>

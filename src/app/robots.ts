@@ -21,6 +21,8 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         '/shipping',
         '/returns',
         '/api/images/',
+        '/api/products',
+        '/api/medical-tips',
         '/uploads/',
         '/_next/image'
       ],

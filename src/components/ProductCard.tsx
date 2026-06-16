@@ -15,6 +15,7 @@ import { trackAddToCart, trackAddToWishlist } from '@/lib/tracking'
 interface ProductCardProps {
   id: string
   title: string
+  titleEn?: string | null
   price: number
   oldPrice?: number | null
   image: string
@@ -27,7 +28,7 @@ interface ProductCardProps {
   desc?: string | null
 }
 
-export default function ProductCard({ id, title, price, oldPrice, image, imageAlt, imageWidth, imageHeight, tag, discountType, discountValue, desc }: ProductCardProps) {
+export default function ProductCard({ id, title, titleEn, price, oldPrice, image, imageAlt, imageWidth, imageHeight, tag, discountType, discountValue, desc }: ProductCardProps) {
   const [isAdded, setIsAdded] = React.useState(false)
   const [isHovered, setIsHovered] = React.useState(false)
   const { addToCart } = useCart()
@@ -35,15 +36,27 @@ export default function ProductCard({ id, title, price, oldPrice, image, imageAl
   const { t, translate, language } = useLanguage()
 
   const isFavorite = isInWishlist(id)
+  const isRtl = language === 'ar'
+
+  const trimmedTitle = (title || '').trim()
+  const displayTitle = trimmedTitle.startsWith('{') && trimmedTitle.endsWith('}')
+    ? translate(title)
+    : (language === 'en' ? (titleEn || translate(title)) : title)
+
+  const getBilingualTitle = () => {
+    if (trimmedTitle.startsWith('{') && trimmedTitle.endsWith('}')) {
+      return title
+    }
+    return JSON.stringify({ ar: title, en: titleEn || title })
+  }
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     
-    addToCart({ id, title, price, image, quantity: 1 })
+    addToCart({ id, title: getBilingualTitle(), price, image, quantity: 1 })
     
     // Track AddToCart event
-    const displayTitle = translate(title)
     trackAddToCart({ id, title: displayTitle, price, image, quantity: 1 })
 
     setIsAdded(true)
@@ -56,11 +69,10 @@ export default function ProductCard({ id, title, price, oldPrice, image, imageAl
     
     // Track AddToWishlist event only when adding (not when removing)
     if (!isFavorite) {
-      const displayTitle = translate(title)
       trackAddToWishlist({ id, title: displayTitle, price, image })
     }
 
-    toggleWishlist({ id, title, price, image, categoryId: '' })
+    toggleWishlist({ id, title: getBilingualTitle(), price, image, categoryId: '' })
   }
 
   // Calculate discount tag
@@ -74,7 +86,7 @@ export default function ProductCard({ id, title, price, oldPrice, image, imageAl
   }
 
   const discountPercent = oldPrice && price ? Math.round(((oldPrice - price) / oldPrice) * 100) : null
-  const imgAlt = productImageAlt({ imageAlt, title }, translate(title))
+  const imgAlt = productImageAlt({ imageAlt, title, titleEn }, displayTitle)
   const cardImage = productMainImage(image) || 'https://placehold.co/400x400?text=No+Image'
 
   return (
@@ -166,16 +178,16 @@ export default function ProductCard({ id, title, price, oldPrice, image, imageAl
       </Link>
 
       {/* Content */}
-      <div className="p-2 xs:p-3 text-right space-y-1 xs:space-y-1.5">
+      <div className={cn("p-2 xs:p-3 space-y-1 xs:space-y-1.5", isRtl ? "text-right" : "text-left")}>
         <Link href={`/product/${id}`}>
           <h3 className="text-xs xs:text-sm font-bold text-gray-800 line-clamp-2 hover:text-green-700 transition-colors" style={{ lineHeight: '1.4' }}>
-            {translate(title)}
+            {displayTitle}
           </h3>
         </Link>
 
         {/* Stars mini */}
         <div
-          className="flex items-center justify-end gap-0.5"
+          className={cn("flex items-center gap-0.5", isRtl ? "justify-end" : "justify-start")}
           role="img"
           aria-label={language === 'ar' ? 'التقييم: 4.9 من 5 نجوم' : 'Rating: 4.9 out of 5 stars'}
         >
@@ -186,7 +198,7 @@ export default function ProductCard({ id, title, price, oldPrice, image, imageAl
         </div>
 
         {/* Price */}
-        <div className="flex flex-wrap items-center justify-end gap-1 xs:gap-2 pt-0.5">
+        <div className={cn("flex flex-wrap items-center gap-1 xs:gap-2 pt-0.5", isRtl ? "justify-end" : "justify-start")}>
           {oldPrice && (
             <span className="text-[10px] xs:text-xs text-gray-500 line-through">{oldPrice} {t('currency')}</span>
           )}

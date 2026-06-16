@@ -420,6 +420,9 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
   )
 
   // Parse data
+  const titleBi = parseBilingual(product.title)
+  const titleEn = product.titleEn || titleBi.en || titleBi.ar
+  const wishlistTitle = JSON.stringify({ ar: titleBi.ar, en: titleEn })
   const additionalImages = product.images ? product.images.split(',').map((img: string) => img.trim()).filter((i: string) => i) : []
   const imageVersion = productImageVersion(product)
   const allImages = [product.image, ...additionalImages].filter(Boolean).map((src: string) => withImageVersion(src, imageVersion))
@@ -1277,7 +1280,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
 
                   {/* Wishlist on mobile next to Quantity (hidden on sm:) */}
                   <motion.button
-                    onClick={() => toggleWishlist({ id: product.id, title: product.title, price: currentPrice, image: product.image, categoryId: product.categoryId || '' })}
+                    onClick={() => toggleWishlist({ id: product.id, title: wishlistTitle, price: currentPrice, image: product.image, categoryId: product.categoryId || '' })}
                     whileHover={{ scale: 1.08 }}
                     whileTap={{ scale: 0.92 }}
                     className={`w-11 h-11 max-[340px]:w-10 max-[340px]:h-10 xs:w-12 xs:h-12 sm:hidden rounded-2xl border border-[#e8f0ed] flex items-center justify-center transition-all flex-shrink-0 ${isFavorite ? 'text-red-500 bg-red-50 border-red-100' : 'text-gray-400 bg-white hover:text-red-500'}`}
@@ -1309,7 +1312,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
 
                 {/* Wishlist on desktop (hidden on mobile, shown on sm:) */}
                 <motion.button
-                  onClick={() => toggleWishlist({ id: product.id, title: product.title, price: currentPrice, image: product.image, categoryId: product.categoryId || '' })}
+                  onClick={() => toggleWishlist({ id: product.id, title: wishlistTitle, price: currentPrice, image: product.image, categoryId: product.categoryId || '' })}
                   whileHover={{ scale: 1.08 }}
                   whileTap={{ scale: 0.92 }}
                   className={`hidden sm:flex w-11 h-11 xs:w-12 xs:h-12 sm:w-16 sm:h-16 rounded-2xl border border-[#e8f0ed] items-center justify-center transition-all flex-shrink-0 ${isFavorite ? 'text-red-500 bg-red-50 border-red-100' : 'text-gray-400 bg-white hover:text-red-500'}`}

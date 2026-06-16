@@ -76,9 +76,25 @@ const limitSeoText = (value: string, maxLength: number) => {
 }
 
 const productSeoTitle = (product: ProductData, isEn: boolean) => {
-  const title = isEn ? (product.titleEn || product.title) : product.title
-  const brandName = product.brand?.name ? ` | ${product.brand.name}` : ''
-  return limitSeoText(`${title}${brandName}`, 62)
+  let title = isEn ? (product.titleEn || product.title) : product.title
+  if (!title) return ''
+
+  // Clean up any existing "| The VitaHub" or "| ذا فيتا هوب" from the title
+  title = title
+    .replace(/\s*\|\s*The\s*VitaHub/gi, '')
+    .replace(/\s*\|\s*ذا\s*فيتا\s*هوب/g, '')
+    .trim()
+
+  const brandName = product.brand?.name || ''
+  if (brandName) {
+    const lowerTitle = title.toLowerCase()
+    const lowerBrand = brandName.toLowerCase()
+    if (!lowerTitle.includes(lowerBrand)) {
+      title = `${title} | ${brandName}`
+    }
+  }
+
+  return limitSeoText(title, 62)
 }
 
 const productSeoDescription = (product: ProductData, isEn: boolean) => {

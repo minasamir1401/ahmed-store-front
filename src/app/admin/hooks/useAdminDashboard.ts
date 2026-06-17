@@ -36,6 +36,7 @@ export function useAdminDashboard() {
   const [backupLoading, setBackupLoading] = useState(false)
   const [restoreLoading, setRestoreLoading] = useState(false)
   const [cleanLoading, setCleanLoading] = useState(false)
+  const [excelImporting, setExcelImporting] = useState(false)
   const [aiProvider, setAiProvider] = useState<AIProvider>('openrouter')
 
   const handleAiProviderChange = (provider: AIProvider) => {
@@ -78,6 +79,7 @@ export function useAdminDashboard() {
   const mainFileInputRef = useRef<HTMLInputElement>(null)
   const galleryFileInputRef = useRef<HTMLInputElement>(null)
   const brandLogoRef = useRef<HTMLInputElement>(null)
+  const excelInputRef = useRef<HTMLInputElement>(null)
 
   const addLog = (msg: string) => setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev].slice(0, 4))
 
@@ -1026,6 +1028,52 @@ export function useAdminDashboard() {
     }
   }
 
+  const handleExcelImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setExcelImporting(true)
+    addLog(`يجري استيراد المنتجات من ملف Excel: ${file.name}...`)
+
+    const uploadData = new FormData()
+    uploadData.append('file', file)
+
+    try {
+      // Use fetchWithAdminAuth to send the request
+      const res = await fetchWithAdminAuth(
+        `${BACKEND_API}/api/products/import-excel`,
+        { method: 'POST', body: uploadData },
+        null
+      )
+
+      if (res.ok) {
+        const result = await res.json()
+        addLog(result.message || 'تم استيراد المنتجات بنجاح!')
+        await showAlert(
+          result.message || 'تم استيراد المنتجات بنجاح!',
+          'استيراد ناجح'
+        )
+        // Refresh products list
+        fetchData()
+      } else {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'حدث خطأ غير معروف')
+      }
+    } catch (err: any) {
+      console.error('Excel Import Error:', err)
+      addLog(`فشل الاستيراد: ${err.message}`)
+      await showAlert(
+        err.message || 'تعذر معالجة واستيراد ملف Excel',
+        'خطأ في الاستيراد'
+      )
+    } finally {
+      setExcelImporting(false)
+      if (excelInputRef.current) {
+        excelInputRef.current.value = ''
+      }
+    }
+  }
+
   const handleCleanBase64Images = async () => {
     if (!(await showConfirm('تحذير: سيتم البحث في كامل قاعدة البيانات وحذف كافة الصور بصيغة Base64 واستبدالها بصور افتراضية. هل تريد الاستمرار؟', 'تأكيد تنظيف قاعدة البيانات'))) {
       return
@@ -1294,6 +1342,9 @@ export function useAdminDashboard() {
     mainFileInputRef,
     galleryFileInputRef,
     brandLogoRef,
+    excelInputRef,
+    excelImporting,
+    handleExcelImport,
     addLog,
     getAuthHeaders,
     fetchWithAdminAuth,

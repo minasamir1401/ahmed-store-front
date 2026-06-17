@@ -14,6 +14,7 @@ import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { productImageAlt, productImageThumb, productImageVersion, safeBrandImage, withImageVersion } from '@/lib/product-images'
+import { BrandLogo } from '@/components/BrandLogo'
 import { trackViewContent, trackAddToCart } from '@/lib/tracking'
 
 // ── Animation variants ──────────────────────────────────────────────────
@@ -704,11 +705,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                   <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] max-[340px]:text-[9px] font-black uppercase tracking-wider">{getLocalizedValue(language, product.category?.name, product.category?.nameEn, translate)}</span>
                   {product.brand && (
                     <Link href={`/brands/${product.brand.id}`} className="flex items-center gap-2 bg-gray-50 text-gray-700 pr-1 pl-3 py-1 rounded-full text-[11px] max-[340px]:text-[10px] font-black border border-gray-100 hover:border-primary/30 hover:bg-white transition-all shadow-sm">
-                    {product.brand.image ? (
-                      <Image src={safeBrandImage(product.brand.image)} alt={getLocalizedValue(language, product.brand.name, product.brand.nameEn, translate)} width={24} height={24} className="w-6 h-6 rounded-full object-cover bg-white border border-gray-100" />
-                    ) : (
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary"><Building2 size={12} /></div>
-                      )}
+                    <BrandLogo image={product.brand.image} name={product.brand.name} size={24} className="bg-white" />
                       <span>{getLocalizedValue(language, product.brand.name, product.brand.nameEn, translate)}</span>
                     </Link>
                   )}
@@ -733,6 +730,12 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     </div>
                   )}
                 </div>
+                {product.expiryDate && (
+                  <div className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-xl text-xs font-black border border-amber-200/50 w-fit mt-1">
+                    <Calendar size={13} />
+                    <span>{language === 'ar' ? `تاريخ الانتهاء: ${product.expiryDate}` : `Expiry Date: ${product.expiryDate}`}</span>
+                  </div>
+                )}
               </div>
             </motion.div>
 
@@ -1152,11 +1155,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                 
                 {product.brand && (
                   <Link href={`/brands/${product.brand.id}`} className="flex items-center gap-2 bg-gray-50 text-gray-700 pr-1 pl-3 py-1 rounded-full text-[11px] max-[340px]:text-[10px] font-black border border-gray-100 hover:border-primary/30 hover:bg-white transition-all shadow-sm">
-                    {product.brand.image ? (
-                      <Image src={safeBrandImage(product.brand.image)} alt={getLocalizedValue(language, product.brand.name, product.brand.nameEn, translate)} width={24} height={24} className="w-6 h-6 rounded-full object-cover bg-white border border-gray-100" />
-                    ) : (
-                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary"><Building2 size={12} /></div>
-                    )}
+                    <BrandLogo image={product.brand.image} name={product.brand.name} size={24} className="bg-white" />
                     <span>{getLocalizedValue(language, product.brand.name, product.brand.nameEn, translate)}</span>
                   </Link>
                 )}
@@ -1181,6 +1180,12 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                   </div>
                 )}
               </motion.div>
+              {product.expiryDate && (
+                <motion.div variants={fadeUp} className="hidden lg:flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-xl text-xs font-black border border-amber-200/50 w-fit order-3 -mt-2 mb-2">
+                  <Calendar size={13} />
+                  <span>{language === 'ar' ? `تاريخ الانتهاء: ${product.expiryDate}` : `Expiry Date: ${product.expiryDate}`}</span>
+                </motion.div>
+              )}
 
               {/* Size Selector */}
               {sizeOptions.length > 0 && (
@@ -1598,7 +1603,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
               <div className="h-px flex-1 bg-slate-200" />
             </motion.div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 sm:gap-6">
               {similarProducts.map((p) => (
                 <ProductCard key={p.id} {...p} />
               ))}

@@ -4,10 +4,9 @@ import React, { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
-import Image from 'next/image'
-import { Building2, ChevronLeft, Loader2 } from 'lucide-react'
+import { ChevronLeft, Loader2, Building2 } from 'lucide-react'
+import { BrandLogo } from '@/components/BrandLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import { safeBrandImage } from '@/lib/product-images'
 
 function BrandSkeleton() {
   return (
@@ -101,11 +100,7 @@ export default function BrandsPageClient({ initialBrands = [] }: BrandsPageClien
                   className="group bg-white rounded-[2.5rem] p-8 border border-[#e8f0ed] hover:shadow-2xl hover:shadow-primary/5 transition-all hover:-translate-y-2 flex flex-col items-center gap-6"
                 >
                   <div className="aspect-square w-full bg-gray-50 rounded-[1.5rem] p-4 flex items-center justify-center overflow-hidden border border-gray-50 group-hover:bg-white transition-all relative">
-                    {brand.image ? (
-                      <Image src={safeBrandImage(brand.image)} fill className="object-contain p-4 mix-blend-multiply" sizes="(max-width: 640px) 150px, 200px" alt={language === 'en' ? (brand.nameEn || translate(brand.name)) : brand.name} />
-                    ) : (
-                      <Building2 size={32} className="text-gray-300" />
-                    )}
+                    <BrandLogo image={brand.image} name={brand.name} size={100} className="bg-transparent border-none" />
                   </div>
                   <div className="text-center">
                     <h3 className="text-sm font-black text-gray-800 group-hover:text-primary transition-colors">{language === 'en' ? (brand.nameEn || translate(brand.name)) : brand.name}</h3>

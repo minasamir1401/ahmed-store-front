@@ -12,6 +12,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'placehold.co' },
       { protocol: 'https', hostname: 'logo.clearbit.com' },
       { protocol: 'https', hostname: 'www.google.com' },
+      { protocol: 'https', hostname: 't1.gstatic.com' },
     ]
   },
 

@@ -84,6 +84,9 @@ export default function AdminDashboard() {
     mainFileInputRef,
     galleryFileInputRef,
     brandLogoRef,
+    excelInputRef,
+    excelImporting,
+    handleExcelImport,
     addLog,
     fetchWithAdminAuth,
     fetchWhatsappStatus,
@@ -367,6 +370,34 @@ export default function AdminDashboard() {
                   <button onClick={fetchData} className="p-3 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-2xl transition-all bg-white border border-slate-100 shadow-sm cursor-pointer" title="تحديث البيانات">
                     <RotateCcw size={16} className={loading ? 'animate-spin' : ''} />
                   </button>
+                  {activeTab === 'products' && (
+                    <>
+                      <input 
+                        type="file" 
+                        ref={excelInputRef} 
+                        onChange={handleExcelImport} 
+                        accept=".xlsx" 
+                        className="hidden" 
+                      />
+                      <button 
+                        onClick={() => excelInputRef.current?.click()} 
+                        disabled={excelImporting}
+                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white flex-1 lg:flex-none px-6 py-3 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-blue-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer"
+                      >
+                        {excelImporting ? (
+                          <>
+                            <Loader2 className="animate-spin" size={16} />
+                            <span>جاري الاستيراد...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload size={16} />
+                            <span>استيراد من Excel</span>
+                          </>
+                        )}
+                      </button>
+                    </>
+                  )}
                   {activeTab !== 'hero' && activeTab !== 'orders' && activeTab !== 'whatsapp' && activeTab !== 'admin-settings' && (
                     <button onClick={() => handleOpenModal()} className="bg-emerald-600 text-white flex-1 lg:flex-none px-8 py-3 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer">
                       <Plus size={16} /> إضافة عنصر جديد

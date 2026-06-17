@@ -173,7 +173,7 @@ export default function ProductsForm(props: any) {
                           </div>
 
                           {/* Pricing details */}
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <div className="space-y-2">
                               <label className="text-xs font-black text-slate-800 block mr-1">السعر الحالي (ج.م)</label>
                               <input type="number" value={formData.price || ''} onChange={e => setFormData({...formData, price: e.target.value})} className="w-full bg-slate-50 rounded-2xl py-3.5 px-5 font-black text-emerald-600 text-sm outline-none" placeholder="0.00" required />
@@ -194,6 +194,10 @@ export default function ProductsForm(props: any) {
                                   <input type="number" value={formData.discountValue || ''} onChange={e => setFormData({...formData, discountValue: e.target.value})} className="w-20 bg-slate-50 rounded-2xl py-3.5 px-3 font-black text-xs text-center text-slate-700" placeholder="القيمة" />
                                 )}
                               </div>
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-xs font-black text-slate-800 block mr-1">تاريخ انتهاء الصلاحية</label>
+                              <input type="text" value={formData.expiryDate || ''} onChange={e => setFormData({...formData, expiryDate: e.target.value})} className="w-full bg-slate-50 rounded-2xl py-3.5 px-5 font-bold text-xs text-slate-700 outline-none" placeholder="مثال: 2028-10" />
                             </div>
                           </div>
 

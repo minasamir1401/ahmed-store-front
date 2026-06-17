@@ -564,11 +564,7 @@ export function useAdminDashboard() {
   "titleEn": "اسم المنتج الاحترافي باللغة الإنجليزية (مثال: Optimum Nutrition Micronized Creatine Monohydrate 600g). لا تذكر اسم المتجر The VitaHub هنا أبداً.",
   "desc": "وصف منتج عملي ومباشر ومطول قليلاً، يشرح الوظيفة الرئيسية للمنتج والفوائد المهمة ولماذا يشتريه العميل، بصياغة سهلة ومناسبة للسوق المصري، وبدون مبالغة.",
   "features": "قائمة مميزات المنتج والفوائد والمكونات النشطة الأساسية، كل ميزة في سطر منفصل (مثال: ميزة 1\\nميزة 2\\nميزة 3)",
-  "brandName": "اسم الشركة المصنعة باللغة الإنجليزية",
   "brandImage": "رابط لوجو الشركة (استخدم https://www.google.com/s2/favicons?domain=brandname.com&sz=128)",
-  "price": السعر التقريبي بالجنيه المصري (كرقم صحيح، مثلا 150),
-  "sizes": "الأحجام المتوفرة (مثال: 60 كبسولة) أو اتركها فارغة",
-  "sizesPrices": "[{\\"size\\": \\"الحجم 1\\", \\"price\\": 150}, {\\"size\\": \\"الحجم 2\\", \\"price\\": 250}]",
   "productSpecs": "{\\"authentic\\": true, \\"sku\\": \\"رمز\\", \\"shippingWeight\\": \\"وزن\\"}",
   "keyInfo": "{\\"servingSize\\": \\"حجم الجرعة\\", \\"totalServings\\": \\"إجمالي الحصص\\", \\"bestBefore\\": \\"تاريخ\\", \\"origin\\": \\"المنشأ\\"}",
   "certifications": "{\\"glutenFree\\": true/false, \\"dairyFree\\": true/false, \\"soyFree\\": true/false, \\"treeNutFree\\": true/false, \\"nonGmo\\": true/false, \\"organic\\": true/false}",
@@ -600,10 +596,7 @@ export function useAdminDashboard() {
           titleEn: parsed.titleEn || prev.titleEn,
           desc: parsed.desc || prev.desc,
           features: parsed.features || prev.features,
-          brandName: parsed.brandName || prev.brandName,
           brandImage: parsed.brandImage || prev.brandImage,
-          price: parsed.price ? String(parsed.price) : prev.price,
-          sizes: parsed.sizes || prev.sizes,
           seoKeywords: parsed.seoKeywords || prev.seoKeywords,
           seoDesc: parsed.seoDesc || prev.seoDesc,
           warnings: parsed.warnings || prev.warnings,
@@ -615,11 +608,6 @@ export function useAdminDashboard() {
           setSupplementFactsList(parsed.supplementFacts ? (typeof parsed.supplementFacts === 'string' ? JSON.parse(parsed.supplementFacts) : parsed.supplementFacts) : [])
         } catch {
           setSupplementFactsList([])
-        }
-        try {
-          setSizesPricesList(parsed.sizesPrices ? (typeof parsed.sizesPrices === 'string' ? JSON.parse(parsed.sizesPrices) : parsed.sizesPrices) : [])
-        } catch {
-          setSizesPricesList([])
         }
         try {
           setProductSpecsObj(parsed.productSpecs ? (typeof parsed.productSpecs === 'string' ? JSON.parse(parsed.productSpecs) : parsed.productSpecs) : { authentic: true })
@@ -649,7 +637,6 @@ export function useAdminDashboard() {
           // keep existing if error
         }
 
-        if (parsed.brandName) setBrandSearch(parsed.brandName)
         addLog('تم التوليد وتعبئة الحقول بنجاح!')
       } else {
         throw new Error(data.error?.message || 'Invalid Response')

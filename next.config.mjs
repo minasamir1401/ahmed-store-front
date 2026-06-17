@@ -13,7 +13,9 @@ const nextConfig = {
       { protocol: 'https', hostname: 'logo.clearbit.com' },
       { protocol: 'https', hostname: 'www.google.com' },
       { protocol: 'https', hostname: 't1.gstatic.com' },
-    ]
+    ],
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   // ─── Security Headers ──────────────────────────────────────────────────────

@@ -1,11 +1,11 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Loader2, Calendar, Clock, ChevronLeft } from 'lucide-react'
+import { Loader2, Calendar, Clock, ChevronLeft, ChevronRight } from 'lucide-react'
 import ProductCard from '@/components/ProductCard'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
@@ -530,6 +530,49 @@ export default function HomeClient({
           </div>
         </section>
 
+        {/* Categories Product Rows Section */}
+        <section className="py-10 sm:py-20 bg-slate-50/20 border-t border-slate-100/50 relative z-10">
+          <div className="max-w-screen-xl mx-auto px-4" dir={dir}>
+            
+            <motion.div 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="flex items-center justify-center gap-3 mb-14"
+            >
+              <div className="h-px flex-1 bg-slate-100" />
+              <span className="flex items-center gap-2 text-2xl font-black text-slate-800 italic uppercase tracking-wider text-center">
+                {t('shop_by_category')}
+              </span>
+              <div className="h-px flex-1 bg-slate-100" />
+            </motion.div>
+
+            {error ? null : loading ? (
+              <>
+                <CategoryRowSkeleton />
+                <CategoryRowSkeleton />
+              </>
+            ) : (
+              categories.map((category) => {
+                const categoryProducts = allProducts.filter(p => p.categoryId === category.id)
+                return (
+                  <CategoryProductRow 
+                    key={category.id}
+                    category={category}
+                    products={categoryProducts}
+                    language={language}
+                    t={t}
+                    translate={translate}
+                    dir={dir}
+                  />
+                )
+              })
+            )}
+
+          </div>
+        </section>
+
         {/* Articles / Health Tips Section */}
         {articles.length > 0 && (
           <section className="py-12 sm:py-24 bg-white relative z-10 border-t border-slate-100/50">
@@ -644,5 +687,112 @@ export default function HomeClient({
       </main>
       <Footer />
     </>
+  )
+}
+
+interface CategoryProductRowProps {
+  category: any
+  products: any[]
+  language: string
+  t: any
+  translate: any
+  dir: string
+}
+
+function CategoryProductRow({ category, products, language, t, translate, dir }: CategoryProductRowProps) {
+  const rowRef = useRef<HTMLDivElement>(null)
+
+  const handleScroll = (direction: 'left' | 'right') => {
+    if (rowRef.current) {
+      const scrollAmount = 320
+      const finalAmount = direction === 'left' ? -scrollAmount : scrollAmount
+      rowRef.current.scrollBy({
+        left: finalAmount,
+        behavior: 'smooth'
+      })
+    }
+  }
+
+  const categoryName = language === 'en' && category.nameEn ? category.nameEn : translate(category.name)
+
+  if (products.length === 0) return null
+
+  return (
+    <div className="mb-14 relative group/row">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <span className="text-lg sm:text-2xl font-black text-slate-800 border-r-4 border-primary pr-3 leading-none">
+            {categoryName}
+          </span>
+          <span className="bg-primary/10 text-primary text-[10px] sm:text-xs font-black px-2.5 py-0.5 rounded-full">
+            {language === 'ar' ? `${products.length} منتج` : `${products.length} Products`}
+          </span>
+        </div>
+        <Link 
+          href={`/products?category=${category.id}`} 
+          className="text-xs font-black text-primary hover:text-[#235f47] transition-colors flex items-center gap-1"
+        >
+          {t('view_all_category')}
+          <ChevronLeft className={`w-4 h-4 transition-transform duration-300 ${dir === 'ltr' ? 'rotate-180' : ''}`} />
+        </Link>
+      </div>
+
+      {/* Row Wrapper with scroll buttons */}
+      <div className="relative px-2">
+        {/* Left Arrow Button */}
+        <button
+          onClick={() => handleScroll('left')}
+          className="absolute -left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/95 border border-slate-100 rounded-full shadow-md flex items-center justify-center text-slate-600 hover:text-primary hover:bg-slate-50 transition-all opacity-0 group-hover/row:opacity-100 hidden md:flex cursor-pointer"
+          aria-label="Scroll left"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+
+        {/* Right Arrow Button */}
+        <button
+          onClick={() => handleScroll('right')}
+          className="absolute -right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/95 border border-slate-100 rounded-full shadow-md flex items-center justify-center text-slate-600 hover:text-primary hover:bg-slate-50 transition-all opacity-0 group-hover/row:opacity-100 hidden md:flex cursor-pointer"
+          aria-label="Scroll right"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+
+        {/* Products Flex Container */}
+        <div
+          ref={rowRef}
+          className="flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar scroll-smooth py-4 px-2 -mx-2"
+          style={{ scrollbarWidth: 'none' }}
+        >
+          {products.map((p) => (
+            <div key={p.id} className="w-[180px] xs:w-[220px] sm:w-[240px] flex-shrink-0">
+              <ProductCard {...p} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CategoryRowSkeleton() {
+  return (
+    <div className="mb-14">
+      <div className="flex items-center justify-between mb-6">
+        <div className="h-6 bg-slate-200 animate-pulse rounded-md w-48" />
+        <div className="h-4 bg-slate-200 animate-pulse rounded-md w-16" />
+      </div>
+      <div className="flex gap-4 overflow-x-hidden py-2">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="w-[180px] xs:w-[220px] sm:w-[240px] flex-shrink-0 bg-white rounded-2xl overflow-hidden p-3 space-y-3 border border-[#e8f0ed]">
+            <div className="aspect-square bg-slate-100 animate-pulse rounded-xl" />
+            <div className="space-y-2">
+              <div className="h-3.5 bg-slate-100 animate-pulse rounded-md w-full" />
+              <div className="h-3 bg-slate-100 animate-pulse rounded-md w-2/3" />
+            </div>
+            <div className="h-9 bg-slate-100 animate-pulse rounded-xl w-full" />
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

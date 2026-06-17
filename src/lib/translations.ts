@@ -19,6 +19,8 @@ export const translations: Record<string, Record<string, string>> = {
     featured_products_categories: "منتجات وأقسام مميزة",
     newly_added: "المضاف حديثاً",
     view_all_products: "مشاهدة كافة المنتجات",
+    shop_by_category: "تسوق حسب الأقسام",
+    view_all_category: "عرض الكل",
     category: "قسم",
     product: "منتج",
 
@@ -310,6 +312,8 @@ export const translations: Record<string, Record<string, string>> = {
     featured_products_categories: "Featured Products & Categories",
     newly_added: "Newly Added",
     view_all_products: "View All Products",
+    shop_by_category: "Shop by Category",
+    view_all_category: "View All",
     category: "Category",
     product: "Product",
 
@@ -605,6 +609,9 @@ const arToEnMap: Record<string, string> = {
   "تغذية صحية": "Healthy Nutrition",
   "صحة عامة": "General Health",
   "نمط حياة": "Lifestyle",
+  "منتجات الرجال": "Men's Products",
+  "منتجات النساء": "Women's Products",
+  "منتجات الأطفال": "Kids' Products",
 
   // Articles Categories
   "تغذية صحية ": "Healthy Nutrition",

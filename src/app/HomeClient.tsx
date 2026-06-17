@@ -31,7 +31,7 @@ export default function HomeClient({
   
   const [products, setProducts] = useState<any[]>(() => {
     const ordered = newestProducts(initialProducts)
-    return ordered.slice(0, 6)
+    return ordered.slice(0, 7)
   })
   const [hero, setHero] = useState<any>(initialHero)
   const [categories, setCategories] = useState<any[]>(initialCategories)
@@ -105,7 +105,7 @@ export default function HomeClient({
     ])
       .then(([productsData, heroData, categoriesData, articlesData]) => {
         const orderedProducts = newestProducts(Array.isArray(productsData) ? productsData : [])
-        setProducts(orderedProducts.slice(0, 6))
+        setProducts(orderedProducts.slice(0, 7))
         setHero(heroData)
         setCategories(Array.isArray(categoriesData) ? categoriesData : [])
         setAllProducts(orderedProducts)

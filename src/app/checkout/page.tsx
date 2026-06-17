@@ -13,8 +13,39 @@ import { useLanguage } from '@/context/LanguageContext'
 import { trackInitiateCheckout, trackPurchase } from '@/lib/tracking'
 
 const governorates = [
-  "القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "البحر الأحمر", "البحيرة", "الفيوم", "الغربية", "الإسماعيلية", "المنوفية", "المنيا", "القليوبية", "الوادي الجديد", "الشرقية", "السويس", "أسوان", "أسيوط", "بني سويف", "بورسعيد", "دمياط", "الأقصر", "قنا", "شمال سيناء", "سوهاج", "جنوب سيناء", "كفر الشيخ", "مطروح"
+  "القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "البحر الأحمر", "البحيرة", "الفيوم", "الغربية", "الإسماعيلية", "المنوفية", "المنيا", "القليوبية", "الوادي الجديد", "الشرقية", "السويس", "أسوان", "أسيوط", "بني سويف", "بورسعيد", "دمياط", "الأقصر", "قنا", "شمال سيناء", "سوهاج", "جنوب سيناء", "كفر الشيخ", "مطروح", "العين السخنة"
 ]
+
+const districtsByGovernorate: Record<string, string[]> = {
+  "أسوان": ["أسوان", "ابو سمبل", "السد العالي", "كوم امبو", "مركز إدفو", "مركز دراو", "نصر النوبة"],
+  "أسيوط": ["أبو منقار", "أبوتيج", "أسيوط", "أسيوط الجديدة", "البلينا", "الفرافرة", "القوصية", "ديروط", "مركز أبنوب", "مركز البدارى", "مركز الغنايم", "مركز الفتح", "مركز دار السلام", "مركز ساحل سليم", "مركز صدفا", "مركز منفلوط", "منطقة سمكس"],
+  "الإسكندرية": ["الإسكندرية", "الدخيلة", "الساحل الشمالى", "العامرية", "برج العرب", "سيدي كرير", "عوايد راس سودا", "كنج مريوط", "مركز ادكو"],
+  "الإسماعيلية": ["أبو سلطان", "أبوصوير", "الإسماعيلية", "التل الكبير", "القنطرة شرق", "القنطرة غرب", "فايد"],
+  "البحر الأحمر": ["الاحياء", "الجونة", "العريش", "الغردقة", "القصير", "حلايب و شلاتين", "رأس غارب", "راس شقير", "سفاجا", "سهل حشيش", "مرسى علم", "وادي دار الظرايا"],
+  "البحيرة": ["المحمودية", "النوبارية", "دمنهور", "فاراسكور", "كفر الدوار", "كفر سعد", "مدينة الزرقا", "مركز ابو المطامير", "مركز ابو حمص", "مركز الدلنجات", "مركز الرحمانية", "مركز ايتاي البارود", "مركز حوش عيسى", "مركز شبراخيت", "مركز كوم حمادة", "وادي النطرون"],
+  "الجيزة": ["أبو رواش", "أرض اللواء", "أطفيح", "إمبابة", "البدرشين", "الجيزة", "الحوامدية", "الدقي", "السادس من أكتوبر", "الصف", "العطف", "العمرانية", "العياط", "الكريمات", "المنيب", "المهندسين", "الهرم", "الواحات البحرية", "الوراق", "اوسيم", "براجيل", "بشتيل", "بهتيم", "بولاق الدكرور", "حدائق الاهرام", "دهشور", "زمالك", "سقارة", "شبرا منت", "طريق اسكندرية الصحراوى", "عجوزة", "فيصل", "مدينة الشيخ زايد", "منيل الروضة"],
+  "الدقهلية": ["أجا", "السنبلاوين", "المنزلة", "المنصورة", "بلقاس", "بني عبيد", "دكرنس", "شربين", "طلخا", "مدينة الجمالية", "مدينة المطرية", "مدينة تامي الامديد", "منية النصر", "ميت غمر", "نبروة"],
+  "السويس": ["السلام", "السويس", "قرية عامر"],
+  "الشرقية": ["أبو حماد", "أبو كبير", "أولاد صقر", "الإبراهيمية", "الحسينية", "الزقازيق", "الصالحية الجديدة", "الصوفية", "العدوه", "القنايات", "القيران", "المناصافور", "انشاص", "بلبيس", "ديرب نجم", "كفر الحمام", "كفر صقر", "مدينة العاشر من رمضان", "مشتول السوق", "منيا القمح", "هيهيا"],
+  "العين السخنة": ["العين السخنة"],
+  "الغربية": ["السنطة", "المحلة الكبرى", "المنشأه الكبرى", "بسيون", "زفتي", "سمنود", "طنطا", "فاقوس", "قطور", "كفر الزيات"],
+  "الفيوم": ["أطسا", "إبشواى", "الفيوم", "سنورس", "طامية", "مدينة الفيوم الجديدة", "يوسف الصديق"],
+  "القاهرة": ["اسبيكو", "الأميرية", "الإباجية", "الازبكية", "البساتين", "التبين", "الجمالية", "الحرفيين", "الرحاب", "الزاوية الحمراء", "الزيتون", "الساحل", "السلام أول", "السواح", "السيدة زينب", "الشرابية", "الشروق", "الضاهر", "العاصمة الادارية الجديدة", "العباسية", "العتبة", "القاهرة", "القاهرة الجديدة", "القصر العيني", "القطامية", "المرج", "المطرية", "المعادى", "المعصرة", "المقطم", "النزهة", "الهايكستب", "الوايلي", "باب الشعرية", "بولاق ابوالعلا", "جاردن سيتي", "حدائق القبة", "حلوان", "دار السلام", "رمسيس", "روض الفرج", "شبرا مصر", "طرة", "عابدين", "عين شمس الغربيه", "عين شمس- الشرقية", "غمره", "قسم الخليفة", "قصر النيل", "كورنيش النيل", "مدينة 15 مايو", "مدينة السلام", "مدينة المستقبل", "مدينة بدر", "مدينة نصر", "مدينتي", "منشية ناصر", "منيل شيحة", "هليوبوليس", "وادى حوف", "وراق الحضر", "وسط البلد"],
+  "القليوبية": ["ابو زعبل", "الخانكة", "القليوبية", "القناطر الخيرية", "باسوس", "بنها", "بيجام", "شبرا الخيمة", "شبين القناطر", "طوخ", "قليوب", "قها", "كفر شكر", "مدينة العبور", "مسطرد"],
+  "المنوفية": ["أشمون", "الباجور", "الشهداء", "المنوفية", "بركة السبع", "تلا", "شبين الكوم", "قويسنا Merc", "كفر المصيلحة", "مدينة منوف", "مدينه السادات"],
+  "المنيا": ["أبو قرقاص", "العدوى", "المنيا", "بنى مزار", "دير مواس", "سملوط", "طه السبع", "عزبة شاهين", "مالاوى", "مدينة المنيا الجديدة", "مطاى", "مغاغة"],
+  "الوادي الجديد": ["الخارجة", "الواحات الداخلة", "الوادي الجديد", "باريس", "بلاط", "توشكى"],
+  "بني سويف": ["أهناسيا", "الفشن", "الواسطى", "ببا", "بنى سويف", "سمسطا", "ناصر"],
+  "بورسعيد": ["بور سعيد", "بور فؤاد", "شرق التفريعة"],
+  "جنوب سيناء": ["أبو رديس", "الطور", "الغرقانة", "الهضبة", "حى النور", "دهب", "راس سدر", "سانت كاترين", "شرم الشيخ", "طابا", "نعمة باى", "نويبع"],
+  "دمياط": ["بورت دمياط", "دمياط", "راس البر", "عزبت البرج", "مدينة دمياط الجديدة"],
+  "سوهاج": ["جهينة", "سوهاج", "صحراء جهينة الغربية", "مدينة سوهاج الجديدة", "مركز أخميم", "مركز البلينا", "مركز المراغة", "مركز المنشأة", "مركز جرجا", "مركز ساقلتة", "مركز طما", "مركز طهطا"],
+  "شمال سيناء": ["بئر العبد", "الشيخ زويد"],
+  "قنا": ["أبو تشت", "الوقف", "دشنا", "فرشوط", "قفط", "قنا", "قوص", "مدينة نجع حمادي", "نقادة"],
+  "كفر الشيخ": ["الحامول", "الرياض", "بلطيم", "بيلا", "دسوق", "سيدي سالم", "فوه", "قلين", "كفر الشيخ", "مطوبس"],
+  "مطروح": ["الضبعة", "السلوم", "العلمين", "النجيلية", "سيدي براني", "سيوة", "مرسى مطروح", "مارينا"],
+  "الأقصر": ["الاقصر", "ارمنت", "اسنا", "طيبة الجديدة"]
+}
 
 export default function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart()
@@ -30,6 +61,7 @@ export default function CheckoutPage() {
     name: '',
     email: '',
     phone: '',
+    phone2: '',
     governorate: 'القاهرة',
     district: '',
     address: '',
@@ -82,7 +114,13 @@ export default function CheckoutPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData(prev => {
+      const next = { ...prev, [name]: value }
+      if (name === 'governorate') {
+        next.district = ''
+      }
+      return next
+    })
   }
 
   const handleContinueToPayment = async () => {
@@ -113,7 +151,7 @@ export default function CheckoutPage() {
       const orderPayload = {
         customerName: formData.name,
         customerEmail: formData.email,
-        customerPhone: formData.phone,
+        customerPhone: formData.phone2 ? `${formData.phone} - ${formData.phone2}` : formData.phone,
         governorate: formData.governorate,
         district: formData.district,
         address: formData.address,
@@ -313,6 +351,20 @@ export default function CheckoutPage() {
                         </div>
                       </div>
                       <div className="space-y-2">
+                        <label className="text-xs xs:text-sm font-bold text-slate-700">{language === 'ar' ? 'رقم الهاتف البديل' : 'Alternative Phone'} ({language === 'ar' ? 'اختياري' : 'Optional'})</label>
+                        <div className="relative">
+                          <input 
+                            type="tel" 
+                            name="phone2"
+                            value={formData.phone2 || ''}
+                            onChange={handleInputChange}
+                            className={`w-full h-12 xs:h-13 bg-slate-50 border-2 border-slate-50 rounded-xl px-3 xs:px-5 text-sm xs:text-base focus:border-primary focus:bg-white transition-all outline-none font-mono ${isRtl ? 'pr-14 text-right' : 'pl-14 text-left'}`} 
+                            placeholder="01xxxxxxxxx" 
+                          />
+                          <span className={`absolute top-1/2 -translate-y-1/2 text-muted font-bold text-xs xs:text-sm ${isRtl ? 'right-4 border-l pl-2' : 'left-4 border-r pr-2'}`}>+20</span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
                         <label className="text-xs xs:text-sm font-bold text-slate-700">{t('login_email')} ({language === 'ar' ? 'اختياري' : 'Optional'})</label>
                         <input 
                           type="email" 
@@ -338,14 +390,36 @@ export default function CheckoutPage() {
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs xs:text-sm font-bold text-slate-700">{language === 'ar' ? 'المنطقة / الحي' : 'District / Neighborhood'} <span className="text-red-500">*</span></label>
-                        <input 
-                          type="text" 
-                          name="district"
-                          value={formData.district}
-                          onChange={handleInputChange}
-                          className={`w-full h-12 xs:h-13 bg-slate-50 border-2 border-slate-50 rounded-xl px-3 xs:px-5 focus:border-primary focus:bg-white transition-all outline-none text-sm xs:text-base ${isRtl ? 'text-right' : 'text-left'}`} 
-                          placeholder={language === 'ar' ? "مثلاً: المعادي، سموحة" : "e.g., Maadi, Smouha"} 
-                        />
+                        {(() => {
+                          const availableDistricts = districtsByGovernorate[formData.governorate] || [];
+                          if (availableDistricts.length > 0) {
+                            return (
+                              <select 
+                                name="district"
+                                value={formData.district}
+                                onChange={handleInputChange}
+                                className={`w-full h-12 xs:h-13 bg-slate-50 border-2 border-slate-50 rounded-xl px-3 xs:px-5 focus:border-primary focus:bg-white transition-all outline-none appearance-none font-bold text-sm xs:text-base ${isRtl ? 'text-right' : 'text-left'}`}
+                                required
+                              >
+                                <option value="">{language === 'ar' ? '-- اختر المنطقة / الحي --' : '-- Select District / Neighborhood --'}</option>
+                                {availableDistricts.map(dist => (
+                                  <option key={dist} value={dist}>{dist}</option>
+                                ))}
+                              </select>
+                            );
+                          }
+                          return (
+                            <input 
+                              type="text" 
+                              name="district"
+                              value={formData.district}
+                              onChange={handleInputChange}
+                              className={`w-full h-12 xs:h-13 bg-slate-50 border-2 border-slate-50 rounded-xl px-3 xs:px-5 focus:border-primary focus:bg-white transition-all outline-none text-sm xs:text-base ${isRtl ? 'text-right' : 'text-left'}`} 
+                              placeholder={language === 'ar' ? "مثلاً: المعادي، سموحة" : "e.g., Maadi, Smouha"} 
+                              required
+                            />
+                          );
+                        })()}
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs xs:text-sm font-bold text-slate-700">{language === 'ar' ? 'اسم الشارع / العنوان بالكامل' : 'Street Name / Complete Address'} <span className="text-red-500">*</span></label>

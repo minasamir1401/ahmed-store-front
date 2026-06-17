@@ -117,6 +117,8 @@ export default function AdminDashboard() {
     tabs
   } = useAdminDashboard()
 
+  const [logoLoading, setLogoLoading] = React.useState(false)
+
   const items = data
   const propsObj = {
     formData,
@@ -403,6 +405,47 @@ export default function AdminDashboard() {
                       <Plus size={16} /> إضافة عنصر جديد
                     </button>
                   )}
+                  {activeTab === 'brands' && (
+                    <button 
+                      onClick={async () => {
+                        const confirm = await showConfirm(
+                          'هل ترغب في البحث التلقائي بالذكاء الاصطناعي عن لوجوهات لجميع الشركات التي لا تملك لوجو حالياً؟ قد يستغرق ذلك بعض الوقت.',
+                          'البحث التلقائي عن اللوجوهات'
+                        );
+                        if (!confirm) return;
+                        
+                        setLogoLoading(true);
+                        try {
+                          const res = await fetchWithAdminAuth(`${BACKEND_API}/api/admin/auto-find-all-brand-logos`, {
+                            method: 'POST'
+                          });
+                          const resData = await res.json();
+                          if (res.ok) {
+                            await showAlert(
+                              `تم تحديث لوجوهات الشركات بنجاح! عدد الشركات المحدثة: ${resData.updatedCount || 0}`,
+                              'تحديث ناجح'
+                            );
+                            fetchData(); // Refresh data
+                          } else {
+                            await showAlert(resData.error || 'فشل تحديث اللوجوهات', 'خطأ');
+                          }
+                        } catch (err) {
+                          await showAlert('حدث خطأ أثناء الاتصال بالخادم', 'خطأ');
+                        } finally {
+                          setLogoLoading(false);
+                        }
+                      }}
+                      disabled={logoLoading}
+                      className="bg-purple-600 text-white px-6 py-3 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-purple-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer disabled:opacity-50"
+                    >
+                      {logoLoading ? (
+                        <Loader2 className="animate-spin" size={16} />
+                      ) : (
+                        <Sparkles size={16} />
+                      )}
+                      <span>تحديث لوجوهات الشركات بالذكاء الاصطناعي</span>
+                    </button>
+                  )}
                 </div>
               </div>
               
@@ -544,6 +587,48 @@ export default function AdminDashboard() {
                           </div>
                          )}
                       </div>
+
+                      {activeTab === 'brands' && (
+                        <div className="flex justify-center pt-2">
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              const brandName = formData.name || formData.nameEn;
+                              if (!brandName) {
+                                await showAlert('يرجى كتابة اسم الشركة أولاً للبحث عن اللوجو الخاص بها.', 'تنبيه');
+                                return;
+                              }
+                              setLogoLoading(true);
+                              try {
+                                const res = await fetchWithAdminAuth(`${BACKEND_API}/api/admin/auto-find-brand-logo`, {
+                                  method: 'POST',
+                                  body: JSON.stringify({ name: brandName })
+                                });
+                                const resData = await res.json();
+                                if (res.ok && resData.logoUrl) {
+                                  setFormData({ ...formData, image: resData.logoUrl });
+                                  await showAlert(`تم العثور على لوجو الشركة بنجاح من النطاق: ${resData.domain} ✅`, 'تم العثور على اللوجو');
+                                } else {
+                                  await showAlert(resData.error || 'فشل في العثور على لوجو لهذه الشركة تلقائياً.', 'خطأ في البحث');
+                                }
+                              } catch (err) {
+                                await showAlert('حدث خطأ أثناء البحث عن اللوجو.', 'خطأ');
+                              } finally {
+                                setLogoLoading(false);
+                              }
+                            }}
+                            disabled={logoLoading}
+                            className="bg-purple-600 hover:bg-purple-500 disabled:bg-slate-350 text-white px-6 py-3 rounded-2xl font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-purple-600/10 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                          >
+                            {logoLoading ? (
+                              <Loader2 className="animate-spin" size={14} />
+                            ) : (
+                              <Sparkles size={14} />
+                            )}
+                            <span>البحث التلقائي عن لوجو الشركة بالذكاء الاصطناعي</span>
+                          </button>
+                        </div>
+                      )}
                       <div className="space-y-4">
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                            <div className="space-y-2">

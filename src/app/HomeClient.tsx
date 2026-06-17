@@ -31,7 +31,7 @@ export default function HomeClient({
   
   const [products, setProducts] = useState<any[]>(() => {
     const ordered = newestProducts(initialProducts)
-    return ordered.slice(0, 7)
+    return ordered.slice(0, 5)
   })
   const [hero, setHero] = useState<any>(initialHero)
   const [categories, setCategories] = useState<any[]>(initialCategories)
@@ -105,7 +105,7 @@ export default function HomeClient({
     ])
       .then(([productsData, heroData, categoriesData, articlesData]) => {
         const orderedProducts = newestProducts(Array.isArray(productsData) ? productsData : [])
-        setProducts(orderedProducts.slice(0, 7))
+        setProducts(orderedProducts.slice(0, 5))
         setHero(heroData)
         setCategories(Array.isArray(categoriesData) ? categoriesData : [])
         setAllProducts(orderedProducts)
@@ -480,8 +480,8 @@ export default function HomeClient({
                 </button>
               </div>
             ) : loading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 sm:gap-6">
-                {Array.from({ length: 7 }).map((_, i) => (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+                {Array.from({ length: 5 }).map((_, i) => (
                   <SkeletonCard key={i} />
                 ))}
               </div>
@@ -499,7 +499,7 @@ export default function HomeClient({
                     }
                   }
                 }}
-                className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 sm:gap-6"
+                className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6"
               >
                 {products.map((p) => (
                   <motion.div 

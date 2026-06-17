@@ -31,6 +31,7 @@ interface ProductCardProps {
 export default function ProductCard({ id, title, titleEn, price, oldPrice, image, imageAlt, imageWidth, imageHeight, tag, discountType, discountValue, desc }: ProductCardProps) {
   const [isAdded, setIsAdded] = React.useState(false)
   const [isHovered, setIsHovered] = React.useState(false)
+  const [imgError, setImgError] = React.useState(false)
   const { addToCart } = useCart()
   const { toggleWishlist, isInWishlist } = useWishlist()
   const { t, translate, language } = useLanguage()
@@ -87,7 +88,8 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
 
   const discountPercent = oldPrice && price ? Math.round(((oldPrice - price) / oldPrice) * 100) : null
   const imgAlt = productImageAlt({ imageAlt, title, titleEn }, displayTitle)
-  const cardImage = productMainImage(image) || 'https://placehold.co/400x400?text=No+Image'
+  const rawImage = productMainImage(image)
+  const cardImage = (!imgError && rawImage) ? rawImage : null
 
   return (
     <motion.div
@@ -153,14 +155,26 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
           )}
 
           <div className="relative w-full h-full">
-            <Image
-              src={cardImage}
-              alt={imgAlt}
-              fill
-              className="object-contain"
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
-              loading="lazy"
-            />
+            {cardImage ? (
+              <Image
+                src={cardImage}
+                alt={imgAlt}
+                fill
+                className="object-contain"
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
+                loading="lazy"
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 opacity-40">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2e7d5e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <span className="text-[9px] font-bold text-primary/60">{language === 'ar' ? 'لا توجد صورة' : 'No Image'}</span>
+              </div>
+            )}
           </div>
 
           {/* Hover shine overlay */}

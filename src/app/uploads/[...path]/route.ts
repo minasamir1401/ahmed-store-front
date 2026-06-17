@@ -21,10 +21,17 @@ export async function GET(request: NextRequest, context: { params: Promise<{ pat
     return NextResponse.json({ error: 'Backend URL is not configured' }, { status: 500 })
   }
 
-  // Clone headers and remove host to avoid proxy issues
-  const headers = new Headers(request.headers)
-  headers.delete('host')
-  headers.delete('connection')
+  // Create clean headers to avoid forwarding cookies, host, and proxy headers (like X-Forwarded-Host)
+  // which can cause the backend server/CDN to reject the request with a 400 Bad Request.
+  const headers = new Headers()
+  const userAgent = request.headers.get('user-agent')
+  if (userAgent) {
+    headers.set('user-agent', userAgent)
+  }
+  const accept = request.headers.get('accept')
+  if (accept) {
+    headers.set('accept', accept)
+  }
 
   let lastError: any
 

@@ -14,6 +14,11 @@ const nextConfig = {
       { protocol: 'https', hostname: 'www.google.com' },
       { protocol: 'https', hostname: 't1.gstatic.com' },
     ],
+    localPatterns: [
+      {
+        pathname: '/uploads/**',
+      },
+    ],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },

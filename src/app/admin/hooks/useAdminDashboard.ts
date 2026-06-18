@@ -254,7 +254,7 @@ export function useAdminDashboard() {
       if (brandRes.ok) {
         const bnds = await brandRes.json()
         setBrands(Array.isArray(bnds) ? bnds : [])
-        addLog(`تم تحميل ${Array.isArray(bnds) ? bnds.length : 0} شركة`)
+        addLog(`تم تحميل ${Array.isArray(bnds) ? bnds.length : 0} ماركة`)
       }
       if (prodRes.ok) {
         const prods = await prodRes.json()

@@ -270,6 +270,13 @@ export default function AdminDashboard() {
           ${isModalOpen ? 'hidden' : ''}
           md:relative md:translate-x-0 md:flex
         `}>
+          {/* Mobile Sidebar Close Header */}
+          <div className="flex items-center justify-between md:hidden mb-6 border-b border-slate-800/60 pb-4 shrink-0">
+            <span className="text-xs font-black text-slate-200">لوحة التحكم</span>
+            <button onClick={() => setIsSidebarOpen(false)} className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer">
+              <X size={18} />
+            </button>
+          </div>
           <div className="flex-1 space-y-2 mt-4">
             {tabs.map(tab => (
               <button 
@@ -349,8 +356,8 @@ export default function AdminDashboard() {
                   <Award className="w-5 h-5 sm:w-[22px] sm:h-[22px]" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[10px] font-black text-slate-400 block uppercase">الأقسام والشركات</span>
-                  <span className="text-xs sm:text-sm md:text-lg font-black text-slate-800 truncate block mt-0.5">{stats.totalCategories} قسماً / {stats.totalBrands} شركة</span>
+                  <span className="text-[10px] font-black text-slate-400 block uppercase">الأقسام والماركات</span>
+                  <span className="text-xs sm:text-sm md:text-lg font-black text-slate-800 truncate block mt-0.5">{stats.totalCategories} قسماً / {stats.totalBrands} ماركة</span>
                 </div>
               </div>
             </div>
@@ -368,7 +375,7 @@ export default function AdminDashboard() {
                     </div>
                   )}
                 </div>
-                <div className="flex gap-3 w-full lg:w-auto justify-end">
+                <div className="flex flex-wrap gap-2 md:gap-3 w-full lg:w-auto justify-start lg:justify-end items-center">
                   <button onClick={fetchData} className="p-3 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-2xl transition-all bg-white border border-slate-100 shadow-sm cursor-pointer" title="تحديث البيانات">
                     <RotateCcw size={16} className={loading ? 'animate-spin' : ''} />
                   </button>
@@ -384,7 +391,7 @@ export default function AdminDashboard() {
                       <button 
                         onClick={() => excelInputRef.current?.click()} 
                         disabled={excelImporting}
-                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white flex-1 lg:flex-none px-6 py-3 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-blue-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer"
+                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white flex-1 md:flex-none px-4 md:px-6 py-3 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-blue-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer"
                       >
                         {excelImporting ? (
                           <>
@@ -401,7 +408,7 @@ export default function AdminDashboard() {
                     </>
                   )}
                   {activeTab !== 'hero' && activeTab !== 'orders' && activeTab !== 'whatsapp' && activeTab !== 'admin-settings' && (
-                    <button onClick={() => handleOpenModal()} className="bg-emerald-600 text-white flex-1 lg:flex-none px-8 py-3 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer">
+                    <button onClick={() => handleOpenModal()} className="bg-emerald-600 text-white flex-1 md:flex-none px-6 md:px-8 py-3 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer">
                       <Plus size={16} /> إضافة عنصر جديد
                     </button>
                   )}
@@ -409,7 +416,7 @@ export default function AdminDashboard() {
                     <button 
                       onClick={async () => {
                         const confirm = await showConfirm(
-                          'هل ترغب في البحث التلقائي بالذكاء الاصطناعي عن لوجوهات لجميع الشركات التي لا تملك لوجو حالياً؟ قد يستغرق ذلك بعض الوقت.',
+                          'هل ترغب في البحث التلقائي بالذكاء الاصطناعي عن لوجوهات لجميع الماركات التي لا تملك لوجو حالياً؟ قد يستغرق ذلك بعض الوقت.',
                           'البحث التلقائي عن اللوجوهات'
                         );
                         if (!confirm) return;
@@ -422,7 +429,7 @@ export default function AdminDashboard() {
                           const resData = await res.json();
                           if (res.ok) {
                             await showAlert(
-                              `تم تحديث لوجوهات الشركات بنجاح! عدد الشركات المحدثة: ${resData.updatedCount || 0}`,
+                              `تم تحديث لوجوهات الماركات بنجاح! عدد الماركات المحدثة: ${resData.updatedCount || 0}`,
                               'تحديث ناجح'
                             );
                             fetchData(); // Refresh data
@@ -436,14 +443,15 @@ export default function AdminDashboard() {
                         }
                       }}
                       disabled={logoLoading}
-                      className="bg-purple-600 text-white px-6 py-3 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-purple-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer disabled:opacity-50"
+                      className="bg-purple-600 text-white flex-1 md:flex-none px-4 md:px-6 py-3 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-purple-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer disabled:opacity-50"
                     >
                       {logoLoading ? (
                         <Loader2 className="animate-spin" size={16} />
                       ) : (
                         <Sparkles size={16} />
                       )}
-                      <span>تحديث لوجوهات الشركات بالذكاء الاصطناعي</span>
+                      <span className="hidden sm:inline">تحديث لوجوهات الماركات بالذكاء الاصطناعي</span>
+                      <span className="sm:hidden">تحديث اللوجوهات (AI)</span>
                     </button>
                   )}
                 </div>
@@ -595,7 +603,7 @@ export default function AdminDashboard() {
                             onClick={async () => {
                               const brandName = formData.name || formData.nameEn;
                               if (!brandName) {
-                                await showAlert('يرجى كتابة اسم الشركة أولاً للبحث عن اللوجو الخاص بها.', 'تنبيه');
+                                await showAlert('يرجى كتابة اسم الماركة أولاً للبحث عن اللوجو الخاص بها.', 'تنبيه');
                                 return;
                               }
                               setLogoLoading(true);
@@ -607,9 +615,9 @@ export default function AdminDashboard() {
                                 const resData = await res.json();
                                 if (res.ok && resData.logoUrl) {
                                   setFormData({ ...formData, image: resData.logoUrl });
-                                  await showAlert(`تم العثور على لوجو الشركة بنجاح من النطاق: ${resData.domain} ✅`, 'تم العثور على اللوجو');
+                                  await showAlert(`تم العثور على لوجو الماركة بنجاح من النطاق: ${resData.domain} ✅`, 'تم العثور على اللوجو');
                                 } else {
-                                  await showAlert(resData.error || 'فشل في العثور على لوجو لهذه الشركة تلقائياً.', 'خطأ في البحث');
+                                  await showAlert(resData.error || 'فشل في العثور على لوجو لهذه الماركة تلقائياً.', 'خطأ في البحث');
                                 }
                               } catch (err) {
                                 await showAlert('حدث خطأ أثناء البحث عن اللوجو.', 'خطأ');
@@ -625,7 +633,7 @@ export default function AdminDashboard() {
                             ) : (
                               <Sparkles size={14} />
                             )}
-                            <span>البحث التلقائي عن لوجو الشركة بالذكاء الاصطناعي</span>
+                            <span>البحث التلقائي عن لوجو الماركة بالذكاء الاصطناعي</span>
                           </button>
                         </div>
                       )}

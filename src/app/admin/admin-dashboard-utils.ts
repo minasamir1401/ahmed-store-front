@@ -29,7 +29,7 @@ export const DEFAULT_CATEGORIES = [
 export const ADMIN_TABS = [
   { id: 'products', label: 'المنتجات', endpoint: 'products', iconKey: 'Package' },
   { id: 'orders', label: 'الطلبات', endpoint: 'orders', iconKey: 'ShoppingCart' },
-  { id: 'brands', label: 'الشركات', endpoint: 'brands', iconKey: 'Building2' },
+  { id: 'brands', label: 'الماركات', endpoint: 'brands', iconKey: 'Building2' },
   { id: 'categories', label: 'الأقسام', endpoint: 'categories', iconKey: 'Award' },
   { id: 'offers', label: 'العروض', endpoint: 'offers', iconKey: 'Tag' },
   { id: 'hero', label: 'الهيرو', endpoint: 'hero', iconKey: 'Layers' },

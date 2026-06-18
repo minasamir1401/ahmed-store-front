@@ -148,7 +148,7 @@ export default function ProductsForm(props: any) {
                               <label className="text-xs font-black text-slate-800 block mr-1">الشركة المصنعة / الماركة</label>
                               <div className="flex gap-2">
                                 <div className="relative flex-1">
-                                  <input type="text" value={brandSearch} onChange={e => {setBrandSearch(e.target.value); setFormData({...formData, brandName: e.target.value}); setShowBrandSuggestions(true)}} onFocus={() => setShowBrandSuggestions(true)} className="w-full bg-slate-50 rounded-2xl py-3.5 px-5 font-bold text-xs outline-none border border-transparent focus:border-emerald-500/20 transition-all text-slate-700" placeholder="اسم الشركة بالإنجليزية..." />
+                                  <input type="text" value={brandSearch} onChange={e => {setBrandSearch(e.target.value); setFormData({...formData, brandName: e.target.value}); setShowBrandSuggestions(true)}} onFocus={() => setShowBrandSuggestions(true)} className="w-full bg-slate-50 rounded-2xl py-3.5 px-5 font-bold text-xs outline-none border border-transparent focus:border-emerald-500/20 transition-all text-slate-700" placeholder="اسم الماركة بالإنجليزية..." />
                                   {showBrandSuggestions && brandSearch && (
                                     <div className="absolute top-full right-0 left-0 bg-white shadow-2xl rounded-2xl mt-2 z-50 border border-slate-100 max-h-48 overflow-y-auto">
                                       {filteredBrands.length > 0 ? filteredBrands.map((b: any) => (

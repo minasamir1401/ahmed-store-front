@@ -33,11 +33,11 @@ export async function generateMetadata({ searchParams }: PageParams): Promise<Me
 
   const title = isEn
     ? "Original Global Supplement Brands | The VitaHub Egypt"
-    : "العلامات التجارية والشركات العالمية الأصلية | The VitaHub"
+    : "الماركات العالمية الأصلية | The VitaHub"
 
   const description = isEn
     ? "Explore original imported supplement and vitamin brands available in Egypt at The VitaHub. 100% authentic products with fast delivery."
-    : "تسوق منتجات ومكملات أفضل العلامات التجارية العالمية الأصلية 100% في مصر. بروتينات، فيتامينات، وأقوى الماركات العالمية المستوردة مع توصيل سريع."
+    : "تصفح منتجات أفضل الماركات العالمية الأصلية 100% في مصر. بروتينات، فيتامينات، وأقوى الماركات المستوردة مع توصيل سريع."
 
   return {
     title,

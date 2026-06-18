@@ -43,8 +43,8 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
   
   if (!brand) {
     return {
-      title: isEn ? 'Brand Not Found | The VitaHub' : 'الشركة غير موجودة | The VitaHub',
-      description: isEn ? 'The brand you are looking for is currently unavailable.' : 'الشركة التي تبحث عنها غير متوفرة حالياً.',
+      title: isEn ? 'Brand Not Found | The VitaHub' : 'الماركة غير موجودة | The VitaHub',
+      description: isEn ? 'The brand you are looking for is currently unavailable.' : 'الماركة التي تبحث عنها غير متوفرة حالياً.',
       metadataBase: new URL(siteUrl),
       alternates: {
         canonical: canonicalUrl,
@@ -62,11 +62,11 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
   
   const title = isEn
     ? `Original ${brandName} Supplements & Vitamins | The VitaHub Egypt`
-    : `مكملات وفيتامينات شركة ${brandName} الأصلية | The VitaHub`
+    : `مكملات وفيتامينات ${brandName} الأصلية | The VitaHub`
 
   const description = isEn
     ? `Shop all 100% original ${brandName} supplements and vitamins in Egypt. Proteins, vitamins, and fat burners from ${brandName} with fast delivery.`
-    : `تسوق جميع منتجات ومكملات شركة ${brandName} الأصلية 100% في مصر. بروتينات، فيتامينات، وأقوى حوارق الدهون من ${brandName} مع توصيل سريع.`
+    : `تسوق جميع منتجات ${brandName} الأصلية 100% في مصر. بروتينات، فيتامينات، وأقوى حوارق الدهون من ${brandName} مع توصيل سريع.`
 
   return {
     title,
@@ -123,11 +123,11 @@ export default async function BrandDetailPage({ params, searchParams }: PagePara
       "@context": "https://schema.org",
       "@type": "CollectionPage",
       "@id": `${siteUrl}/brands/${resolvedParams.id}/#collection`,
-      "name": isEn ? `Original ${brandName} Supplements & Vitamins` : `مكملات وفيتامينات شركة ${brandName} الأصلية`,
+      "name": isEn ? `Original ${brandName} Supplements & Vitamins` : `مكملات وفيتامينات ${brandName} الأصلية`,
       "url": `${siteUrl}/brands/${resolvedParams.id}`,
       "description": isEn 
         ? `Collection of ${brandName} supplements and vitamins available in Egypt at The VitaHub.`
-        : `مجموعة منتجات ومكملات شركة ${brandName} المتاحة للشراء في مصر عبر متجر The VitaHub.`,
+        : `مجموعة منتجات ${brandName} المتاحة للشراء في مصر عبر متجر The VitaHub.`,
       "about": {
         "@type": "Brand",
         "name": brandName,
@@ -159,7 +159,7 @@ export default async function BrandDetailPage({ params, searchParams }: PagePara
         {
           "@type": "ListItem",
           "position": 2,
-          "name": isEn ? "Brands" : "الشركات",
+          "name": isEn ? "Brands" : "الماركات",
           "item": `${siteUrl}/brands${isEn ? '?lang=en' : ''}`
         },
         {

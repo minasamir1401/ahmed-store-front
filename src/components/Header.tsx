@@ -73,12 +73,13 @@ function HeaderContent() {
                 {/* Logo */}
                 <Link href="/" aria-label="The VitaHub Homepage" className="flex items-center flex-shrink-0 relative select-none">
                   <Image
-                    src="/logo-header.jpg"
+                    src="/favicon.ico"
                     alt="The VitaHub Logo"
                     width={140}
                     height={56}
                     className="h-10 xs:h-12 md:h-14 w-auto object-contain"
                     priority
+                    unoptimized
                   />
                 </Link>
 
@@ -231,11 +232,12 @@ function HeaderContent() {
               <div className="p-4 xs:p-6 flex items-center justify-between border-b border-[#e8f0ed] relative z-10">
                 <Link href="/" aria-label="Home" onClick={() => setIsMenuOpen(false)} className="flex items-center select-none relative">
                   <Image
-                    src="/logo-header.jpg"
+                    src="/favicon.ico"
                     alt="The VitaHub Logo"
                     width={120}
                     height={48}
                     className="h-10 xs:h-12 w-auto object-contain"
+                    unoptimized
                   />
                 </Link>
                 <button
@@ -268,7 +270,7 @@ function HeaderContent() {
                     },
                     {
                       href: "/products",
-                      label: language === 'ar' ? "منتجاتنا المميزة" : "Our Featured Products",
+                      label: language === 'ar' ? "المنتجات" : "Products",
                       icon: (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
@@ -280,7 +282,7 @@ function HeaderContent() {
                     },
                     {
                       href: "/offers",
-                      label: language === 'ar' ? "أحدث العروض والخصومات" : "Latest Offers & Discounts",
+                      label: language === 'ar' ? "العروض والخصومات" : "Offers & Discounts",
                       icon: (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                           <line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
@@ -291,7 +293,7 @@ function HeaderContent() {
                     },
                     {
                       href: "/brands",
-                      label: language === 'ar' ? "تسوق بأقوى الماركات" : "Shop Top Brands",
+                      label: language === 'ar' ? "الماركات" : "Brands",
                       icon: (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -302,7 +304,7 @@ function HeaderContent() {
                     },
                     {
                       href: "/health-tips",
-                      label: language === 'ar' ? "نصائح صحية ومدونة طبية" : "Health Tips & Blog",
+                      label: language === 'ar' ? "نصائح صحية" : "Health Tips",
                       icon: (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
@@ -314,7 +316,7 @@ function HeaderContent() {
                     },
                     {
                       href: "/track",
-                      label: language === 'ar' ? "تتبع طلبك الآن" : "Track Your Order",
+                      label: language === 'ar' ? "تتبع الطلب" : "Track Order",
                       icon: (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                           <rect width="16" height="8" x="2" y="6" rx="2"/>
@@ -327,7 +329,7 @@ function HeaderContent() {
                     },
                     {
                       href: "/bmi-calculator",
-                      label: language === 'ar' ? "حاسبة الوزن والـ BMI الذكية" : "Smart BMI Calculator",
+                      label: language === 'ar' ? "حاسبة BMI" : "BMI Calculator",
                       icon: (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 const siteName = 'The VitaHub'
-const defaultImage = '/logo-header.jpg'
+const defaultImage = '/favicon.ico'
 
 type PublicPageMetadataInput = {
   title: string

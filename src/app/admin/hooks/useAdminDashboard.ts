@@ -31,6 +31,7 @@ export function useAdminDashboard() {
   const [isAILoading, setIsAILoading] = useState(false)
   const [isSEOLoading, setIsSEOLoading] = useState(false)
   const [isTranslatingLoading, setIsTranslatingLoading] = useState(false)
+  const [rowSeoLoading, setRowSeoLoading] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [brandUploading, setBrandUploading] = useState(false)
   const [backupLoading, setBackupLoading] = useState(false)
@@ -788,6 +789,28 @@ export function useAdminDashboard() {
     }
   }
 
+  const handleProductRowSEO = async (productId: string) => {
+    setRowSeoLoading(productId)
+    addLog(`جاري توليد الـ SEO للمنتج في الخلفية...`)
+    try {
+      const res = await fetchWithAdminAuth(`${BACKEND_API}/api/admin/products/${productId}/generate-seo`, {
+        method: 'POST'
+      })
+      const resData = await res.json()
+      if (res.ok) {
+        await showAlert('تم توليد وتحديث بيانات الـ SEO للمنتج بنجاح! ✅', 'تحديث ناجح')
+        addLog(`تم تحديث الـ SEO للمنتج بنجاح.`)
+        await fetchData() // Refresh product list data
+      } else {
+        await showAlert(resData.error || 'فشل تحديث الـ SEO', 'خطأ')
+      }
+    } catch (err: any) {
+      await showAlert('حدث خطأ أثناء الاتصال بالخادم: ' + err.message, 'خطأ')
+    } finally {
+      setRowSeoLoading(null)
+    }
+  }
+
   const translateText = async (text: string) => {
     const cleaned = text?.trim()
     if (!cleaned) return ''
@@ -1390,6 +1413,8 @@ export function useAdminDashboard() {
     handleSaveAdminSettings,
     handleSave,
     filteredBrands,
+    rowSeoLoading,
+    handleProductRowSEO,
     backupLoading,
     restoreLoading,
     handleDownloadBackup,

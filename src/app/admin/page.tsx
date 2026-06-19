@@ -114,6 +114,8 @@ export default function AdminDashboard() {
     handleRestoreBackup,
     cleanLoading,
     handleCleanBase64Images,
+    rowSeoLoading,
+    handleProductRowSEO,
     tabs
   } = useAdminDashboard()
 
@@ -502,6 +504,13 @@ export default function AdminDashboard() {
                                       <>
                                         <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-500">ID: {item.id.substring(0, 8)}</span>
                                         {item.categoryId && <span className="text-emerald-600 font-black">#{categories.find(c => c.id === item.categoryId)?.name || 'غير مصنف'}</span>}
+                                        {activeTab === 'products' && (
+                                          item.desc && item.desc.length > 200 ? (
+                                            <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded font-black border border-emerald-100/50">SEO جاهز ✅</span>
+                                          ) : (
+                                            <span className="bg-slate-100 text-slate-400 px-2 py-0.5 rounded font-bold border border-slate-200/50">بدون SEO ⚠️</span>
+                                          )
+                                        )}
                                       </>
                                     )}
                                   </div>
@@ -541,6 +550,18 @@ export default function AdminDashboard() {
                                   </>
                                 ) : (
                                   <>
+                                    {activeTab === 'products' && (
+                                      <button 
+                                        type="button" 
+                                        onClick={() => handleProductRowSEO(item.id)} 
+                                        disabled={rowSeoLoading === item.id} 
+                                        className="text-[10px] bg-emerald-600 text-white border border-transparent px-3 py-1.5 rounded-xl font-black shadow-sm flex items-center justify-center gap-1.5 hover:bg-emerald-500 transition-all disabled:opacity-50 cursor-pointer whitespace-nowrap"
+                                        title="توليد بالذكاء الاصطناعي"
+                                      >
+                                        {rowSeoLoading === item.id ? <Loader2 className="animate-spin" size={12} /> : <Sparkles size={12} />} 
+                                        توليد بالذكاء الاصطناعي
+                                      </button>
+                                    )}
                                     <button onClick={() => handleOpenModal(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all cursor-pointer" title="تعديل"><Edit2 size={16} /></button>
                                     <button onClick={() => handleDelete(item.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all cursor-pointer" title="حذف"><Trash2 size={16} /></button>
                                   </>

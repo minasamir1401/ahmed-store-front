@@ -114,10 +114,13 @@ export default function ProductsForm(props: any) {
                               <input type="text" value={formData.title || ''} onChange={e => setFormData({...formData, title: e.target.value})} className="flex-1 bg-slate-50 focus:bg-white border border-transparent focus:border-emerald-500/20 rounded-2xl py-3.5 px-6 font-bold text-sm sm:text-base outline-none transition-all text-slate-700" placeholder="مثال: أوميجا 3 تركيز عالي" required />
                             </div>
                             <div className="flex flex-wrap gap-2 pt-1">
-
                               <button type="button" onClick={() => handleAIFill()} disabled={isAILoading || !formData.title} className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-3 rounded-2xl font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-200 disabled:opacity-50 cursor-pointer whitespace-nowrap hover:scale-[1.02] active:scale-[0.98]">
                                 {isAILoading ? <Loader2 className="animate-spin" size={14} /> : <Sparkles size={14} />}
                                 <span>توليد بالذكاء الاصطناعي</span>
+                              </button>
+                              <button type="button" onClick={() => handleSEOAI()} disabled={isSEOLoading || !formData.title} className="text-[10px] bg-emerald-600 text-white border border-transparent px-3 py-1.5 rounded-xl font-black shadow-sm flex items-center justify-center gap-1.5 hover:bg-emerald-500 transition-all disabled:opacity-50 cursor-pointer whitespace-nowrap">
+                                {isSEOLoading ? <Loader2 className="animate-spin" size={12} /> : <Sparkles size={12} />}
+                                <span>توليد SEO بالذكاء الاصطناعي</span>
                               </button>
                               <button
                                 type="button"

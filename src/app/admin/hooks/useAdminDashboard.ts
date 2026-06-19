@@ -13,9 +13,9 @@ type AIProvider = 'openrouter' | 'gemini'
 export function useAdminDashboard() {
   const { showAlert, showConfirm } = useModal()
   const AI_MAX_TOKENS = {
-    productFill: 1800,
-    seo: 1800,
-    tip: 1400
+    productFill: 1200,
+    seo: 1200,
+    tip: 1000
   }
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -680,8 +680,8 @@ export function useAdminDashboard() {
 القواعد العامة:
 - لا تستخدم Markdown في النصوص.
 - لا تذكر اسم المتجر "The VitaHub" أو "ذا فيتا هوب" في عنوان الصفحة (title) أو عنوان الصفحة بالإنجليزية (titleEn)، لأن النظام يضيفه تلقائياً. أما في الوصف المختصر (seoDesc) فاذكر فيه اسم المتجر "The VitaHub" بشكل طبيعي.
-- الكلمات المفتاحية (seoKeywords و seoKeywordsEn) يجب أن تكون كثيرة جداً ومنوعة (بالضبط 250 كلمة أو عبارة مفتاحية)، مفصولة بفواصل، وتشمل مرادفات، فوائد، ونوايا شراء مثل (سعر، أفضل نوع، في مصر، مستورد، الأصلي).
-- يجب أن يكون الوصف بالعربي (desc) والوصف بالإنجليزي (descEn) مفصلين، دقيقين علمياً، ويتجاوز كل منهما 250 كلمة.
+- الكلمات المفتاحية (seoKeywords و seoKeywordsEn) يجب أن تكون منوعة ومختصرة (بين 15 إلى 20 كلمة أو عبارة مفتاحية فقط)، مفصولة بفواصل، وتشمل مرادفات، فوائد، ونوايا شراء مثل (سعر، أفضل نوع، في مصر، مستورد، الأصلي).
+- يجب أن يكون الوصف بالعربي (desc) والوصف بالإنجليزي (descEn) مفصلين، دقيقين علمياً، ويتجاوز كل منهما 100 كلمة.
 - يجب توفير حقول: طريقة الاستخدام (directions و usageEn)، المحاذير (warnings و warningsEn)، والمكونات (ingredients و ingredientsEn).
 - توليد 3 أسئلة شائعة (faqs) ملائمة للمنتج وإجاباتها باحترافية باللغتين العربية والإنجليزية.
 
@@ -689,16 +689,16 @@ export function useAdminDashboard() {
 {
   "title": "اسم المنتج باللغة العربية بطريقة احترافية مع التركيز والجرعة (بدون اسم المتجر)",
   "titleEn": "اسم المنتج بالإنجليزية بطريقة احترافية مع التركيز والجرعة (بدون اسم المتجر)",
-  "desc": "وصف تفصيلي كامل ومقنع باللغة العربية يتجاوز 250 كلمة، يتناول الفوائد، المكونات، ودواعي الاستخدام وكيف يساعد العميل، مع دمج الكلمات المفتاحية بشكل طبيعي ولماذا الشراء من The VitaHub هو الأفضل.",
-  "descEn": "Detailed professional description in English exceeding 250 words naturally integrating SEO keywords.",
+  "desc": "وصف تفصيلي كامل ومقنع باللغة العربية يتجاوز 100 كلمة، يتناول الفوائد، المكونات، ودواعي الاستخدام وكيف يساعد العميل، مع دمج الكلمات المفتاحية بشكل طبيعي ولماذا الشراء من The VitaHub هو الأفضل.",
+  "descEn": "Detailed professional description in English exceeding 100 words naturally integrating SEO keywords.",
   "directions": "طريقة الاستخدام والجرعات الموصى بها بالتفصيل باللغة العربية.",
   "usageEn": "Detailed usage and dosage instructions in English.",
   "ingredients": "المكونات بالتفصيل باللغة العربية.",
   "ingredientsEn": "Detailed ingredients list in English.",
   "warnings": "المحاذير الطبية وموانع الاستعمال باللغة العربية.",
   "warningsEn": "Medical warnings and precautions in English.",
-  "seoKeywords": "بالضبط 250 كلمة أو عبارة بحث مفتاحية متنوعة بالعربية مفصولة بفواصل لتغطية كافة عمليات البحث الممكنة.",
-  "seoKeywordsEn": "Exactly 250 highly relevant meta keywords and search queries in English separated by commas.",
+  "seoKeywords": "بين 15 إلى 20 كلمة أو عبارة بحث مفتاحية متنوعة بالعربية مفصولة بفواصل لتغطية كافة عمليات البحث الممكنة.",
+  "seoKeywordsEn": "Between 15 to 20 highly relevant meta keywords and search queries in English separated by commas.",
   "seoDesc": "وصف ميتا للبحث بالعربية مقنع وجذاب ويشجع على الشراء (بين 150 و 220 حرفاً).",
   "seoDescEn": "Meta description in English for Google search (150-220 characters).",
   "faqs": [

@@ -716,9 +716,9 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                 </div>
 
                 {/* Title */}
-                <h1 className="text-lg xs:text-xl font-black text-gray-800 leading-tight break-words">
+                <div className="text-lg xs:text-xl font-black text-gray-800 leading-tight break-words">
                   {getLocalizedValue(language, product.title, product.titleEn, translate)}
-                </h1>
+                </div>
 
                 {/* Price */}
                 <div className="flex flex-wrap items-end gap-2 xs:gap-3 py-1">
@@ -1515,7 +1515,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                       <Sparkles className="w-3.5 h-3.5" />
                       Premium Nutrient Sheet
                     </div>
-                    <h2 className="text-xl max-[340px]:text-lg font-black italic uppercase tracking-tighter mb-1 text-slate-100">Supplement Facts</h2>
+                    <h3 className="text-xl max-[340px]:text-lg font-black italic uppercase tracking-tighter mb-1 text-slate-100">Supplement Facts</h3>
                     <div className="text-[10px] font-bold text-slate-400">{language === 'ar' ? 'الحصص لكل عبوة: بحسب الجرعة المطلوبة' : 'Servings per container: Varies by dosage'}</div>
                   </div>
 
@@ -1597,9 +1597,9 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
               className="flex items-center justify-center gap-3 mb-14"
             >
               <div className="h-px flex-1 bg-slate-200" />
-              <span className="flex items-center gap-2 text-2xl font-black text-slate-800 italic uppercase tracking-wider">
+              <h2 className="flex items-center gap-2 text-2xl font-black text-slate-800 italic uppercase tracking-wider">
                 {language === 'ar' ? 'منتجات مشابهة قد تعجبك' : 'Similar Products You Might Like'}
-              </span>
+              </h2>
               <div className="h-px flex-1 bg-slate-200" />
             </motion.div>
 
@@ -1624,9 +1624,9 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
               className="flex items-center justify-center gap-3 mb-14"
             >
               <div className="h-px flex-1 bg-slate-200" />
-              <span className="flex items-center gap-2 text-2xl font-black text-slate-800 italic uppercase tracking-wider">
+              <h2 className="flex items-center gap-2 text-2xl font-black text-slate-800 italic uppercase tracking-wider">
                 {language === 'ar' ? 'مقالات طبية مرشحة لك' : 'Recommended Medical Articles'}
-              </span>
+              </h2>
               <div className="h-px flex-1 bg-slate-200" />
             </motion.div>
 

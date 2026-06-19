@@ -95,9 +95,30 @@ export async function generateMetadata({ searchParams }: PageParams): Promise<Me
 export default async function Home() {
   const { products, hero, categories, articles } = await getHomeData()
 
+  // Clean products array on the server side to reduce HTML size dramatically
+  const lightweightProducts = Array.isArray(products)
+    ? products.map((p: any) => ({
+        id: p.id,
+        title: p.title,
+        titleEn: p.titleEn || null,
+        price: p.price,
+        oldPrice: p.oldPrice || null,
+        image: p.image,
+        imageAlt: p.imageAlt || null,
+        imageWidth: p.imageWidth || null,
+        imageHeight: p.imageHeight || null,
+        tag: p.tag || null,
+        discountType: p.discountType || null,
+        discountValue: p.discountValue || null,
+        categoryId: p.categoryId,
+        brandId: p.brandId || null,
+        createdAt: p.createdAt
+      }))
+    : []
+
   return (
     <HomeClient
-      initialProducts={products}
+      initialProducts={lightweightProducts}
       initialHero={hero}
       initialCategories={categories}
       initialArticles={articles}

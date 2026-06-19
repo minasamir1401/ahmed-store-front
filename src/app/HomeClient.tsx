@@ -159,6 +159,13 @@ export default function HomeClient({
 
       <main id="main-content" className="flex-1 pb-20 md:pb-0 bg-white relative overflow-hidden w-full">
         
+        {/* Visually Hidden H1 for SEO */}
+        <h1 className="sr-only">
+          {language === 'ar' 
+            ? "The VitaHub | ذا فيتا هوب | متجر المكملات الغذائية والفيتامينات الأصلي في مصر" 
+            : "The VitaHub | Original Vitamins & Dietary Supplements Store in Egypt"}
+        </h1>
+        
         {/* Elite Ambient Glow Circles */}
         <div className="absolute top-20 right-10 w-96 h-96 bg-emerald-100 rounded-full blur-[110px] opacity-40 pointer-events-none animate-pulse-glow" />
         <div className="absolute top-[400px] left-10 w-96 h-96 bg-amber-100 rounded-full blur-[110px] opacity-30 pointer-events-none animate-pulse-glow" />
@@ -199,14 +206,14 @@ export default function HomeClient({
                             ? 'right-4 xs:right-8 md:right-16 text-right' 
                             : 'left-4 xs:left-8 md:left-16 text-left'
                         }`}>
-                          <motion.h1 
+                          <motion.h2 
                             initial={{ opacity: 0, x: dir === 'rtl' ? 40 : -40 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.2, duration: 0.5 }}
                             className="text-lg xs:text-2xl sm:text-3xl md:text-5xl font-black text-slate-800 mb-1.5 sm:mb-3 leading-tight"
                           >
                             {translate(slides[currentSlide].title)}
-                          </motion.h1>
+                          </motion.h2>
                           <motion.p 
                             initial={{ opacity: 0, x: dir === 'rtl' ? 30 : -30 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -267,14 +274,14 @@ export default function HomeClient({
                         ? 'right-4 xs:right-8 md:right-16 text-right' 
                         : 'left-4 xs:left-8 md:left-16 text-left'
                     }`}>
-                      <motion.h1 
+                      <motion.h2 
                         initial={{ opacity: 0, x: dir === 'rtl' ? 40 : -40 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3, duration: 0.6 }}
                         className="text-lg xs:text-2xl sm:text-3xl md:text-5xl font-black text-slate-800 mb-1.5 sm:mb-3 leading-tight"
                       >
                         {translate(hero.title)}
-                      </motion.h1>
+                      </motion.h2>
                       <motion.p 
                         initial={{ opacity: 0, x: dir === 'rtl' ? 30 : -30 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -464,7 +471,7 @@ export default function HomeClient({
               className="flex items-center justify-center gap-3 mb-14"
             >
               <div className="h-px flex-1 bg-slate-100" />
-              <span className="flex items-center gap-2 text-2xl font-black text-slate-800 italic uppercase tracking-wider">{t('newly_added')}</span>
+              <h2 className="flex items-center gap-2 text-2xl font-black text-slate-800 italic uppercase tracking-wider">{t('newly_added')}</h2>
               <div className="h-px flex-1 bg-slate-100" />
             </motion.div>
 
@@ -543,7 +550,7 @@ export default function HomeClient({
             >
               <div className="h-px flex-1 bg-slate-100" />
               <span className="flex items-center gap-2 text-2xl font-black text-slate-800 italic uppercase tracking-wider text-center">
-                {t('shop_by_category')}
+                <h2 className="text-2xl font-black text-slate-800 italic uppercase tracking-wider text-center inline-block">{t('shop_by_category')}</h2>
               </span>
               <div className="h-px flex-1 bg-slate-100" />
             </motion.div>
@@ -586,9 +593,9 @@ export default function HomeClient({
                 className="flex items-center justify-center gap-3 mb-14"
               >
                 <div className="h-px flex-1 bg-slate-100" />
-                <span className="flex items-center gap-2 text-2xl font-black text-slate-800 italic uppercase tracking-wider">
+                <h2 className="flex items-center gap-2 text-2xl font-black text-slate-800 italic uppercase tracking-wider">
                   {language === 'ar' ? 'نصائح طبية ومقالات تهمك' : 'Health Tips & Articles'}
-                </span>
+                </h2>
                 <div className="h-px flex-1 bg-slate-100" />
               </motion.div>
 
@@ -684,6 +691,61 @@ export default function HomeClient({
           </div>
         </section>
 
+        {/* Detailed SEO Informational Content Section (>250 words) */}
+        <section className="py-12 sm:py-24 bg-white border-t border-slate-100/50 relative z-10">
+          <div className="max-w-screen-xl mx-auto px-4" dir={dir}>
+            <div className="bg-slate-50/50 border border-slate-100 rounded-[2.5rem] p-6 sm:p-12 shadow-sm">
+              <h2 className="text-xl sm:text-3xl font-black text-slate-800 mb-6 border-r-4 border-primary pr-4 leading-none">
+                {language === 'ar' 
+                  ? "ذا فيتا هوب: متجرك الموثوق لشراء المكملات الغذائية والفيتامينات في مصر" 
+                  : "The VitaHub: Your Trusted Store for Dietary Supplements & Vitamins in Egypt"}
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-slate-600 text-xs sm:text-sm leading-relaxed font-bold">
+                {language === 'ar' ? (
+                  <>
+                    <div className="space-y-4">
+                      <p>
+                        مرحبًا بك في <strong>ذا فيتا هوب (The VitaHub)</strong>، المتجر الإلكتروني الرائد والمتخصص في توفير <strong>مكملات غذائية</strong> و<strong>فيتامينات</strong> مستوردة وأصلية 100% في جمهورية مصر العربية. نحن نلتزم بتقديم منتجات عالية الجودة مستوردة مباشرة من أشهر العلامات التجارية العالمية لدعم نمط حياتك الصحي، وتعزيز حيويتك اليومية، والارتقاء بأدائك البدني ومساعدتك في رحلة <strong>الرشاقة والجمال</strong>.
+                      </p>
+                      <p>
+                        إذا كنت من عشاق ممارسة الرياضة والرشاقة وتبحث عن أفضل <strong>بروتينات مصر</strong>، فإننا نوفر لك باقة واسعة من مساحيق البروتين مثل الواي بروتين (Whey Protein)، والكازين، والأحماض الأمينية متفرعة السلسلة (BCAAs) التي تسهم بفعالية في البناء العضلي وتسرع من عملية الاستشفاء بعد التمارين الرياضية. بالإضافة إلى ذلك، نقدم تشكيلة مميزة من <strong>مكملات جيم</strong> تشمل منتجات الطاقة لما قبل التمرين (Pre-workout) والكرياتين النقي لمساعدتك على التفوق وتحقيق أقصى استفادة من حصتك التدريبية.
+                      </p>
+                    </div>
+                    <div className="space-y-4">
+                      <p>
+                        نحن في ذا فيتا هوب لا نركز فقط على اللياقة البدنية والرياضة، بل نضع الصحة الوقائية لجميع أفراد عائلتك في مقدمة أولوياتنا. لذا نوفر لك مكملات <strong>أوميجا 3</strong> المركزة وعالية النقاء المستخلصة من زيت السمك النقي لدعم صحة القلب، الأوعية الدموية، والمفاصل، بجانب تحسين الذاكرة والتركيز والقدرات العقلية. كما نهتم بنقص الفيتامينات الشائع من خلال توفير مكملات <strong>فيتامين د</strong> (Vitamin D3) بتركيزات مختلفة لدعم امتصاص الكالسيوم، وتقوية العظام والأسنان، وتقوية الجهاز المناعي لمواجهة مختلف الأمراض بفعالية.
+                      </p>
+                      <p>
+                        لماذا تختار الشراء من ذا فيتا هوب؟ جميع المنتجات المعروضة لدينا تخضع للفحص والتوثيق، ويتم الاحتفاظ بها في مستودعاتنا المجهزة بالكامل بأنظمة تبريد ذكية للحفاظ على فاعليتها الغذائية والطبية الكاملة. نوفر شحنًا آمنًا وسريعًا مباشرة لباب منزلك مع إتاحة خيار فحص محتويات الشحنة بالكامل والتحقق من الباتش نمبر (Batch Number) قبل إتمام الدفع، لضمان رضاك وثقتك المطلقة في خدمتنا.
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-4">
+                      <p>
+                        Welcome to <strong>The VitaHub</strong>, the premier online destination for 100% authentic, imported <strong>dietary supplements</strong> and <strong>vitamins</strong> in Egypt. We are committed to providing premium health and wellness products sourced directly from world-class global brands to support your active lifestyle, boost your daily vitality, and elevate your overall well-being and beauty goals.
+                      </p>
+                      <p>
+                        For fitness enthusiasts looking for top-tier <strong>proteins in Egypt</strong>, we offer a comprehensive collection of Whey Protein, Casein, and essential amino acids (BCAAs) key to muscle building and faster recovery after intense workouts. Our robust collection of <strong>gym supplements</strong> includes premium pre-workouts, pure creatine, and post-workout formulas designed to help you exceed your fitness boundaries.
+                      </p>
+                    </div>
+                    <div className="space-y-4">
+                      <p>
+                        Beyond athletic performance, we prioritize preventive health for you and your family. We offer high-potency <strong>Omega 3</strong> fish oils that support cardiovascular health, joint flexibility, and cognitive functions. We also specialize in combating vitamin deficiencies by stocking premium <strong>Vitamin D</strong> (Vitamin D3) formulas crucial for calcium absorption, bone strength, and strong immune defense.
+                      </p>
+                      <p>
+                        Why shop at The VitaHub? All our products are stored in advanced, temperature-controlled warehouses to preserve their full potency and medical efficacy. We provide fast shipping across Egypt, allowing you to inspect the packaging and verify the batch numbers before making a payment, guaranteeing 100% satisfaction and complete security.
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
       </main>
       <Footer />
     </>
@@ -721,9 +783,9 @@ function CategoryProductRow({ category, products, language, t, translate, dir }:
     <div className="mb-14 relative group/row">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <span className="text-lg sm:text-2xl font-black text-slate-800 border-r-4 border-primary pr-3 leading-none">
+          <h3 className="text-lg sm:text-2xl font-black text-slate-800 border-r-4 border-primary pr-3 leading-none">
             {categoryName}
-          </span>
+          </h3>
           <span className="bg-primary/10 text-primary text-[10px] sm:text-xs font-black px-2.5 py-0.5 rounded-full">
             {language === 'ar' ? `${products.length} منتج` : `${products.length} Products`}
           </span>

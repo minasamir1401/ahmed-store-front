@@ -657,52 +657,74 @@ export function useAdminDashboard() {
     setIsSEOLoading(true)
     const activeProvider = providerOverride || aiProvider
     const providerNames = { gemini: 'Gemini', openrouter: 'OpenRouter' }
-    addLog(`جاري توليد كلمات SEO لمنتج ${formData.title.substring(0, 15)} باستخدام ${providerNames[activeProvider]}...`)
+    addLog(`جاري توليد الـ SEO والمحتوى للمنتج ${formData.title.substring(0, 15)} باستخدام ${providerNames[activeProvider]}...`)
     try {
       const response = await fetchWithAdminAuth(`${BACKEND_API}/api/ai/generate`, {
         method: 'POST',
         body: JSON.stringify({
           provider: activeProvider,
           max_tokens: AI_MAX_TOKENS.seo,
-          model: 'google/gemma-4-31b-it:free',
+          model: 'google/gemini-2.5-flash:free',
           models: [
-            'google/gemma-4-31b-it:free',
-            'openai/gpt-oss-120b:free',
+            'google/gemini-2.5-flash:free',
+            'meta-llama/llama-3-8b-instruct:free',
             'openrouter/free'
           ],
           messages: [
             {
               role: 'system',
-              content: `أنت خبير SEO محترف جداً لمتاجر المكملات والمنتجات الصحية في السوق المصري.
-مهمتك هي استخراج أقصى قيمة SEO ممكنة من بيانات المنتج الحالية، مع صياغة قوية تساعد المنتج يظهر في نتائج بحث جوجل وتساعد العميل يقرر الشراء.
-اكتب محتوى عملي ومفيد مبني على التفاصيل الفعلية فقط، بدون ادعاءات طبية علاجية مبالغ فيها وبدون حشو عام.
-استخدم لغة عربية مصرية مفهومة واحترافية، مع تنسيق لغوي واضح وعلامات ترقيم جيدة، واذكر الاسم الإنجليزي أو المادة الفعالة إن كانت موجودة.
-ركّز على:
-- اسم المنتج التجاري والعلمي بالعربي والإنجليزي إن وجد
-- المادة الفعالة والتركيز والحجم
-- الفئة الرئيسية مثل فيتامينات، معادن، أوميجا، أعشاب، عظام ومفاصل، نوم، طاقة، شعر وبشرة
-- نية البحث الشرائية مثل السعر، أفضل نوع، شراء، في مصر، الأصلي، مستورد، طريقة الاستخدام
-- الفوائد الواقعية المذكورة في بيانات المنتج فقط
-- كلمات طويلة Long-tail بجانب الكلمات القصيرة
+              content: `أنت خبير SEO محترف وعالم صيدلة سريرية متخصص في المكملات والمنتجات الصحية في مصر.
+مهمتك هي كتابة محتوى متكامل، غني وعالي الجودة، ومتوافق تماماً مع محركات البحث (SEO) لمنتج مكمل غذائي.
+يجب أن تصيغ الأوصاف والكلمات المفتاحية بطريقة تجذب العميل للشراء وتجعل الصفحة تتصدر نتائج البحث.
+القواعد العامة:
+- لا تستخدم Markdown في النصوص.
+- لا تذكر اسم المتجر "The VitaHub" أو "ذا فيتا هوب" في عنوان الصفحة (title) أو عنوان الصفحة بالإنجليزية (titleEn)، لأن النظام يضيفه تلقائياً. أما في الوصف المختصر (seoDesc) فاذكر فيه اسم المتجر "The VitaHub" بشكل طبيعي.
+- الكلمات المفتاحية (seoKeywords و seoKeywordsEn) يجب أن تكون كثيرة جداً ومنوعة (بين 40 و 80 كلمة)، مفصولة بفواصل، وتشمل مرادفات، فوائد، ونوايا شراء مثل (سعر، أفضل نوع، في مصر، مستورد، الأصلي).
+- يجب أن يكون الوصف بالعربي (desc) والوصف بالإنجليزي (descEn) مفصلين، دقيقين علمياً، ويتجاوز كل منهما 250 كلمة.
+- يجب توفير حقول: طريقة الاستخدام (directions و usageEn)، المحاذير (warnings و warningsEn)، والمكونات (ingredients و ingredientsEn).
+- توليد 3 أسئلة شائعة (faqs) ملائمة للمنتج وإجاباتها باحترافية باللغتين العربية والإنجليزية.
 
-قواعد مهمة:
-- لا تستخدم Markdown.
-- لا تكتب أي نص خارج JSON.
-- لا تجعل العنوان طويلاً جداً، لكن اجعله غني بالكلمات المهمة.
-- وصف الميتا يجب أن يكون مقنعاً ومناسباً للظهور في جوجل، ويفضل بين 150 و 220 حرفاً تقريباً.
-- الكلمات المفتاحية يجب أن تكون كثيرة ومنوعة ومفصولة بفواصل، وتشمل عربي وإنجليزي، ومرادفات، ونوايا شراء، ولا تكرر نفس الكلمة بلا فائدة.
-- لا تضف تشكيل كامل للحروف العربية لأن ذلك يضعف البحث، لكن اضبط الصياغة وعلامات الترقيم والتنسيق.
-- **هام جداً:** لا تذكر اسم المتجر "The VitaHub" أو "ذا فيتا هوب" في نهاية العنوان (title) الخاص بالمنتج، واكتب اسم المنتج بطريقة احترافية ونظيفة فقط (مثل: اسم المنتج، التركيز، الحجم)، لأن النظام يضيف اسم المتجر تلقائياً في النهاية. أما بالنسبة لوصف الميتا (seoDesc) فاذكر فيه اسم المتجر "The VitaHub" بشكل طبيعي لتعزيز العلامة التجارية.
 قم بإرجاع كائن JSON فقط بالهيكل التالي بدقة ودون أي كلام خارجي على الإطلاق:
 {
-  "title": "عنوان منتج قوي ونظيف ومقروء، يبدأ باسم المنتج أو المادة الفعالة، وبدون اسم المتجر (مثال: Swanson Real Food B Complex 60 Capsules)",
-  "seoKeywords": "40 إلى 80 كلمة أو عبارة بحثية قصيرة وطويلة، عربية وإنجليزية، مفصولة بفواصل فقط، وتشمل أسماء بديلة ونوايا شراء ومرادفات وفوائد فعلية",
-  "seoDesc": "وصف ميتا مقنع ومنسق لغوياً، يوضح المنتج ويشجع على الشراء ويحتوي على اسم المتجر The VitaHub بشكل طبيعي"
+  "title": "اسم المنتج باللغة العربية بطريقة احترافية مع التركيز والجرعة (بدون اسم المتجر)",
+  "titleEn": "اسم المنتج بالإنجليزية بطريقة احترافية مع التركيز والجرعة (بدون اسم المتجر)",
+  "desc": "وصف تفصيلي كامل ومقنع باللغة العربية يتجاوز 250 كلمة، يتناول الفوائد، المكونات، ودواعي الاستخدام وكيف يساعد العميل، مع دمج الكلمات المفتاحية بشكل طبيعي ولماذا الشراء من The VitaHub هو الأفضل.",
+  "descEn": "Detailed professional description in English exceeding 250 words naturally integrating SEO keywords.",
+  "directions": "طريقة الاستخدام والجرعات الموصى بها بالتفصيل باللغة العربية.",
+  "usageEn": "Detailed usage and dosage instructions in English.",
+  "ingredients": "المكونات بالتفصيل باللغة العربية.",
+  "ingredientsEn": "Detailed ingredients list in English.",
+  "warnings": "المحاذير الطبية وموانع الاستعمال باللغة العربية.",
+  "warningsEn": "Medical warnings and precautions in English.",
+  "seoKeywords": "40 إلى 80 كلمة بحث مفتاحية بالعربية مفصولة بفواصل.",
+  "seoKeywordsEn": "40 to 80 meta keywords in English separated by commas.",
+  "seoDesc": "وصف ميتا للبحث بالعربية مقنع وجذاب ويشجع على الشراء (بين 150 و 220 حرفاً).",
+  "seoDescEn": "Meta description in English for Google search (150-220 characters).",
+  "faqs": [
+    {
+      "question_ar": "سؤال شائع 1 بالعربية؟",
+      "answer_ar": "إجابة احترافية 1 بالعربية.",
+      "question_en": "Question 1 in English?",
+      "answer_en": "Professional answer 1 in English."
+    },
+    {
+      "question_ar": "سؤال شائع 2 بالعربية؟",
+      "answer_ar": "إجابة احترافية 2 بالعربية.",
+      "question_en": "Question 2 in English?",
+      "answer_en": "Professional answer 2 in English."
+    },
+    {
+      "question_ar": "سؤال شائع 3 بالعربية؟",
+      "answer_ar": "إجابة احترافية 3 بالعربية.",
+      "question_en": "Question 3 in English?",
+      "answer_en": "Professional answer 3 in English."
+    }
+  ]
 }`
             },
             {
               role: 'user',
-              content: 'اسم المنتج:\n' + formData.title + (formData.desc ? `\n\nالوصف:\n${formData.desc}` : '') + (formData.features ? `\n\nالمميزات:\n${formData.features}` : '')
+              content: 'اسم المنتج:\n' + formData.title + (formData.desc ? `\n\nالوصف الحالي:\n${formData.desc}` : '') + (formData.features ? `\n\nالمميزات الحالية:\n${formData.features}` : '')
             }
           ]
         })
@@ -735,12 +757,26 @@ export function useAdminDashboard() {
         setFormData((prev: any) => ({
           ...prev,
           title: parsed.title || prev.title,
+          titleEn: parsed.titleEn || prev.titleEn || '',
+          desc: parsed.desc || prev.desc || '',
+          descEn: parsed.descEn || prev.descEn || '',
+          directions: parsed.directions || prev.directions || '',
+          usageEn: parsed.usageEn || prev.usageEn || '',
+          ingredients: parsed.ingredients || prev.ingredients || '',
+          ingredientsEn: parsed.ingredientsEn || prev.ingredientsEn || '',
+          warnings: parsed.warnings || prev.warnings || '',
+          warningsEn: parsed.warningsEn || prev.warningsEn || '',
           seoKeywords: addAboveExisting(parsed.seoKeywords, prev.seoKeywords, '، '),
           seoDesc: addAboveExisting(parsed.seoDesc, prev.seoDesc, '\n'),
-          seoKeywordsEn: parsed.seoKeywordsEn || prev.seoKeywordsEn || '',
-          seoDescEn: parsed.seoDescEn || prev.seoDescEn || ''
+          seoKeywordsEn: addAboveExisting(parsed.seoKeywordsEn, prev.seoKeywordsEn, ', '),
+          seoDescEn: addAboveExisting(parsed.seoDescEn, prev.seoDescEn, '\n')
         }))
-        addLog('تم توليد الـ SEO والعنوان بنجاح!')
+
+        if (Array.isArray(parsed.faqs)) {
+          setFaqsList(parsed.faqs)
+        }
+
+        addLog('تم توليد الـ SEO والمحتوى التفصيلي بنجاح!')
       } else {
         throw new Error(data.error?.message || 'Invalid Response from AI')
       }

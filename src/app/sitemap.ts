@@ -33,18 +33,27 @@ const changedAt = (item: { updatedAt?: string; createdAt?: string }) => {
   return item.updatedAt ? new Date(item.updatedAt) : new Date(item.createdAt || Date.now())
 }
 
-const sitemapEntry = (url: string, changeFrequency: SitemapChangeFrequency, priority: number, lastModified = new Date()) => ({
-  url,
-  lastModified,
-  changeFrequency,
-  priority,
-  alternates: {
-    languages: {
-      'ar-EG': url,
-      'en-EG': `${url}${url.includes('?') ? '&' : '?'}lang=en`
+const escapeXmlUrl = (url: string) => {
+  if (!url) return ''
+  // Replace raw '&' with '&amp;' (only if it is not already escaped)
+  return url.replace(/&(?!amp;|lt;|gt;|quot;|apos;)/g, '&amp;')
+}
+
+const sitemapEntry = (url: string, changeFrequency: SitemapChangeFrequency, priority: number, lastModified = new Date()) => {
+  const cleanUrl = escapeXmlUrl(url)
+  return {
+    url: cleanUrl,
+    lastModified,
+    changeFrequency,
+    priority,
+    alternates: {
+      languages: {
+        'ar-EG': cleanUrl,
+        'en-EG': escapeXmlUrl(`${cleanUrl}${cleanUrl.includes('?') ? '&' : '?'}lang=en`)
+      }
     }
   }
-})
+}
 
 const fetchProductPage = async (backendUrl: string, page: number): Promise<ProductSitemapItem[]> => {
   const res = await fetch(`${backendUrl}/api/products?page=${page}&limit=100`, { next: { revalidate: 3600 } })
@@ -124,7 +133,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         const imageUrl = absoluteProductImageUrl(productMainImage(product.image), baseUrl)
         return imageUrl ? {
           ...entry,
-          images: [withImageVersion(imageUrl, productImageVersion(product))]
+          images: [escapeXmlUrl(withImageVersion(imageUrl, productImageVersion(product)))]
         } : entry
       }),
       ...brands.map((brand) => sitemapEntry(

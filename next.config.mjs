@@ -57,6 +57,23 @@ const nextConfig = {
     ];
   },
 
+  // ─── 301 Redirects (Canonicalization) ──────────────────────────────────────
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'www.the-vitahub.com',
+          },
+        ],
+        destination: 'https://the-vitahub.com/:path*',
+        permanent: true, // 301 Redirect
+      },
+    ];
+  },
+
   // ─── API Rewrites ──────────────────────────────────────────────────────────
   async rewrites() {
     return [

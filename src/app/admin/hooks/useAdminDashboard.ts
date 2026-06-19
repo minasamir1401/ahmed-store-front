@@ -680,7 +680,7 @@ export function useAdminDashboard() {
 القواعد العامة:
 - لا تستخدم Markdown في النصوص.
 - لا تذكر اسم المتجر "The VitaHub" أو "ذا فيتا هوب" في عنوان الصفحة (title) أو عنوان الصفحة بالإنجليزية (titleEn)، لأن النظام يضيفه تلقائياً. أما في الوصف المختصر (seoDesc) فاذكر فيه اسم المتجر "The VitaHub" بشكل طبيعي.
-- الكلمات المفتاحية (seoKeywords و seoKeywordsEn) يجب أن تكون كثيرة جداً ومنوعة (بين 40 و 80 كلمة)، مفصولة بفواصل، وتشمل مرادفات، فوائد، ونوايا شراء مثل (سعر، أفضل نوع، في مصر، مستورد، الأصلي).
+- الكلمات المفتاحية (seoKeywords و seoKeywordsEn) يجب أن تكون كثيرة جداً ومنوعة (بالضبط 250 كلمة أو عبارة مفتاحية)، مفصولة بفواصل، وتشمل مرادفات، فوائد، ونوايا شراء مثل (سعر، أفضل نوع، في مصر، مستورد، الأصلي).
 - يجب أن يكون الوصف بالعربي (desc) والوصف بالإنجليزي (descEn) مفصلين، دقيقين علمياً، ويتجاوز كل منهما 250 كلمة.
 - يجب توفير حقول: طريقة الاستخدام (directions و usageEn)، المحاذير (warnings و warningsEn)، والمكونات (ingredients و ingredientsEn).
 - توليد 3 أسئلة شائعة (faqs) ملائمة للمنتج وإجاباتها باحترافية باللغتين العربية والإنجليزية.
@@ -697,8 +697,8 @@ export function useAdminDashboard() {
   "ingredientsEn": "Detailed ingredients list in English.",
   "warnings": "المحاذير الطبية وموانع الاستعمال باللغة العربية.",
   "warningsEn": "Medical warnings and precautions in English.",
-  "seoKeywords": "40 إلى 80 كلمة بحث مفتاحية بالعربية مفصولة بفواصل.",
-  "seoKeywordsEn": "40 to 80 meta keywords in English separated by commas.",
+  "seoKeywords": "بالضبط 250 كلمة أو عبارة بحث مفتاحية متنوعة بالعربية مفصولة بفواصل لتغطية كافة عمليات البحث الممكنة.",
+  "seoKeywordsEn": "Exactly 250 highly relevant meta keywords and search queries in English separated by commas.",
   "seoDesc": "وصف ميتا للبحث بالعربية مقنع وجذاب ويشجع على الشراء (بين 150 و 220 حرفاً).",
   "seoDescEn": "Meta description in English for Google search (150-220 characters).",
   "faqs": [

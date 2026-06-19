@@ -664,9 +664,9 @@ export function useAdminDashboard() {
         body: JSON.stringify({
           provider: activeProvider,
           max_tokens: AI_MAX_TOKENS.seo,
-          model: 'google/gemini-2.5-flash:free',
+          model: 'openrouter/free',
           models: [
-            'google/gemini-2.5-flash:free',
+            'openrouter/free',
             'meta-llama/llama-3-8b-instruct:free',
             'openrouter/free'
           ],

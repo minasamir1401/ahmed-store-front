@@ -8,7 +8,7 @@ import {
   parseAIJSON
 } from '../admin-dashboard-utils'
 
-type AIProvider = 'openrouter' | 'gemini'
+type AIProvider = 'openrouter' | 'apifree'
 
 export function useAdminDashboard() {
   const { showAlert, showConfirm } = useModal()
@@ -41,9 +41,9 @@ export function useAdminDashboard() {
   const [aiProvider, setAiProvider] = useState<AIProvider>('openrouter')
 
   const handleAiProviderChange = (provider: AIProvider) => {
-    setAiProvider('openrouter')
-    localStorage.setItem('mithaly_ai_provider', 'openrouter')
-    addLog(`تم تثبيت OpenRouter كمزود الذكاء الاصطناعي الوحيد`)
+    setAiProvider(provider)
+    localStorage.setItem('mithaly_ai_provider', provider)
+    addLog(`تم تغيير مزود الذكاء الاصطناعي إلى ${provider === 'apifree' ? 'APIFreeLLM' : 'OpenRouter'}`)
   }
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -522,7 +522,7 @@ export function useAdminDashboard() {
     }
     setIsAILoading(true)
     const activeProvider = providerOverride || aiProvider
-    const providerNames = { gemini: 'Gemini', openrouter: 'OpenRouter' }
+    const providerNames: Record<AIProvider, string> = { openrouter: 'OpenRouter', apifree: 'APIFreeLLM' }
     addLog(`جاري جلب تفاصيل ${formData.title.substring(0, 15)} باستخدام ${providerNames[activeProvider]}...`)
     try {
       const response = await fetchWithAdminAuth(`${BACKEND_API}/api/ai/generate`, {
@@ -530,11 +530,11 @@ export function useAdminDashboard() {
         body: JSON.stringify({
           provider: activeProvider,
           max_tokens: AI_MAX_TOKENS.productFill,
-          model: 'meta-llama/llama-3.3-70b-instruct:free',
+          model: 'openai/gpt-oss-120b:free',
           models: [
-            'meta-llama/llama-3.3-70b-instruct:free',
-            'meta-llama/llama-3.1-8b-instruct:free',
-            'nvidia/nemotron-nano-12b-v2-vl:free'
+            'openai/gpt-oss-120b:free',
+            'openai/gpt-oss-20b:free',
+            'meta-llama/llama-3.3-70b-instruct:free'
           ],
           messages: [
             {
@@ -657,7 +657,7 @@ export function useAdminDashboard() {
     }
     setIsSEOLoading(true)
     const activeProvider = providerOverride || aiProvider
-    const providerNames = { gemini: 'Gemini', openrouter: 'OpenRouter' }
+    const providerNames: Record<AIProvider, string> = { openrouter: 'OpenRouter', apifree: 'APIFreeLLM' }
     addLog(`جاري توليد الـ SEO والمحتوى للمنتج ${formData.title.substring(0, 15)} باستخدام ${providerNames[activeProvider]}...`)
     try {
       const response = await fetchWithAdminAuth(`${BACKEND_API}/api/ai/generate`, {
@@ -665,11 +665,11 @@ export function useAdminDashboard() {
         body: JSON.stringify({
           provider: activeProvider,
           max_tokens: AI_MAX_TOKENS.seo,
-          model: 'meta-llama/llama-3.3-70b-instruct:free',
+          model: 'openai/gpt-oss-120b:free',
           models: [
-            'meta-llama/llama-3.3-70b-instruct:free',
-            'meta-llama/llama-3.1-8b-instruct:free',
-            'nvidia/nemotron-nano-12b-v2-vl:free'
+            'openai/gpt-oss-120b:free',
+            'openai/gpt-oss-20b:free',
+            'meta-llama/llama-3.3-70b-instruct:free'
           ],
           messages: [
             {
@@ -789,12 +789,18 @@ export function useAdminDashboard() {
     }
   }
 
-  const handleProductRowSEO = async (productId: string) => {
+  const handleProductRowSEO = async (productId: string, providerOverride?: AIProvider) => {
     setRowSeoLoading(productId)
-    addLog(`جاري توليد الـ SEO للمنتج في الخلفية...`)
+    const activeProvider = providerOverride || aiProvider
+    const providerNames: Record<AIProvider, string> = { openrouter: 'OpenRouter', apifree: 'APIFreeLLM' }
+    addLog(`جاري توليد الـ SEO للمنتج باستخدام ${providerNames[activeProvider]}...`)
     try {
       const res = await fetchWithAdminAuth(`${BACKEND_API}/api/admin/products/${productId}/generate-seo`, {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ provider: activeProvider })
       })
       const resData = await res.json()
       if (res.ok) {
@@ -962,11 +968,11 @@ export function useAdminDashboard() {
         body: JSON.stringify({
           provider: aiProvider,
           max_tokens: AI_MAX_TOKENS.tip,
-          model: 'meta-llama/llama-3.3-70b-instruct:free',
+          model: 'openai/gpt-oss-120b:free',
           models: [
-            'meta-llama/llama-3.3-70b-instruct:free',
-            'meta-llama/llama-3.1-8b-instruct:free',
-            'nvidia/nemotron-nano-12b-v2-vl:free'
+            'openai/gpt-oss-120b:free',
+            'openai/gpt-oss-20b:free',
+            'meta-llama/llama-3.3-70b-instruct:free'
           ],
           messages: [
             {

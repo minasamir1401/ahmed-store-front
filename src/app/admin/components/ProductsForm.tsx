@@ -114,13 +114,21 @@ export default function ProductsForm(props: any) {
                               <input type="text" value={formData.title || ''} onChange={e => setFormData({...formData, title: e.target.value})} className="flex-1 bg-slate-50 focus:bg-white border border-transparent focus:border-emerald-500/20 rounded-2xl py-3.5 px-6 font-bold text-sm sm:text-base outline-none transition-all text-slate-700" placeholder="مثال: أوميجا 3 تركيز عالي" required />
                             </div>
                             <div className="flex flex-wrap gap-2 pt-1">
-                              <button type="button" onClick={() => handleAIFill()} disabled={isAILoading || !formData.title} className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-3 rounded-2xl font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-200 disabled:opacity-50 cursor-pointer whitespace-nowrap hover:scale-[1.02] active:scale-[0.98]">
+                              <button type="button" onClick={() => handleAIFill('openrouter')} disabled={isAILoading || !formData.title} className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-200 disabled:opacity-50 cursor-pointer whitespace-nowrap hover:scale-[1.02] active:scale-[0.98]">
                                 {isAILoading ? <Loader2 className="animate-spin" size={14} /> : <Sparkles size={14} />}
-                                <span>توليد بالذكاء الاصطناعي</span>
+                                <span>توليد (OpenRouter)</span>
                               </button>
-                              <button type="button" onClick={() => handleSEOAI()} disabled={isSEOLoading || !formData.title} className="text-[10px] bg-emerald-600 text-white border border-transparent px-3 py-1.5 rounded-xl font-black shadow-sm flex items-center justify-center gap-1.5 hover:bg-emerald-500 transition-all disabled:opacity-50 cursor-pointer whitespace-nowrap">
+                              <button type="button" onClick={() => handleAIFill('apifree')} disabled={isAILoading || !formData.title} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl font-black text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-200 disabled:opacity-50 cursor-pointer whitespace-nowrap hover:scale-[1.02] active:scale-[0.98]">
+                                {isAILoading ? <Loader2 className="animate-spin" size={14} /> : <Sparkles size={14} />}
+                                <span>توليد (APIFree)</span>
+                              </button>
+                              <button type="button" onClick={() => handleSEOAI('openrouter')} disabled={isSEOLoading || !formData.title} className="text-[10px] bg-emerald-600 text-white border border-transparent px-3 py-1.5 rounded-xl font-black shadow-sm flex items-center justify-center gap-1.5 hover:bg-emerald-500 transition-all disabled:opacity-50 cursor-pointer whitespace-nowrap">
                                 {isSEOLoading ? <Loader2 className="animate-spin" size={12} /> : <Sparkles size={12} />}
-                                <span>توليد SEO بالذكاء الاصطناعي</span>
+                                <span>توليد SEO (OpenRouter)</span>
+                              </button>
+                              <button type="button" onClick={() => handleSEOAI('apifree')} disabled={isSEOLoading || !formData.title} className="text-[10px] bg-blue-600 text-white border border-transparent px-3 py-1.5 rounded-xl font-black shadow-sm flex items-center justify-center gap-1.5 hover:bg-blue-500 transition-all disabled:opacity-50 cursor-pointer whitespace-nowrap">
+                                {isSEOLoading ? <Loader2 className="animate-spin" size={12} /> : <Sparkles size={12} />}
+                                <span>توليد SEO (APIFree)</span>
                               </button>
                               <button
                                 type="button"
@@ -732,9 +740,12 @@ export default function ProductsForm(props: any) {
                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3 border-slate-200/50">
                                 <h4 className="text-xs font-black text-emerald-600 uppercase tracking-widest flex items-center gap-2"><Sparkles size={16} /> تحسين محركات البحث وجوجل (SEO)</h4>
                                 <div className="flex flex-wrap gap-1.5 w-full sm:w-auto justify-end">
-                                  <button type="button" onClick={() => handleSEOAI()} disabled={isSEOLoading || !formData.title} className="text-[10px] bg-emerald-600 text-white border border-transparent px-3 py-1.5 rounded-xl font-black shadow-sm flex items-center justify-center gap-1.5 hover:bg-emerald-500 transition-all disabled:opacity-50 cursor-pointer">
-                                     {isSEOLoading ? <Loader2 className="animate-spin" size={12} /> : <Sparkles size={12} />} توليد بالذكاء الاصطناعي
-                                  </button>
+                                  <button type="button" onClick={() => handleSEOAI('openrouter')} disabled={isSEOLoading || !formData.title} className="text-[10px] bg-emerald-600 text-white border border-transparent px-3 py-1.5 rounded-xl font-black shadow-sm flex items-center justify-center gap-1.5 hover:bg-emerald-500 transition-all disabled:opacity-50 cursor-pointer">
+                                      {isSEOLoading ? <Loader2 className="animate-spin" size={12} /> : <Sparkles size={12} />}  توليد (OpenRouter)
+                                   </button>
+                                   <button type="button" onClick={() => handleSEOAI('apifree')} disabled={isSEOLoading || !formData.title} className="text-[10px] bg-blue-600 text-white border border-transparent px-3 py-1.5 rounded-xl font-black shadow-sm flex items-center justify-center gap-1.5 hover:bg-blue-500 transition-all disabled:opacity-50 cursor-pointer">
+                                      {isSEOLoading ? <Loader2 className="animate-spin" size={12} /> : <Sparkles size={12} />}  توليد (APIFree)
+                                   </button>
                                 </div>
                              </div>
                              <div className="grid grid-cols-1 gap-4">

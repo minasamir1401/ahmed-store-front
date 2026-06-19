@@ -550,30 +550,7 @@ export default function AdminDashboard() {
                                   </>
                                 ) : (
                                   <>
-                                    {activeTab === 'products' && (
-                                      <div className="flex gap-1">
-                                        <button 
-                                          type="button" 
-                                          onClick={() => handleProductRowSEO(item.id, 'openrouter')} 
-                                          disabled={rowSeoLoading === item.id} 
-                                          className="text-[9px] bg-emerald-600 text-white border border-transparent px-2 py-1.5 rounded-xl font-black shadow-sm flex items-center justify-center gap-1 hover:bg-emerald-500 transition-all disabled:opacity-50 cursor-pointer whitespace-nowrap"
-                                          title="توليد بالذكاء الاصطناعي OpenRouter"
-                                        >
-                                          {rowSeoLoading === item.id ? <Loader2 className="animate-spin" size={10} /> : <Sparkles size={10} />} 
-                                          SEO (OpenRouter)
-                                        </button>
-                                        <button 
-                                          type="button" 
-                                          onClick={() => handleProductRowSEO(item.id, 'apifree')} 
-                                          disabled={rowSeoLoading === item.id} 
-                                          className="text-[9px] bg-blue-600 text-white border border-transparent px-2 py-1.5 rounded-xl font-black shadow-sm flex items-center justify-center gap-1 hover:bg-blue-500 transition-all disabled:opacity-50 cursor-pointer whitespace-nowrap"
-                                          title="توليد بالذكاء الاصطناعي APIFree"
-                                        >
-                                          {rowSeoLoading === item.id ? <Loader2 className="animate-spin" size={10} /> : <Sparkles size={10} />} 
-                                          SEO (APIFree)
-                                        </button>
-                                      </div>
-                                    )}
+
                                     <button onClick={() => handleOpenModal(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all cursor-pointer" title="تعديل"><Edit2 size={16} /></button>
                                     <button onClick={() => handleDelete(item.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all cursor-pointer" title="حذف"><Trash2 size={16} /></button>
                                   </>

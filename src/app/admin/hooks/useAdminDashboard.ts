@@ -529,11 +529,11 @@ export function useAdminDashboard() {
         body: JSON.stringify({
           provider: activeProvider,
           max_tokens: AI_MAX_TOKENS.productFill,
-          model: 'google/gemma-4-31b-it:free',
+          model: 'qwen/qwen3-next-80b-a3b-instruct:free',
           models: [
-            'google/gemma-4-31b-it:free',
-            'openai/gpt-oss-120b:free',
-            'openrouter/free'
+            'qwen/qwen3-next-80b-a3b-instruct:free',
+            'qwen/qwen3-coder:free',
+            'meta-llama/llama-3.3-70b-instruct:free'
           ],
           messages: [
             {
@@ -664,11 +664,11 @@ export function useAdminDashboard() {
         body: JSON.stringify({
           provider: activeProvider,
           max_tokens: AI_MAX_TOKENS.seo,
-          model: 'openrouter/free',
+          model: 'qwen/qwen3-next-80b-a3b-instruct:free',
           models: [
-            'openrouter/free',
-            'meta-llama/llama-3-8b-instruct:free',
-            'openrouter/free'
+            'qwen/qwen3-next-80b-a3b-instruct:free',
+            'qwen/qwen3-coder:free',
+            'meta-llama/llama-3.3-70b-instruct:free'
           ],
           messages: [
             {
@@ -939,11 +939,11 @@ export function useAdminDashboard() {
         body: JSON.stringify({
           provider: aiProvider,
           max_tokens: AI_MAX_TOKENS.tip,
-          model: 'google/gemma-4-31b-it:free',
+          model: 'qwen/qwen3-next-80b-a3b-instruct:free',
           models: [
-            'google/gemma-4-31b-it:free',
-            'openai/gpt-oss-120b:free',
-            'openrouter/free'
+            'qwen/qwen3-next-80b-a3b-instruct:free',
+            'qwen/qwen3-coder:free',
+            'meta-llama/llama-3.3-70b-instruct:free'
           ],
           messages: [
             {

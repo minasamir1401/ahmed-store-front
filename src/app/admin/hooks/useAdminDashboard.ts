@@ -530,11 +530,11 @@ export function useAdminDashboard() {
         body: JSON.stringify({
           provider: activeProvider,
           max_tokens: AI_MAX_TOKENS.productFill,
-          model: 'qwen/qwen3-next-80b-a3b-instruct:free',
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
           models: [
-            'qwen/qwen3-next-80b-a3b-instruct:free',
-            'qwen/qwen3-coder:free',
-            'meta-llama/llama-3.3-70b-instruct:free'
+            'meta-llama/llama-3.3-70b-instruct:free',
+            'meta-llama/llama-3.1-8b-instruct:free',
+            'nvidia/nemotron-nano-12b-v2-vl:free'
           ],
           messages: [
             {
@@ -665,11 +665,11 @@ export function useAdminDashboard() {
         body: JSON.stringify({
           provider: activeProvider,
           max_tokens: AI_MAX_TOKENS.seo,
-          model: 'qwen/qwen3-next-80b-a3b-instruct:free',
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
           models: [
-            'qwen/qwen3-next-80b-a3b-instruct:free',
-            'qwen/qwen3-coder:free',
-            'meta-llama/llama-3.3-70b-instruct:free'
+            'meta-llama/llama-3.3-70b-instruct:free',
+            'meta-llama/llama-3.1-8b-instruct:free',
+            'nvidia/nemotron-nano-12b-v2-vl:free'
           ],
           messages: [
             {
@@ -962,11 +962,11 @@ export function useAdminDashboard() {
         body: JSON.stringify({
           provider: aiProvider,
           max_tokens: AI_MAX_TOKENS.tip,
-          model: 'qwen/qwen3-next-80b-a3b-instruct:free',
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
           models: [
-            'qwen/qwen3-next-80b-a3b-instruct:free',
-            'qwen/qwen3-coder:free',
-            'meta-llama/llama-3.3-70b-instruct:free'
+            'meta-llama/llama-3.3-70b-instruct:free',
+            'meta-llama/llama-3.1-8b-instruct:free',
+            'nvidia/nemotron-nano-12b-v2-vl:free'
           ],
           messages: [
             {

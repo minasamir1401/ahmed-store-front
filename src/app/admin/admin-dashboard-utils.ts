@@ -1,7 +1,7 @@
 export const BACKEND_API = process.env.NEXT_PUBLIC_API_URL || ''
 
 export const DEFAULT_DOSAGE_CALCULATOR = {
-  enabled: false,
+  enabled: true,
   genderTarget: 'both',
   title: '',
   icon: 'Activity',

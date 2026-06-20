@@ -674,53 +674,19 @@ export function useAdminDashboard() {
           messages: [
             {
               role: 'system',
-              content: `أنت خبير SEO محترف وعالم صيدلة سريرية متخصص في المكملات والمنتجات الصحية في مصر.
-مهمتك هي كتابة محتوى متكامل، غني وعالي الجودة، ومتوافق تماماً مع محركات البحث (SEO) لمنتج مكمل غذائي.
-يجب أن تصيغ الأوصاف والكلمات المفتاحية بطريقة تجذب العميل للشراء وتجعل الصفحة تتصدر نتائج البحث.
+              content: `أنت خبير SEO محترف ومتخصص في المكملات والمنتجات الصحية في مصر.
+مهمتك هي كتابة الكلمات المفتاحية ووصف الميتا (SEO Meta) لصفحة المنتج فقط بشكل متوافق تماماً مع محركات البحث.
 القواعد العامة:
 - لا تستخدم Markdown في النصوص.
-- لا تذكر اسم المتجر "The VitaHub" أو "ذا فيتا هوب" في عنوان الصفحة (title) أو عنوان الصفحة بالإنجليزية (titleEn)، لأن النظام يضيفه تلقائياً. أما في الوصف المختصر (seoDesc) فاذكر فيه اسم المتجر "The VitaHub" بشكل طبيعي.
+- اذكر اسم المتجر "The VitaHub" بشكل طبيعي في حقل الوصف المختصر (seoDesc) والوصف الإنجليزي (seoDescEn) لزيادة الوعي بالعلامة التجارية.
 - الكلمات المفتاحية (seoKeywords و seoKeywordsEn) يجب أن تكون منوعة ومختصرة (بين 15 إلى 20 كلمة أو عبارة مفتاحية فقط)، مفصولة بفواصل، وتشمل مرادفات، فوائد، ونوايا شراء مثل (سعر، أفضل نوع، في مصر، مستورد، الأصلي).
-- يجب أن يكون الوصف بالعربي (desc) والوصف بالإنجليزي (descEn) مفصلين وشاملين، دقيقين علمياً، ويتجاوز كل منهما 350 كلمة.
-- يجب توفير حقول: طريقة الاستخدام (directions و usageEn)، المحاذير (warnings و warningsEn)، والمكونات (ingredients و ingredientsEn).
-- توليد 3 أسئلة شائعة (faqs) ملائمة للمنتج وإجاباتها باحترافية باللغتين العربية والإنجليزية.
 
 قم بإرجاع كائن JSON فقط بالهيكل التالي بدقة ودون أي كلام خارجي على الإطلاق:
 {
-  "title": "اسم المنتج باللغة العربية بطريقة احترافية مع التركيز والجرعة (بدون اسم المتجر)",
-  "titleEn": "اسم المنتج بالإنجليزية بطريقة احترافية مع التركيز والجرعة (بدون اسم المتجر)",
-  "desc": "وصف تفصيلي كامل وشامل ومقنع جداً باللغة العربية يتجاوز 350 كلمة، يتناول الفوائد، المكونات، ودواعي الاستخدام بالتفصيل وكيف يساعد العميل، مع دمج الكلمات المفتاحية بشكل طبيعي ولماذا الشراء من The VitaHub هو الأفضل.",
-  "descEn": "Detailed professional description in English exceeding 350 words naturally integrating SEO keywords.",
-  "directions": "طريقة الاستخدام والجرعات الموصى بها بالتفصيل باللغة العربية.",
-  "usageEn": "Detailed usage and dosage instructions in English.",
-  "ingredients": "المكونات بالتفصيل باللغة العربية.",
-  "ingredientsEn": "Detailed ingredients list in English.",
-  "warnings": "المحاذير الطبية وموانع الاستعمال باللغة العربية.",
-  "warningsEn": "Medical warnings and precautions in English.",
   "seoKeywords": "بين 15 إلى 20 كلمة أو عبارة بحث مفتاحية متنوعة بالعربية مفصولة بفواصل لتغطية كافة عمليات البحث الممكنة.",
   "seoKeywordsEn": "Between 15 to 20 highly relevant meta keywords and search queries in English separated by commas.",
   "seoDesc": "وصف ميتا للبحث بالعربية مقنع وجذاب ويشجع على الشراء (بين 150 و 220 حرفاً).",
-  "seoDescEn": "Meta description in English for Google search (150-220 characters).",
-  "faqs": [
-    {
-      "question_ar": "سؤال شائع 1 بالعربية؟",
-      "answer_ar": "إجابة احترافية 1 بالعربية.",
-      "question_en": "Question 1 in English?",
-      "answer_en": "Professional answer 1 in English."
-    },
-    {
-      "question_ar": "سؤال شائع 2 بالعربية؟",
-      "answer_ar": "إجابة احترافية 2 بالعربية.",
-      "question_en": "Question 2 in English?",
-      "answer_en": "Professional answer 2 in English."
-    },
-    {
-      "question_ar": "سؤال شائع 3 بالعربية؟",
-      "answer_ar": "إجابة احترافية 3 بالعربية.",
-      "question_en": "Question 3 in English?",
-      "answer_en": "Professional answer 3 in English."
-    }
-  ]
+  "seoDescEn": "Meta description in English for Google search (150-220 characters)."
 }`
             },
             {
@@ -757,27 +723,13 @@ export function useAdminDashboard() {
 
         setFormData((prev: any) => ({
           ...prev,
-          title: parsed.title || prev.title,
-          titleEn: parsed.titleEn || prev.titleEn || '',
-          desc: parsed.desc || prev.desc || '',
-          descEn: parsed.descEn || prev.descEn || '',
-          directions: parsed.directions || prev.directions || '',
-          usageEn: parsed.usageEn || prev.usageEn || '',
-          ingredients: parsed.ingredients || prev.ingredients || '',
-          ingredientsEn: parsed.ingredientsEn || prev.ingredientsEn || '',
-          warnings: parsed.warnings || prev.warnings || '',
-          warningsEn: parsed.warningsEn || prev.warningsEn || '',
           seoKeywords: addAboveExisting(parsed.seoKeywords, prev.seoKeywords, '، '),
           seoDesc: addAboveExisting(parsed.seoDesc, prev.seoDesc, '\n'),
           seoKeywordsEn: addAboveExisting(parsed.seoKeywordsEn, prev.seoKeywordsEn, ', '),
           seoDescEn: addAboveExisting(parsed.seoDescEn, prev.seoDescEn, '\n')
         }))
 
-        if (Array.isArray(parsed.faqs)) {
-          setFaqsList(parsed.faqs)
-        }
-
-        addLog('تم توليد الـ SEO والمحتوى التفصيلي بنجاح!')
+        addLog('تم توليد الـ SEO بنجاح!')
       } else {
         throw new Error(data.error?.message || 'Invalid Response from AI')
       }

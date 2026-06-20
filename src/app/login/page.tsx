@@ -36,7 +36,7 @@ function LoginContent() {
   const [googleLoading, setGoogleLoading] = useState(false)
   const [runtimeGoogleClientId, setRuntimeGoogleClientId] = useState('')
   const [error, setError] = useState('')
-  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || runtimeGoogleClientId || '941750565259-bucmsc2elr7eb72uutmnelf5fmpfiv92.apps.googleusercontent.com'
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || runtimeGoogleClientId
 
   const [formData, setFormData] = useState({
     name: '',

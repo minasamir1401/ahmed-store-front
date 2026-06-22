@@ -41,9 +41,9 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       images: [
         {
-          url: "/favicon.ico",
-          width: 512,
-          height: 512,
+          url: "/logo-header.jpg",
+          width: 1024,
+          height: 682,
           alt: "The VitaHub Premium Supplements"
         }
       ]
@@ -52,12 +52,15 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title: "The VitaHub | متجر المكملات الغذائية والفيتامينات الأصلي في مصر",
       description: "تسوق أفضل المكملات الغذائية، الفيتامينات، البروتينات، حوارق الدهون، ومنتجات الرشاقة الأصلية 100% في مصر مع The VitaHub. توصيل سريع ودعم طبي متخصص.",
-      images: ["/favicon.ico"],
+      images: ["/logo-header.jpg"],
     },
     icons: {
-      icon: "/favicon.ico",
+      icon: [
+        { url: "/favicon.ico" },
+        { url: "/favicon.png", type: "image/png", sizes: "512x512" }
+      ],
       shortcut: "/favicon.ico",
-      apple: "/favicon.ico",
+      apple: "/favicon.png",
     },
     verification: {
       google: "HQafwMSqWBmmU1Y1QVxosnsDRkdLHXUdt1KEZrTRIIc",

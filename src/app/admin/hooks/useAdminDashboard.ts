@@ -13,8 +13,8 @@ type AIProvider = 'openrouter' | 'apifree'
 export function useAdminDashboard() {
   const { showAlert, showConfirm } = useModal()
   const AI_MAX_TOKENS = {
-    productFill: 1200,
-    seo: 1200,
+    productFill: 4000,
+    seo: 4000,
     tip: 1000
   }
 
@@ -573,7 +573,7 @@ export function useAdminDashboard() {
   "directions": "طريقة الاستخدام (نص)",
   "ingredients": "المكونات (نص)",
   "supplementFacts": "[{\\"name\\": \\"Vitamin C\\", \\"amount\\": \\"500mg\\", \\"dv\\": \\"556%\\"}]",
-  "seoKeywords": "كلمات بحث قصيرة وطويلة مرتبطة باسم المنتج والفائدة الرئيسية وسوق الشراء، مفصولة بفواصل فقط",
+  "seoKeywords": "قائمة ضخمة ومكثفة تتكون من 300 كلمة أو عبارة بحث مفتاحية متنوعة وقوية باللغة العربية مفصولة بفواصل لتغطية كافة عمليات البحث الممكنة بشكل كامل.",
   "seoDesc": "وصف ميتا قصير ومقنع يشرح المنتج ويشجع على الشراء ويحتوي على الكلمات الأساسية المهمة بشكل طبيعي",
   "faqs": "[{\\"question_ar\\": \\"سؤال بالعربي\\", \\"answer_ar\\": \\"إجابة بالعربي\\", \\"question_en\\": \\"Question in English\\", \\"answer_en\\": \\"Answer in English\\"}]",
   "dosageCalculator": "{\\"enabled\\": true/false (true if product requires dose calc like vitamins/minerals/sports supplements, false for general creams/beauty), \\"genderTarget\\": \\"both\\"/\\"male\\"/\\"female\\", \\"title\\": \\"حاسبة الجرعة الموصى بها (مثال: حاسبة جرعة المغنيسيوم الذكية)\\", \\"icon\\": \\"Activity\\"/\\"Sun\\"/\\"Droplet\\"/\\"Moon\\"/\\"Dumbbell\\"/\\"Sparkles\\", \\"optionsLabel\\": \\"الهدف الأساسي:\\", \\"rules\\": [{\\"value\\": \\"sleep\\", \\"label\\": \\"النوم والاسترخاء\\", \\"icon\\": \\"Moon\\", \\"maleDose\\": \\"400 ملجم من المغنيسيوم العنصري\\", \\"maleCapsules\\": \\"كبسولتين يومياً\\", \\"maleTip\\": \\"يفضل تناوله قبل النوم بـ 30-60 دقيقة.\\", \\"femaleDose\\": \\"320 ملجم من المغنيسيوم العنصري\\", \\"femaleCapsules\\": \\"كبسولتين يومياً\\", \\"femaleTip\\": \\"يفضل تناوله قبل النوم بـ 30-60 دقيقة.\\"}]}"
@@ -679,12 +679,12 @@ export function useAdminDashboard() {
 القواعد العامة:
 - لا تستخدم Markdown في النصوص.
 - اذكر اسم المتجر "The VitaHub" بشكل طبيعي في حقل الوصف المختصر (seoDesc) والوصف الإنجليزي (seoDescEn) لزيادة الوعي بالعلامة التجارية.
-- الكلمات المفتاحية (seoKeywords و seoKeywordsEn) يجب أن تكون منوعة ومختصرة (بين 15 إلى 20 كلمة أو عبارة مفتاحية فقط)، مفصولة بفواصل، وتشمل مرادفات، فوائد، ونوايا شراء مثل (سعر، أفضل نوع، في مصر، مستورد، الأصلي).
+- الكلمات المفتاحية (seoKeywords و seoKeywordsEn) يجب أن تكون قائمة ضخمة ومكثفة تتكون من 300 كلمة أو عبارة بحث مفتاحية متنوعة وقوية مفصولة بفواصل، وتشمل مرادفات، فوائد، ونوايا شراء مثل (سعر، أفضل نوع، في مصر، مستورد، الأصلي) لتغطية عمليات البحث بالكامل.
 
 قم بإرجاع كائن JSON فقط بالهيكل التالي بدقة ودون أي كلام خارجي على الإطلاق:
 {
-  "seoKeywords": "بين 15 إلى 20 كلمة أو عبارة بحث مفتاحية متنوعة بالعربية مفصولة بفواصل لتغطية كافة عمليات البحث الممكنة.",
-  "seoKeywordsEn": "Between 15 to 20 highly relevant meta keywords and search queries in English separated by commas.",
+  "seoKeywords": "قائمة ضخمة ومكثفة تتكون من 300 كلمة أو عبارة بحث مفتاحية متنوعة وقوية باللغة العربية مفصولة بفواصل لتغطية كافة عمليات البحث الممكنة بشكل كامل.",
+  "seoKeywordsEn": "An extensive list of 300 highly relevant meta keywords and search queries in English separated by commas.",
   "seoDesc": "وصف ميتا للبحث بالعربية مقنع وجذاب ويشجع على الشراء (بين 150 و 220 حرفاً).",
   "seoDescEn": "Meta description in English for Google search (150-220 characters)."
 }`

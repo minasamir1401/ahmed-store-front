@@ -55,12 +55,9 @@ export async function generateMetadata(): Promise<Metadata> {
       images: ["/logo-header.jpg"],
     },
     icons: {
-      icon: [
-        { url: "/favicon.ico" },
-        { url: "/favicon.png", type: "image/png", sizes: "512x512" }
-      ],
+      icon: "/favicon.ico",
       shortcut: "/favicon.ico",
-      apple: "/favicon.png",
+      apple: "/favicon.ico",
     },
     verification: {
       google: "HQafwMSqWBmmU1Y1QVxosnsDRkdLHXUdt1KEZrTRIIc",

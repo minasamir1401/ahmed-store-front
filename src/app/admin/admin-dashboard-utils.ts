@@ -35,6 +35,7 @@ export const ADMIN_TABS = [
   { id: 'hero', label: 'الهيرو', endpoint: 'hero', iconKey: 'Layers' },
   { id: 'medical-tips', label: 'النصائح الطبية', endpoint: 'medical-tips', iconKey: 'Stethoscope' },
   { id: 'whatsapp', label: 'إعدادات واتساب', endpoint: 'whatsapp', iconKey: 'Smartphone' },
+  { id: 'indexing', label: 'أرشفة جوجل', endpoint: 'admin/indexing/logs', iconKey: 'Search' },
   { id: 'admin-settings', label: 'إعدادات الحساب', endpoint: 'admin/profile', iconKey: 'User' }
 ]
 

@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { newestProducts } from '@/lib/product-display'
+import { getProductUrlParam } from '@/lib/slug'
 
 function SkeletonCard() {
   return (
@@ -192,6 +193,8 @@ export default function OffersPageClient({
               ) : (
                 (() => {
                   const currentOffer = activeOffers[currentSlide % activeOffers.length];
+                  const offerProduct = currentOffer.productId ? products.find((p: any) => p.id === currentOffer.productId) : null;
+                  const offerUrl = offerProduct ? `/product/${getProductUrlParam(offerProduct)}` : `/product/${currentOffer.productId}`;
                   return (
                     <motion.div
                       key={currentSlide}
@@ -253,7 +256,7 @@ export default function OffersPageClient({
                         {/* Action button inside slide */}
                         {currentOffer.productId && (
                           <div className="pt-4">
-                            <Link href={`/product/${currentOffer.productId}`} className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-2xl font-black text-xs sm:text-sm shadow-xl shadow-emerald-600/20 transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                            <Link href={offerUrl} className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-2xl font-black text-xs sm:text-sm shadow-xl shadow-emerald-600/20 transition-all hover:scale-105 active:scale-95 cursor-pointer">
                               {language === 'ar' ? 'تسوق هذا المنتج الآن' : 'Shop this product now'} <Sparkles size={16} className="animate-pulse" />
                             </Link>
                           </div>
@@ -263,7 +266,7 @@ export default function OffersPageClient({
                       {/* Graphic Display Side */}
                       <div className="relative order-1 lg:order-2 max-w-[280px] sm:max-w-xs w-full shrink-0 z-10 aspect-square">
                         {currentOffer.productId ? (
-                          <Link href={`/product/${currentOffer.productId}`} className="block relative group/img cursor-pointer w-full h-full">
+                          <Link href={offerUrl} className="block relative group/img cursor-pointer w-full h-full">
                             <div className="aspect-square bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-white/5 rounded-[3rem] p-6 sm:p-8 flex items-center justify-center shadow-2xl relative w-full h-full">
                               <div className="bg-white p-3 sm:p-4 rounded-[2.5rem] shadow-2xl rotate-3 relative z-10 transition-transform duration-500 group-hover/img:rotate-0 w-full h-full aspect-square">
                                 <Image 

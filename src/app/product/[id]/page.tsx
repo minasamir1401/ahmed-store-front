@@ -3,6 +3,8 @@ import type { Metadata } from 'next'
 import { cache } from 'react'
 import { absoluteProductImageUrl, productImageAlt, productImageVersion, productMainImage, withImageVersion } from '@/lib/product-images'
 import { getServerSiteUrl as getSiteUrl } from '@/lib/seo'
+import { getProductIdFromParam, getProductUrlParam } from '@/lib/slug'
+import { redirect } from 'next/navigation'
 
 interface PageParams {
   params: Promise<{
@@ -47,15 +49,16 @@ type JsonLd = Record<string, unknown>
 
 // Server-side fetching with cache
 const getProduct = cache(async (id: string): Promise<ProductData | null> => {
+  const realId = getProductIdFromParam(id)
   const baseUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL
   if (!baseUrl) return null
 
-  const targetUrl = `${baseUrl.replace(/\/+$/, '')}/api/products/${id}`
+  const targetUrl = `${baseUrl.replace(/\/+$/, '')}/api/products/${realId}`
   try {
     const res = await fetch(targetUrl, { cache: 'no-store' })
     if (res.ok) return await res.json()
   } catch (e) {
-    console.error(`Failed server-side fetch for product ${id} from ${targetUrl}:`, e)
+    console.error(`Failed server-side fetch for product ${realId} from ${targetUrl}:`, e)
   }
   return null
 })
@@ -118,9 +121,10 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
   const resolvedSearchParams = await searchParams
   const isEn = resolvedSearchParams.lang === 'en'
   const siteUrl = await getSiteUrl()
-  const canonicalUrl = `${siteUrl}/product/${resolvedParams.id}`
-  
-  const product = await getProduct(resolvedParams.id)
+  const realId = getProductIdFromParam(resolvedParams.id)
+  const product = await getProduct(realId)
+  const expectedParam = product ? getProductUrlParam(product) : resolvedParams.id
+  const canonicalUrl = `${siteUrl}/product/${expectedParam}`
   
   if (!product) {
     return {
@@ -190,7 +194,18 @@ export default async function ProductPage({ params, searchParams }: PageParams) 
   const resolvedParams = await params
   const resolvedSearchParams = await searchParams
   const isEn = resolvedSearchParams.lang === 'en'
-  const product = await getProduct(resolvedParams.id)
+  const realId = getProductIdFromParam(resolvedParams.id)
+  const product = await getProduct(realId)
+
+  if (product) {
+    const expectedParam = getProductUrlParam(product)
+    if (resolvedParams.id !== expectedParam) {
+      const searchStr = new URLSearchParams(resolvedSearchParams).toString()
+      const query = searchStr ? `?${searchStr}` : ''
+      redirect(`/product/${expectedParam}${query}`)
+    }
+  }
+
   const siteUrl = await getSiteUrl()
 
   let structuredData: JsonLd | null = null
@@ -254,7 +269,7 @@ export default async function ProductPage({ params, searchParams }: PageParams) 
       },
       "offers": {
         "@type": "Offer",
-        "url": `${siteUrl}/product/${product.id}`,
+        "url": `${siteUrl}/product/${getProductUrlParam(product)}`,
         "priceCurrency": "EGP",
         "price": product.price,
         "priceValidUntil": "2027-12-31",
@@ -330,7 +345,7 @@ export default async function ProductPage({ params, searchParams }: PageParams) 
           "@type": "ListItem",
           "position": 4,
           "name": isEn ? (product.titleEn || product.title) : product.title,
-          "item": `${siteUrl}/product/${product.id}${isEn ? '?lang=en' : ''}`
+          "item": `${siteUrl}/product/${getProductUrlParam(product)}${isEn ? '?lang=en' : ''}`
         }
       ]
     }

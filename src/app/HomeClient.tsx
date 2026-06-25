@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import SkeletonCard from '@/components/ui/SkeletonCard'
 import { newestProducts } from '@/lib/product-display'
+import { getProductUrlParam } from '@/lib/slug'
 
 const MotionImage = motion(Image)
 
@@ -410,7 +411,7 @@ export default function HomeClient({
                         if (prodObj) {
                           title = translate(prodObj.title);
                           defaultImg = prodObj.image || defaultImg;
-                          href = `/product/${item.id}`;
+                          href = `/product/${getProductUrlParam(prodObj)}`;
                         }
                       }
                     }

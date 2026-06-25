@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { publishGoogleIndexingNotification } from '@/lib/google-indexing'
+import { getProductUrlParam } from '@/lib/slug'
 
 export const runtime = 'nodejs'
 
@@ -30,13 +31,6 @@ const isAuthorized = async (request: NextRequest) => {
   }
 }
 
-const buildProductUrl = (productId: string) => {
-  const siteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL
-  if (!siteUrl) throw new Error('SITE_URL or NEXT_PUBLIC_SITE_URL is not configured')
-
-  return `${stripTrailingSlash(siteUrl)}/product/${encodeURIComponent(productId)}`
-}
-
 export async function POST(request: NextRequest) {
   if (!(await isAuthorized(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -48,13 +42,50 @@ export async function POST(request: NextRequest) {
     const rawUrl = typeof body.url === 'string' ? body.url.trim() : ''
     const type = body.type === 'URL_DELETED' ? 'URL_DELETED' : 'URL_UPDATED'
 
-    const url = rawUrl || (productId ? buildProductUrl(productId) : '')
-    if (!url) {
+    let urlsToNotify: string[] = []
+    if (rawUrl) {
+      urlsToNotify.push(rawUrl)
+    } else if (productId) {
+      const siteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL
+      if (!siteUrl) throw new Error('SITE_URL or NEXT_PUBLIC_SITE_URL is not configured')
+      const cleanSiteUrl = stripTrailingSlash(siteUrl)
+      
+      // 1. Old URL (ID-only)
+      const oldUrl = `${cleanSiteUrl}/product/${productId}`
+      urlsToNotify.push(oldUrl)
+      
+      // 2. Fetch product to construct new slugged URL
+      const backendUrl = getBackendUrl()
+      if (backendUrl) {
+        try {
+          const res = await fetch(`${backendUrl}/api/products/${productId}`, { cache: 'no-store' })
+          if (res.ok) {
+            const product = await res.json()
+            if (product) {
+              const newUrlParam = getProductUrlParam(product)
+              const newUrl = `${cleanSiteUrl}/product/${newUrlParam}`
+              if (newUrl !== oldUrl) {
+                urlsToNotify.push(newUrl)
+              }
+            }
+          }
+        } catch (e) {
+          console.error(`Failed to fetch product for google indexing URL slugification:`, e)
+        }
+      }
+    }
+
+    if (urlsToNotify.length === 0) {
       return NextResponse.json({ error: 'Missing productId or url' }, { status: 400 })
     }
 
-    const result = await publishGoogleIndexingNotification(url, type)
-    return NextResponse.json({ ok: true, url, type, result })
+    const results = []
+    for (const url of urlsToNotify) {
+      const res = await publishGoogleIndexingNotification(url, type)
+      results.push({ url, result: res })
+    }
+
+    return NextResponse.json({ ok: true, results, type })
   } catch (error: unknown) {
     console.error('Google Indexing API error:', error)
     const message = error instanceof Error ? error.message : 'Google Indexing API failed'

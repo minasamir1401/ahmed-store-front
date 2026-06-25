@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { cache } from 'react'
 import { getServerSiteUrl } from '@/lib/seo'
 import { absoluteProductImageUrl } from '@/lib/product-images'
+import { getProductUrlParam } from '@/lib/slug'
 
 interface PageParams {
   params: Promise<{
@@ -139,7 +140,7 @@ export default async function BrandDetailPage({ params, searchParams }: PagePara
         "itemListElement": products.map((prod: any, index: number) => ({
           "@type": "ListItem",
           "position": index + 1,
-          "url": `${siteUrl}/product/${prod.id}${isEn ? '?lang=en' : ''}`,
+          "url": `${siteUrl}/product/${getProductUrlParam(prod)}${isEn ? '?lang=en' : ''}`,
           "name": isEn ? (prod.titleEn || prod.title) : prod.title,
           "image": prod.image ? absoluteProductImageUrl(prod.image, siteUrl) : `${siteUrl}/logo-header.jpg`
         }))

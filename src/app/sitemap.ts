@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
 import { getServerSiteUrl } from '@/lib/seo'
 import { absoluteProductImageUrl, productImageVersion, productMainImage, withImageVersion } from '@/lib/product-images'
+import { getProductUrlParam } from '@/lib/slug'
 
 type SitemapChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]['changeFrequency']>
 
@@ -125,7 +126,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...routes,
       ...products.map((product) => {
         const entry = sitemapEntry(
-          absoluteUrl(baseUrl, `/product/${product.id}`),
+          absoluteUrl(baseUrl, `/product/${getProductUrlParam(product)}`),
           'daily',
           0.90,
           changedAt(product)

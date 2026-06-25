@@ -11,6 +11,7 @@ import { useWishlist } from '@/context/WishlistContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { productImageAlt, productMainImage } from '@/lib/product-images'
 import { trackAddToCart, trackAddToWishlist } from '@/lib/tracking'
+import { getProductUrlParam } from '@/lib/slug'
 
 interface ProductCardProps {
   id: string
@@ -140,7 +141,7 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
       </AnimatePresence>
 
       {/* Product Image */}
-      <Link href={`/product/${id}`} className="block">
+      <Link href={`/product/${getProductUrlParam({ id, title, titleEn })}`} className="block">
         <div className="aspect-square overflow-hidden flex items-center justify-center p-2 xs:p-4 relative" style={{ background: '#f0f7f4' }}>
           {/* Discount Badge */}
           {(displayTag || discountPercent) && (
@@ -193,7 +194,7 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
 
       {/* Content */}
       <div className={cn("p-2 xs:p-3 space-y-1 xs:space-y-1.5", isRtl ? "text-right" : "text-left")}>
-        <Link href={`/product/${id}`}>
+        <Link href={`/product/${getProductUrlParam({ id, title, titleEn })}`}>
           <h3 className="text-xs xs:text-sm font-bold text-gray-800 line-clamp-2 hover:text-green-700 transition-colors" style={{ lineHeight: '1.4' }}>
             {displayTitle}
           </h3>

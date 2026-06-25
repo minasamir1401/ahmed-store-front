@@ -658,13 +658,16 @@ export function useAdminDashboard() {
     setIsSEOLoading(true)
     const activeProvider = providerOverride || aiProvider
     const providerNames: Record<AIProvider, string> = { openrouter: 'OpenRouter', apifree: 'APIFreeLLM' }
-    addLog(`جاري توليد الـ SEO والمحتوى للمنتج ${formData.title.substring(0, 15)} باستخدام ${providerNames[activeProvider]}...`)
+    
     try {
-      const response = await fetchWithAdminAuth(`${BACKEND_API}/api/ai/generate`, {
+      // Call 1: Arabic SEO
+      addLog(`[1/2] جاري توليد الكلمات المفتاحية والـ Meta بالعربية للمنتج ${formData.title.substring(0, 15)} باستخدام ${providerNames[activeProvider]}...`)
+      
+      const responseAr = await fetchWithAdminAuth(`${BACKEND_API}/api/ai/generate`, {
         method: 'POST',
         body: JSON.stringify({
           provider: activeProvider,
-          max_tokens: AI_MAX_TOKENS.seo,
+          max_tokens: 2000,
           model: 'openai/gpt-oss-120b:free',
           models: [
             'openai/gpt-oss-120b:free',
@@ -675,67 +678,114 @@ export function useAdminDashboard() {
             {
               role: 'system',
               content: `أنت خبير SEO محترف ومتخصص في المكملات والمنتجات الصحية في مصر.
-مهمتك هي كتابة الكلمات المفتاحية ووصف الميتا (SEO Meta) لصفحة المنتج فقط بشكل متوافق تماماً مع محركات البحث.
+مهمتك هي كتابة الكلمات المفتاحية ووصف الميتا (SEO Meta) باللغة العربية لصفحة المنتج فقط بشكل متوافق تماماً مع محركات البحث.
 القواعد العامة:
 - لا تستخدم Markdown في النصوص.
-- اذكر اسم المتجر "The VitaHub" بشكل طبيعي في حقل الوصف المختصر (seoDesc) والوصف الإنجليزي (seoDescEn) لزيادة الوعي بالعلامة التجارية.
-- الكلمات المفتاحية (seoKeywords و seoKeywordsEn) يجب أن تكون قائمة ضخمة ومكثفة تتكون من 300 كلمة أو عبارة بحث مفتاحية متنوعة وقوية مفصولة بفواصل، وتشمل مرادفات، فوائد، ونوايا شراء مثل (سعر، أفضل نوع، في مصر، مستورد، الأصلي) لتغطية عمليات البحث بالكامل.
+- اذكر اسم المتجر "The VitaHub" بشكل طبيعي في حقل الوصف المختصر (seoDesc) لزيادة الوعي بالعلامة التجارية.
+- الكلمات المفتاحية (seoKeywords) يجب أن تكون قائمة ضخمة ومكثفة تتكون من 300 كلمة أو عبارة بحث مفتاحية متنوعة وقوية مفصولة بفواصل، وتشمل مرادفات، فوائد، ونوايا شراء مثل (سعر، أفضل نوع، في مصر، مستورد، الأصلي) لتغطية عمليات البحث بالعربية بالكامل.
 
 قم بإرجاع كائن JSON فقط بالهيكل التالي بدقة ودون أي كلام خارجي على الإطلاق:
 {
   "seoKeywords": "قائمة ضخمة ومكثفة تتكون من 300 كلمة أو عبارة بحث مفتاحية متنوعة وقوية باللغة العربية مفصولة بفواصل لتغطية كافة عمليات البحث الممكنة بشكل كامل.",
-  "seoKeywordsEn": "An extensive list of 300 highly relevant meta keywords and search queries in English separated by commas.",
-  "seoDesc": "وصف ميتا للبحث بالعربية مقنع وجذاب ويشجع على الشراء (بين 150 و 220 حرفاً).",
-  "seoDescEn": "Meta description in English for Google search (150-220 characters)."
+  "seoDesc": "وصف ميتا للبحث بالعربية مقنع وجذاب ويشجع على الشراء (بين 150 و 220 حرفاً)."
 }`
             },
             {
               role: 'user',
-              content: 'اسم المنتج:\n' + formData.title + (formData.desc ? `\n\nالوصف الحالي:\n${formData.desc}` : '') + (formData.features ? `\n\nالمميزات الحالية:\n${formData.features}` : '')
+              content: 'اسم المنتج:\n' + formData.title + (formData.desc ? `\n\nالوصف الحالي:\n${formData.desc}` : '')
             }
           ]
         })
       })
 
-      const isJson = response.headers.get('content-type')?.includes('application/json')
-      if (!isJson) {
-        const text = await response.text()
-        throw new Error(`Server Error: ${text}`)
+      if (!responseAr.ok) {
+        const text = await responseAr.text()
+        throw new Error(`Arabic SEO generation failed: ${text}`)
       }
-
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data.error?.message || data.error || `AI request failed (${response.status})`)
-      }
-
-      if (data.choices && data.choices[0] && data.choices[0].message) {
-        const parsed = parseAIJSON(data.choices[0].message.content)
-        const addAboveExisting = (generated: string | undefined, current: string | undefined, separator: string) => {
-          const generatedText = generated?.trim()
-          const currentText = current?.trim()
-
-          if (!generatedText) return current || ''
-          if (!currentText) return generatedText
-          if (currentText.startsWith(generatedText)) return currentText
-
-          return `${generatedText}${separator}${currentText}`
-        }
-
-        setFormData((prev: any) => ({
-          ...prev,
-          seoKeywords: addAboveExisting(parsed.seoKeywords, prev.seoKeywords, '، '),
-          seoDesc: addAboveExisting(parsed.seoDesc, prev.seoDesc, '\n'),
-          seoKeywordsEn: addAboveExisting(parsed.seoKeywordsEn, prev.seoKeywordsEn, ', '),
-          seoDescEn: addAboveExisting(parsed.seoDescEn, prev.seoDescEn, '\n')
-        }))
-
-        addLog('تم توليد الـ SEO بنجاح!')
+      const dataAr = await responseAr.json()
+      let parsedAr = { seoKeywords: '', seoDesc: '' }
+      if (dataAr.choices && dataAr.choices[0] && dataAr.choices[0].message) {
+        parsedAr = parseAIJSON(dataAr.choices[0].message.content)
       } else {
-        throw new Error(data.error?.message || 'Invalid Response from AI')
+        throw new Error('Invalid Arabic SEO response')
       }
-    } catch (err) {
+
+      // Add small delay to prevent rate limits
+      await new Promise(resolve => setTimeout(resolve, 2000))
+
+      // Call 2: English SEO
+      addLog(`[2/2] جاري توليد الكلمات المفتاحية والـ Meta بالإنجليزية للمنتج ${formData.title.substring(0, 15)} باستخدام ${providerNames[activeProvider]}...`)
+      
+      const responseEn = await fetchWithAdminAuth(`${BACKEND_API}/api/ai/generate`, {
+        method: 'POST',
+        body: JSON.stringify({
+          provider: activeProvider,
+          max_tokens: 2000,
+          model: 'openai/gpt-oss-120b:free',
+          models: [
+            'openai/gpt-oss-120b:free',
+            'openai/gpt-oss-20b:free',
+            'google/gemini-2.5-flash'
+          ],
+          messages: [
+            {
+              role: 'system',
+              content: `You are a professional SEO expert specialized in health supplements in Egypt.
+Your task is to write meta keywords and description in English for the product page.
+Rules:
+- Do not use Markdown.
+- Mention the store "The VitaHub" naturally in the meta description (seoDescEn) to increase brand awareness.
+- The keywords (seoKeywordsEn) must be a huge, dense list of 300 highly relevant English search keywords and phrases separated by commas, covering search queries completely.
+
+Return ONLY a JSON object with the following structure:
+{
+  "seoKeywordsEn": "An extensive list of 300 highly relevant meta keywords and search queries in English separated by commas.",
+  "seoDescEn": "Meta description in English for Google search (150-220 characters)."
+}`
+            },
+            {
+              role: 'user',
+              content: 'Product Title:\n' + formData.title + (formData.descEn ? `\n\nCurrent description:\n${formData.descEn}` : '')
+            }
+          ]
+        })
+      })
+
+      if (!responseEn.ok) {
+        const text = await responseEn.text()
+        throw new Error(`English SEO generation failed: ${text}`)
+      }
+      const dataEn = await responseEn.json()
+      let parsedEn = { seoKeywordsEn: '', seoDescEn: '' }
+      if (dataEn.choices && dataEn.choices[0] && dataEn.choices[0].message) {
+        parsedEn = parseAIJSON(dataEn.choices[0].message.content)
+      } else {
+        throw new Error('Invalid English SEO response')
+      }
+
+      const addAboveExisting = (generated: string | undefined, current: string | undefined, separator: string) => {
+        const generatedText = generated?.trim()
+        const currentText = current?.trim()
+
+        if (!generatedText) return current || ''
+        if (!currentText) return generatedText
+        if (currentText.startsWith(generatedText)) return currentText
+
+        return `${generatedText}${separator}${currentText}`
+      }
+
+      setFormData((prev: any) => ({
+        ...prev,
+        seoKeywords: addAboveExisting(parsedAr.seoKeywords, prev.seoKeywords, '، '),
+        seoDesc: addAboveExisting(parsedAr.seoDesc, prev.seoDesc, '\n'),
+        seoKeywordsEn: addAboveExisting(parsedEn.seoKeywordsEn, prev.seoKeywordsEn, ', '),
+        seoDescEn: addAboveExisting(parsedEn.seoDescEn, prev.seoDescEn, '\n')
+      }))
+
+      addLog('تم توليد الـ SEO العربي والإنجليزي بنجاح!')
+    } catch (err: any) {
       console.error(err)
-      addLog('فشل توليد الـ SEO.')
+      addLog(`فشل توليد الـ SEO: ${err.message}`)
     } finally {
       setIsSEOLoading(false)
     }

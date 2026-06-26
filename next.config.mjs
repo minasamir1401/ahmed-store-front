@@ -13,6 +13,8 @@ const nextConfig = {
       { protocol: 'https', hostname: 'logo.clearbit.com' },
       { protocol: 'https', hostname: 'www.google.com' },
       { protocol: 'https', hostname: 't1.gstatic.com' },
+      { protocol: 'https', hostname: 'logos.hunter.io' },
+      { protocol: 'https', hostname: 'icons.duckduckgo.com' },
     ],
     localPatterns: [
       {

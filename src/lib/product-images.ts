@@ -48,10 +48,26 @@ export const withImageVersion = (src: string, version?: string | null) => {
 
 export const safeBrandImage = (src?: string | null) => {
   if (!src) return ''
-  // Fix for blocked clearbit images by adblockers
+  
+  let domain = ''
+  
   if (src.includes('logo.clearbit.com/')) {
-    const domain = src.split('logo.clearbit.com/')[1]
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
+    const part = src.split('logo.clearbit.com/')[1]
+    domain = part.split('/')[0].split('?')[0]
+  } else if (src.includes('google.com/s2/favicons')) {
+    const match = src.match(/[?&]domain=([^&]+)/)
+    if (match) {
+      domain = match[1]
+    }
+  } else if (src.includes('logos.hunter.io/')) {
+    domain = src.split('logos.hunter.io/')[1]
+  } else if (!/^https?:\/\//i.test(src) && !src.startsWith('/') && src.includes('.')) {
+    domain = src.trim()
   }
+
+  if (domain) {
+    return `https://logos.hunter.io/${domain.toLowerCase()}`
+  }
+
   return src
 }

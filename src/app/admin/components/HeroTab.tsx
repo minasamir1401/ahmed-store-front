@@ -22,20 +22,13 @@ const makeLocalizedValue = (ar: string, en: string) => {
 
 export default function HeroTab(props: any) {
   const { 
-    formData, setFormData, handleSave, loading, uploading, handleFileUpload
+    formData, setFormData, handleSave, loading, uploading, handleFileUpload,
+    productsList = []
   } = props;
 
   const [slides, setSlides] = useState<any[]>([]);
-  const [productsList, setProductsList] = useState<any[]>([]);
   const [slideUploading, setSlideUploading] = useState<string | null>(null);
   const [localUploading, setLocalUploading] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch('/api/products')
-      .then(res => res.json())
-      .then(data => setProductsList(data.products || data))
-      .catch(console.error);
-  }, []); // Run once on mount
 
   // Sync from formData to local slides
   useEffect(() => {

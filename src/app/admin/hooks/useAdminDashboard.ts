@@ -415,13 +415,14 @@ export function useAdminDashboard() {
     }
   }
 
-  const uploadAdminImage = async (file: File, altText: string, title?: string) => {
+  const uploadAdminImage = async (file: File, altText: string, title?: string, type?: string) => {
     const uploadData = new FormData()
     uploadData.append('image', file)
     uploadData.append('altText', altText || file.name)
     if (title) uploadData.append('title', title)
 
-    const res = await fetchWithAdminAuth(BACKEND_API + '/api/upload', { method: 'POST', body: uploadData }, null)
+    const url = type ? `${BACKEND_API}/api/upload?type=${type}` : `${BACKEND_API}/api/upload`
+    const res = await fetchWithAdminAuth(url, { method: 'POST', body: uploadData }, null)
     const result = await res.json()
     if (!res.ok || !result.url) {
       throw new Error(result.error || 'فشل في رفع الصورة')
@@ -436,7 +437,8 @@ export function useAdminDashboard() {
 
     try {
       const altText = type === 'brand' ? formData.brandName : formData.imageAlt || formData.title || file.name
-      const result = await uploadAdminImage(file, altText, formData.title)
+      const uploadType = (type === 'side1' || type === 'side2') ? 'side-banner' : undefined
+      const result = await uploadAdminImage(file, altText, formData.title, uploadType)
       if (type === 'brand') setFormData((prev: any) => ({ ...prev, brandImage: result.url }))
       else if (type === 'main') setFormData((prev: any) => ({
         ...prev,

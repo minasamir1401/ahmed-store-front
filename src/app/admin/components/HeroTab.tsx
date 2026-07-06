@@ -96,14 +96,15 @@ export default function HeroTab(props: any) {
     setSlides(newSlides);
   };
 
-  const uploadImage = async (file: File): Promise<string> => {
+  const uploadImage = async (file: File, type?: string): Promise<string> => {
     const uploadData = new FormData();
     uploadData.append('image', file);
     
     const token = localStorage.getItem('mithaly_admin_token') || '';
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+    const url = type ? `${backendUrl}/api/upload?type=${type}` : `${backendUrl}/api/upload`;
     
-    const res = await fetch(`${backendUrl}/api/upload`, {
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
       body: uploadData
@@ -117,7 +118,7 @@ export default function HeroTab(props: any) {
     if (!file) return;
     setSlideUploading(`${lang}-${slideIndex}`);
     try {
-      const url = await uploadImage(file);
+      const url = await uploadImage(file, 'slider');
       const newSlides = [...slides];
       const currentLoc = getLocalizedValue(newSlides[slideIndex].image);
       currentLoc[lang] = url;
@@ -135,7 +136,8 @@ export default function HeroTab(props: any) {
     if (!file) return;
     setLocalUploading(`${field}-${lang}`);
     try {
-      const url = await uploadImage(file);
+      const isSide = field.startsWith('side');
+      const url = await uploadImage(file, isSide ? 'side-banner' : undefined);
       const currentLoc = getLocalizedValue(formData[field]);
       currentLoc[lang] = url;
       setFormData((prev: any) => ({

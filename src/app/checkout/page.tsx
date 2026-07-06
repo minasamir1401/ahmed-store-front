@@ -175,7 +175,8 @@ export default function CheckoutPage() {
         total: total,
         shippingFee: shippingFee + codFee,
         items: cart,
-        userId: user?.id || null
+        userId: user?.id || null,
+        language: language
       }
 
       const response = await fetch('/api/orders', {
@@ -396,7 +397,7 @@ export default function CheckoutPage() {
                           className={`w-full h-12 xs:h-13 bg-slate-50 border-2 border-slate-50 rounded-xl px-3 xs:px-5 focus:border-primary focus:bg-white transition-all outline-none appearance-none font-bold text-sm xs:text-base ${isRtl ? 'text-right' : 'text-left'}`}
                         >
                           {governorates.map(gov => (
-                            <option key={gov} value={gov}>{gov}</option>
+                            <option key={gov} value={gov}>{translate(gov)}</option>
                           ))}
                         </select>
                       </div>
@@ -415,7 +416,7 @@ export default function CheckoutPage() {
                               >
                                 <option value="">{language === 'ar' ? '-- اختر المنطقة / الحي --' : '-- Select District / Neighborhood --'}</option>
                                 {availableDistricts.map(dist => (
-                                  <option key={dist} value={dist}>{dist}</option>
+                                  <option key={dist} value={dist}>{translate(dist)}</option>
                                 ))}
                               </select>
                             );

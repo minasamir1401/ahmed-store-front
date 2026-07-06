@@ -334,30 +334,21 @@ export default function HomeClient({
                   <Link href={hero?.side1Link || '/categories'} className="h-full w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#f0f7f4] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
                     {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
-                        {/* Background Blurred Image */}
                         <Image 
                           src={translate(hero.side1Image)} 
                           fill 
-                          className="object-cover opacity-35 blur-md scale-110" 
-                          sizes="(max-width: 1024px) 50vw, 33vw" 
-                          alt="Categories Banner Background" 
-                        />
-                        {/* Foreground Contain Image */}
-                        <Image 
-                          src={translate(hero.side1Image)} 
-                          fill 
-                          className="object-contain opacity-100 group-hover:scale-105 transition-transform duration-500 z-10" 
+                          className="object-cover opacity-100 group-hover:scale-105 transition-transform duration-500" 
                           sizes="(max-width: 1024px) 50vw, 33vw" 
                           alt="Categories Banner" 
                         />
                         {(translate(hero.side1Title) || translate(hero.side1Desc)) && (
-                          <div className={`absolute inset-0 z-20 p-4 sm:p-6 w-full flex flex-col justify-center bg-black/20 text-white ${language === 'ar' ? 'text-right' : 'text-left'}`}>
-                            <h3 className={`text-xs xs:text-sm sm:text-lg font-black ${
+                          <div className={`relative z-10 p-4 sm:p-6 w-full ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                            <h3 className={`text-xs xs:text-sm sm:text-lg font-black text-slate-800 ${
                               language === 'ar' 
                                 ? 'border-r-[3px] sm:border-r-4 border-emerald-500 pr-1.5 sm:pr-3' 
                                 : 'border-l-[3px] sm:border-l-4 border-emerald-500 pl-1.5 sm:pl-3'
                             }`}>{translate(hero.side1Title)}</h3>
-                            <p className={`text-[8px] xs:text-[10px] sm:text-xs font-bold mt-1 sm:mt-2 ${
+                            <p className={`text-[8px] xs:text-[10px] sm:text-xs text-slate-600 font-bold mt-1 sm:mt-2 ${
                               language === 'ar' ? 'pr-2.5 sm:pr-4' : 'pl-2.5 sm:pl-4'
                             }`}>{translate(hero.side1Desc)}</p>
                           </div>
@@ -376,30 +367,21 @@ export default function HomeClient({
                   <Link href={hero?.side2Link || '/offers'} className="h-full w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#faf5f0] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
                     {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
-                        {/* Background Blurred Image */}
                         <Image 
                           src={translate(hero.side2Image)} 
                           fill 
-                          className="object-cover opacity-35 blur-md scale-110" 
-                          sizes="(max-width: 1024px) 50vw, 33vw" 
-                          alt="Offers Banner Background" 
-                        />
-                        {/* Foreground Contain Image */}
-                        <Image 
-                          src={translate(hero.side2Image)} 
-                          fill 
-                          className="object-contain opacity-100 group-hover:scale-105 transition-transform duration-500 z-10" 
+                          className="object-cover opacity-100 group-hover:scale-105 transition-transform duration-500" 
                           sizes="(max-width: 1024px) 50vw, 33vw" 
                           alt="Offers Banner" 
                         />
                         {(translate(hero.side2Title) || translate(hero.side2Desc)) && (
-                          <div className={`absolute inset-0 z-20 p-4 sm:p-6 w-full flex flex-col justify-center bg-black/20 text-white ${language === 'ar' ? 'text-right' : 'text-left'}`}>
-                            <h3 className={`text-xs xs:text-sm sm:text-lg font-black ${
+                          <div className={`relative z-10 p-4 sm:p-6 w-full ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                            <h3 className={`text-xs xs:text-sm sm:text-lg font-black text-slate-800 ${
                               language === 'ar' 
                                 ? 'border-r-[3px] sm:border-r-4 border-amber-500 pr-1.5 sm:pr-3' 
                                 : 'border-l-[3px] sm:border-l-4 border-amber-500 pl-1.5 sm:pl-3'
                             }`}>{translate(hero.side2Title)}</h3>
-                            <p className={`text-[8px] xs:text-[10px] sm:text-xs font-bold mt-1 sm:mt-2 ${
+                            <p className={`text-[8px] xs:text-[10px] sm:text-xs text-slate-600 font-bold mt-1 sm:mt-2 ${
                               language === 'ar' ? 'pr-2.5 sm:pr-4' : 'pl-2.5 sm:pl-4'
                             }`}>{translate(hero.side2Desc)}</p>
                           </div>

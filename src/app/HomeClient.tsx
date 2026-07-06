@@ -324,19 +324,34 @@ export default function HomeClient({
                 )}
               </motion.div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-col gap-4 sm:gap-6 lg:min-h-0">
+              <div className="grid grid-cols-2 lg:flex lg:flex-col gap-4 sm:gap-6 min-h-[110px] xs:min-h-[140px] sm:min-h-[180px] lg:min-h-0">
                 <motion.div
                   initial={{ opacity: 0, x: dir === 'rtl' ? -30 : 30 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
                   className="flex-1"
                 >
-                  <Link href={hero?.side1Link || '/categories'} className="w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative block bg-[#f0f7f4] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group">
-                    {!hero ? <div className="aspect-[2/1] bg-slate-100 animate-pulse rounded-[1.5rem]" /> : (
+                  <Link href={hero?.side1Link || '/categories'} className="h-full w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#f0f7f4] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
+                    {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
-                        <img src={translate(hero.side1Image)} className="w-full h-auto block object-contain group-hover:scale-105 transition-transform duration-500" alt="Categories Banner" />
+                        {/* Background Blurred Image */}
+                        <Image 
+                          src={translate(hero.side1Image)} 
+                          fill 
+                          className="object-cover opacity-35 blur-md scale-110" 
+                          sizes="(max-width: 1024px) 50vw, 33vw" 
+                          alt="Categories Banner Background" 
+                        />
+                        {/* Foreground Contain Image */}
+                        <Image 
+                          src={translate(hero.side1Image)} 
+                          fill 
+                          className="object-contain opacity-100 group-hover:scale-105 transition-transform duration-500 z-10" 
+                          sizes="(max-width: 1024px) 50vw, 33vw" 
+                          alt="Categories Banner" 
+                        />
                         {(translate(hero.side1Title) || translate(hero.side1Desc)) && (
-                          <div className={`absolute inset-0 z-10 p-4 sm:p-6 w-full flex flex-col justify-center bg-black/10 text-white ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                          <div className={`absolute inset-0 z-20 p-4 sm:p-6 w-full flex flex-col justify-center bg-black/20 text-white ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                             <h3 className={`text-xs xs:text-sm sm:text-lg font-black ${
                               language === 'ar' 
                                 ? 'border-r-[3px] sm:border-r-4 border-emerald-500 pr-1.5 sm:pr-3' 
@@ -358,12 +373,27 @@ export default function HomeClient({
                   transition={{ duration: 0.8, delay: 0.3 }}
                   className="flex-1"
                 >
-                  <Link href={hero?.side2Link || '/offers'} className="w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative block bg-[#faf5f0] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group">
-                    {!hero ? <div className="aspect-[2/1] bg-slate-100 animate-pulse rounded-[1.5rem]" /> : (
+                  <Link href={hero?.side2Link || '/offers'} className="h-full w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#faf5f0] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
+                    {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
-                        <img src={translate(hero.side2Image)} className="w-full h-auto block object-contain group-hover:scale-105 transition-transform duration-500" alt="Offers Banner" />
+                        {/* Background Blurred Image */}
+                        <Image 
+                          src={translate(hero.side2Image)} 
+                          fill 
+                          className="object-cover opacity-35 blur-md scale-110" 
+                          sizes="(max-width: 1024px) 50vw, 33vw" 
+                          alt="Offers Banner Background" 
+                        />
+                        {/* Foreground Contain Image */}
+                        <Image 
+                          src={translate(hero.side2Image)} 
+                          fill 
+                          className="object-contain opacity-100 group-hover:scale-105 transition-transform duration-500 z-10" 
+                          sizes="(max-width: 1024px) 50vw, 33vw" 
+                          alt="Offers Banner" 
+                        />
                         {(translate(hero.side2Title) || translate(hero.side2Desc)) && (
-                          <div className={`absolute inset-0 z-10 p-4 sm:p-6 w-full flex flex-col justify-center bg-black/10 text-white ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                          <div className={`absolute inset-0 z-20 p-4 sm:p-6 w-full flex flex-col justify-center bg-black/20 text-white ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                             <h3 className={`text-xs xs:text-sm sm:text-lg font-black ${
                               language === 'ar' 
                                 ? 'border-r-[3px] sm:border-r-4 border-amber-500 pr-1.5 sm:pr-3' 

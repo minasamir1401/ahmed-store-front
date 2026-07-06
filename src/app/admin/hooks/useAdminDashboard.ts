@@ -282,8 +282,7 @@ export function useAdminDashboard() {
 
   const fetchData = async () => {
     if (!isLoggedIn) return
-    if (activeTab === 'whatsapp') return
-    if (activeTab === 'admin-settings') {
+    if (activeTab === 'whatsapp' || activeTab === 'admin-settings') {
       setLoading(true)
       try {
         const [profileRes, settingsRes] = await Promise.all([

@@ -675,7 +675,7 @@ export function translateText(text: string, lang: 'ar' | 'en'): string {
     try {
       const parsed = JSON.parse(trimmed);
       if (parsed && typeof parsed === 'object') {
-        if (parsed[lang] !== undefined && parsed[lang] !== null) {
+        if (parsed[lang] !== undefined && parsed[lang] !== null && parsed[lang] !== '') {
           return parsed[lang];
         }
         return parsed['ar'] || parsed['en'] || text;

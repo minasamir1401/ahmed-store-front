@@ -324,17 +324,17 @@ export default function HomeClient({
                 )}
               </motion.div>
 
-              <div className="grid grid-cols-2 lg:flex lg:flex-col gap-4 sm:gap-6 min-h-[110px] xs:min-h-[140px] sm:min-h-[180px] lg:min-h-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-col gap-4 sm:gap-6 lg:min-h-0">
                 <motion.div
                   initial={{ opacity: 0, x: dir === 'rtl' ? -30 : 30 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
                   className="flex-1"
                 >
-                  <Link href={hero?.side1Link || '/categories'} className="h-full w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#f0f7f4] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
+                  <Link href={hero?.side1Link || '/categories'} className="w-full aspect-[2/1] rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#f0f7f4] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
                     {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
-                        <Image src={translate(hero.side1Image)} fill className="object-contain opacity-100 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Categories Banner" />
+                        <Image src={translate(hero.side1Image)} fill className="object-cover opacity-100 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Categories Banner" />
                         <div className={`relative z-10 p-4 sm:p-6 w-full ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                           <h3 className={`text-xs xs:text-sm sm:text-lg font-black text-slate-800 ${
                             language === 'ar' 
@@ -356,10 +356,10 @@ export default function HomeClient({
                   transition={{ duration: 0.8, delay: 0.3 }}
                   className="flex-1"
                 >
-                  <Link href={hero?.side2Link || '/offers'} className="h-full w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#faf5f0] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
+                  <Link href={hero?.side2Link || '/offers'} className="w-full aspect-[2/1] rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#faf5f0] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
                     {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
-                        <Image src={translate(hero.side2Image)} fill className="object-contain opacity-100 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Offers Banner" />
+                        <Image src={translate(hero.side2Image)} fill className="object-cover opacity-100 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Offers Banner" />
                         <div className={`relative z-10 p-4 sm:p-6 w-full ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                           <h3 className={`text-xs xs:text-sm sm:text-lg font-black text-slate-800 ${
                             language === 'ar' 

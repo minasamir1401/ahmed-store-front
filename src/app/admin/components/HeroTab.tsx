@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2, CheckCircle2, Upload, Plus, Trash2 } from 'lucide-react';
+import SearchableProductSelect from './SearchableProductSelect';
 
 const getLocalizedValue = (value: string) => {
   if (!value) return { ar: '', en: '' };
@@ -445,16 +446,12 @@ export default function HeroTab(props: any) {
                       ))}
                     </select>
                   ) : (
-                    <select 
-                      value={formData[idField] || ''} 
-                      onChange={e => setFormData({ ...formData, [idField]: e.target.value })}
-                      className="w-full bg-white border border-slate-200 focus:border-emerald-500/50 rounded-2xl py-3 px-4 text-xs font-bold outline-none text-slate-700"
-                    >
-                      <option value="">اختر المنتج</option>
-                      {productsList?.map((prod: any) => (
-                        <option key={prod.id} value={prod.id}>{prod.title}</option>
-                      ))}
-                    </select>
+                    <SearchableProductSelect
+                      productsList={productsList}
+                      value={formData[idField] || ''}
+                      onChange={val => setFormData({ ...formData, [idField]: val })}
+                      placeholder="اختر المنتج"
+                    />
                   )}
                 </div>
 

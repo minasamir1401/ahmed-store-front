@@ -1,5 +1,6 @@
 import React from 'react';
 import { Loader2, Upload, Tag, Box, Image as ImageIcon } from 'lucide-react';
+import SearchableProductSelect from './SearchableProductSelect';
 
 export default function OffersForm(props: any) {
   const { 
@@ -89,23 +90,12 @@ export default function OffersForm(props: any) {
                <Box size={18} className="text-blue-500" />
                توجيه الضغط إلى منتج (اختياري)
              </label>
-             <div className="relative">
-               <select 
-                 value={formData.productId || ''} 
-                 onChange={e => setFormData({...formData, productId: e.target.value})} 
-                 className="w-full bg-white focus:bg-blue-50/30 border-2 border-slate-100 focus:border-blue-500/50 rounded-2xl py-4 px-5 pr-10 font-black text-sm outline-none transition-all text-slate-700 shadow-sm appearance-none cursor-pointer"
-               >
-                 <option value="">-- بدون توجيه لمنتج معين (عرض فقط) --</option>
-                 {productsList?.map((prod: any) => (
-                   <option key={prod.id} value={prod.id}>
-                     {prod.title} - ({prod.price} ج.م)
-                   </option>
-                 ))}
-               </select>
-               <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 bg-white pl-2">
-                 ▼
-               </div>
-             </div>
+              <SearchableProductSelect
+                productsList={productsList}
+                value={formData.productId || ''}
+                onChange={val => setFormData({...formData, productId: val})}
+                placeholder="-- بدون توجيه لمنتج معين (عرض فقط) --"
+              />
              <p className="text-[11px] text-slate-500 mt-2 font-medium">إذا تم اختيار منتج، سيتم تحويل المستخدم مباشرة لصفحة المنتج عند الضغط على البنر في الواجهة الرئيسية.</p>
            </div>
         </div>

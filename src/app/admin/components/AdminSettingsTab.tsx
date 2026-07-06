@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2, CheckCircle2, Upload, Plus, Edit2, Trash2, Eye, Search, Smartphone, Shield, LogIn, Lock as LockIcon, Database, DownloadCloud, Sparkles } from 'lucide-react';
+import { Loader2, CheckCircle2, Upload, Plus, Edit2, Trash2, Eye, Search, Smartphone, Shield, LogIn, Lock as LockIcon, Database, DownloadCloud, Sparkles, Mail, Send } from 'lucide-react';
 
 export default function AdminSettingsTab(props: any) {
   const { 
@@ -7,7 +7,19 @@ export default function AdminSettingsTab(props: any) {
     items, adminEmail, setAdminEmail, adminName, setAdminName, adminPassword, setAdminPassword,
     adminSaveLoading, handleAdminSave, isLoggedIn, setIsLoggedIn, showLogin,
     activeTab, tabs, backupLoading, restoreLoading, handleDownloadBackup, handleRestoreBackup,
-    cleanLoading, handleCleanBase64Images
+    cleanLoading, handleCleanBase64Images,
+    smtpHost, setSmtpHost,
+    smtpPort, setSmtpPort,
+    smtpSecure, setSmtpSecure,
+    smtpUser, setSmtpUser,
+    smtpPass, setSmtpPass,
+    fromEmail, setFromEmail,
+    fromName, setFromName,
+    whatsappNumber, setWhatsappNumber,
+    receivingNumber, setReceivingNumber,
+    testRecipient, setTestRecipient,
+    testEmailLoading, settingsSaveLoading,
+    handleSaveGeneralSettings, handleSendTestEmail
   } = props;
 
   return (
@@ -72,8 +84,202 @@ export default function AdminSettingsTab(props: any) {
                   </form>
 
 
+                  {/* System Phone Numbers Settings */}
+                  <form onSubmit={handleSaveGeneralSettings} className="bg-white border border-slate-100 rounded-[2.5rem] p-6 md:p-10 space-y-6 shadow-sm max-w-xl mx-auto relative overflow-hidden mt-8">
+                    <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-teal-500 to-emerald-500" />
+                    
+                    <div className="text-center space-y-2 mb-6">
+                      <div className="bg-[#10b9811a] w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-emerald-600">
+                        <Smartphone size={22} />
+                      </div>
+                      <h3 className="text-lg font-black text-slate-800">إعدادات أرقام التواصل والدفع</h3>
+                      <p className="text-[10px] text-slate-400 font-bold">تحديث أرقام الاتصال بالموقع وأرقام تحويل الأموال لإنستاباي وفودافون كاش</p>
+                    </div>
+
+                    <div className="space-y-4 text-right">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">رقم الواتساب والاتصال الأساسي للموقع</label>
+                        <input 
+                          type="text" 
+                          value={whatsappNumber} 
+                          onChange={e => setWhatsappNumber(e.target.value)} 
+                          className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
+                          placeholder="مثال: 01201450111" 
+                          required 
+                          disabled={settingsSaveLoading}
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">رقم استقبال فودافون كاش وإنستاباي (Instapay)</label>
+                        <input 
+                          type="text" 
+                          value={receivingNumber} 
+                          onChange={e => setReceivingNumber(e.target.value)} 
+                          className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
+                          placeholder="مثال: 01009596452" 
+                          required 
+                          disabled={settingsSaveLoading}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end pt-4 border-t border-slate-50">
+                      <button type="submit" disabled={settingsSaveLoading} className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white py-4 rounded-2xl font-black text-xs shadow-lg shadow-emerald-600/10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer">
+                        {settingsSaveLoading ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />} حفظ أرقام النظام
+                      </button>
+                    </div>
+                  </form>
+
+                  {/* SMTP Server Settings */}
+                  <form onSubmit={handleSaveGeneralSettings} className="bg-white border border-slate-100 rounded-[2.5rem] p-6 md:p-10 space-y-6 shadow-sm max-w-xl mx-auto relative overflow-hidden mt-8">
+                    <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600" />
+                    
+                    <div className="text-center space-y-2 mb-6">
+                      <div className="bg-[#10b9811a] w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-emerald-600">
+                        <Mail size={22} />
+                      </div>
+                      <h3 className="text-lg font-black text-slate-800">إعدادات البريد الإلكتروني SMTP</h3>
+                      <p className="text-[10px] text-slate-400 font-bold">ربط حساب Gmail أو خادم SMTP خارجي لإرسال فواتير وتأكيدات الطلبات للعملاء تلقائياً</p>
+                    </div>
+
+                    <div className="space-y-4 text-right">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">خادم SMTP (Host)</label>
+                          <input 
+                            type="text" 
+                            value={smtpHost} 
+                            onChange={e => setSmtpHost(e.target.value)} 
+                            className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
+                            placeholder="smtp.gmail.com" 
+                            required 
+                            disabled={settingsSaveLoading}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">المنفذ (Port)</label>
+                          <input 
+                            type="text" 
+                            value={smtpPort} 
+                            onChange={e => setSmtpPort(e.target.value)} 
+                            className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
+                            placeholder="587 أو 465" 
+                            required 
+                            disabled={settingsSaveLoading}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">نوع التشفير / الاتصال الآمن</label>
+                        <select 
+                          value={smtpSecure}
+                          onChange={e => setSmtpSecure(e.target.value)}
+                          className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right"
+                          disabled={settingsSaveLoading}
+                        >
+                          <option value="false">TLS (منفذ 587 - موصى به للـ Gmail)</option>
+                          <option value="true">SSL (منفذ 465)</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">البريد الإلكتروني / الحساب (User)</label>
+                        <input 
+                          type="email" 
+                          value={smtpUser} 
+                          onChange={e => setSmtpUser(e.target.value)} 
+                          className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
+                          placeholder="example@gmail.com" 
+                          required 
+                          disabled={settingsSaveLoading}
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">كلمة المرور / App Password (Gmail)</label>
+                        <input 
+                          type="password" 
+                          value={smtpPass} 
+                          onChange={e => setSmtpPass(e.target.value)} 
+                          className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
+                          placeholder="كلمة مرور التطبيق المكونة من 16 حرفاً" 
+                          required={!smtpPass}
+                          disabled={settingsSaveLoading}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">اسم المرسل الظاهر للعميل</label>
+                          <input 
+                            type="text" 
+                            value={fromName} 
+                            onChange={e => setFromName(e.target.value)} 
+                            className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
+                            placeholder="The VitaHub" 
+                            required 
+                            disabled={settingsSaveLoading}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">بريد المرسل (اختياري)</label>
+                          <input 
+                            type="text" 
+                            value={fromEmail} 
+                            onChange={e => setFromEmail(e.target.value)} 
+                            className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
+                            placeholder="اتركه فارغاً لاستخدام البريد نفسه" 
+                            disabled={settingsSaveLoading}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end pt-4 border-t border-slate-50">
+                      <button type="submit" disabled={settingsSaveLoading} className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white py-4 rounded-2xl font-black text-xs shadow-lg shadow-emerald-600/10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer">
+                        {settingsSaveLoading ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />} حفظ إعدادات SMTP
+                      </button>
+                    </div>
+                  </form>
+
+                  {/* Test Email Connection Form */}
+                  <form onSubmit={handleSendTestEmail} className="bg-white border border-slate-100 rounded-[2.5rem] p-6 md:p-10 space-y-6 shadow-sm max-w-xl mx-auto relative overflow-hidden mt-8">
+                    <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-blue-500 to-indigo-500" />
+                    
+                    <div className="text-center space-y-2 mb-6">
+                      <div className="bg-blue-50 w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-blue-600">
+                        <Send size={22} />
+                      </div>
+                      <h3 className="text-lg font-black text-slate-800">تجربة إرسال بريد إلكتروني</h3>
+                      <p className="text-[10px] text-slate-400 font-bold">اختبار صحة إعدادات SMTP ومدى نجاح الاتصال بإرسال رسالة تجريبية لبريدك الشخصي</p>
+                    </div>
+
+                    <div className="space-y-4 text-right">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">البريد الإلكتروني للمستلم التجريبي</label>
+                        <input 
+                          type="email" 
+                          value={testRecipient} 
+                          onChange={e => setTestRecipient(e.target.value)} 
+                          className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
+                          placeholder="your-email@example.com" 
+                          required 
+                          disabled={testEmailLoading}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end pt-4 border-t border-slate-50">
+                      <button type="submit" disabled={testEmailLoading} className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white py-4 rounded-2xl font-black text-xs shadow-lg shadow-blue-600/10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer">
+                        {testEmailLoading ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />} إرسال رسالة تجريبية
+                      </button>
+                    </div>
+                  </form>
+
                   {/* Backup & Restore Section */}
-                  <div className="bg-white border border-slate-100 rounded-[2.5rem] p-6 md:p-10 space-y-6 shadow-sm max-w-xl mx-auto relative overflow-hidden">
+                  <div className="bg-white border border-slate-100 rounded-[2.5rem] p-6 md:p-10 space-y-6 shadow-sm max-w-xl mx-auto relative overflow-hidden mt-8">
                     <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600" />
                     
                     <div className="text-center space-y-2 mb-6">

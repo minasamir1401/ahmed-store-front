@@ -14,9 +14,20 @@ export default function WishlistPage() {
   const { wishlist, removeFromWishlist } = useWishlist()
   const { t, language, dir } = useLanguage()
 
+  const [whatsappNumber, setWhatsappNumber] = React.useState('01201450111')
+
   useEffect(() => {
     document.title = t('wishlist_title')
   }, [language, t])
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.whatsapp_number) setWhatsappNumber(data.whatsapp_number)
+      })
+      .catch(err => console.error('Error fetching settings in wishlist:', err))
+  }, [])
 
   return (
     <>
@@ -108,7 +119,7 @@ export default function WishlistPage() {
                      : 'Our team is always available to help you choose the best nutritional supplements suitable for your body and health goals.'
                    }
                  </p>
-                 <Link href="https://wa.me/201026026511" className="bg-white text-black px-8 py-4 rounded-full font-bold shadow-md hover:bg-black hover:text-white transition-all inline-block">
+                 <Link href={`https://wa.me/20${whatsappNumber.replace(/^0/, '')}`} className="bg-white text-black px-8 py-4 rounded-full font-bold shadow-md hover:bg-black hover:text-white transition-all inline-block">
                    {language === 'ar' ? 'تحدث معنا على واتساب' : 'Chat with us on WhatsApp'}
                  </Link>
                </div>

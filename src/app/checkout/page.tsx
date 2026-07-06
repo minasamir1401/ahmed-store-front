@@ -56,7 +56,19 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(1) // 1: Shipping, 2: Payment, 3: Success
   const [paymentMethod, setPaymentMethod] = useState('instapay')
   const [placedOrder, setPlacedOrder] = useState<any>(null)
-  
+  const [whatsappNumber, setWhatsappNumber] = useState('01201450111')
+  const [receivingNumber, setReceivingNumber] = useState('01009596452')
+
+  React.useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.whatsapp_number) setWhatsappNumber(data.whatsapp_number)
+        if (data.receiving_number) setReceivingNumber(data.receiving_number)
+      })
+      .catch(err => console.error('Error fetching settings in checkout:', err))
+  }, [])
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -551,9 +563,9 @@ export default function CheckoutPage() {
                         <div className="space-y-2 xs:space-y-3 text-xs xs:text-sm text-amber-700 leading-relaxed">
                           <p>{language === 'ar' ? 'يرجى تحويل مبلغ' : 'Please transfer the amount of'} <span className="font-black text-amber-900">{total} {t('currency')}</span> {language === 'ar' ? 'إلى الرقم التالي:' : 'to the following phone number:'}</p>
                           <div className={`bg-white p-3 xs:p-4 rounded-2xl border border-amber-200 flex items-center justify-between gap-2 ${isRtl ? 'flex-row' : 'flex-row-reverse'}`}>
-                            <span className="text-base xs:text-xl font-black text-amber-900 tracking-wider">01270029230</span>
+                            <span className="text-base xs:text-xl font-black text-amber-900 tracking-wider">{receivingNumber}</span>
                             <button onClick={async () => {
-                              navigator.clipboard.writeText('01270029230')
+                              navigator.clipboard.writeText(receivingNumber)
                               await showAlert(language === 'ar' ? 'تم نسخ الرقم بنجاح ✅' : 'Number copied successfully ✅', language === 'ar' ? 'نسخ الرقم' : 'Copy Number')
                             }} className="h-11 px-6 bg-amber-100 rounded-xl font-bold text-amber-800 hover:bg-amber-200 transition-colors flex-shrink-0 text-xs flex items-center justify-center cursor-pointer">{t('edit') === 'تعديل' ? 'نسخ' : 'Copy'}</button>
                           </div>
@@ -572,7 +584,7 @@ export default function CheckoutPage() {
                           )}
                           <p>{language === 'ar' ? 'بعد التحويل، يرجى إرسال صورة إيصال التأكيد عبر الواتساب لتفعيل الطلب.' : 'After transferring, please send a screenshot of the confirmation receipt via WhatsApp to activate your order.'}</p>
                           <a 
-                            href={`https://wa.me/201270029230?text=${encodeURIComponent(`تم تحويل مبلغ ${total} ج.م لطلب جديد عبر ${paymentMethod === 'instapay' ? 'إنستاباي' : 'المحفظة الإلكترونية'} باسم: ${formData.name}`)}`} 
+                            href={`https://wa.me/20${whatsappNumber.replace(/^0/, '')}?text=${encodeURIComponent(`تم تحويل مبلغ ${total} ج.م لطلب جديد عبر ${paymentMethod === 'instapay' ? 'إنستاباي' : 'المحفظة الإلكترونية'} باسم: ${formData.name}`)}`} 
                             target="_blank" 
                             className={`inline-flex items-center justify-center gap-2 xs:gap-3 bg-[#25D366] text-white w-full py-3.5 xs:py-4 rounded-2xl font-bold hover:opacity-90 transition-all shadow-lg shadow-green-500/20 text-sm xs:text-base cursor-pointer ${isRtl ? 'flex-row' : 'flex-row-reverse'}`}
                           >

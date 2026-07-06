@@ -36,7 +36,7 @@ export default function OrderWaybillModal({ order, onClose }: any) {
               <span className="text-[8px] font-black text-slate-400 uppercase tracking-wider block">المرسل (الشاحن):</span>
               <div className="font-black text-slate-800">The VitaHub</div>
               <div className="text-[9px] text-slate-500 font-medium">القاهرة، جمهورية مصر العربية</div>
-              <div className="text-[9px] text-slate-500 font-medium">هاتف: 01270029230</div>
+              <div className="text-[9px] text-slate-500 font-medium">هاتف: 01201450111</div>
             </div>
             <div className="p-3 space-y-1 border-r border-slate-200">
               <span className="text-[8px] font-black text-slate-400 uppercase tracking-wider block">المرسل إليه (العميل):</span>

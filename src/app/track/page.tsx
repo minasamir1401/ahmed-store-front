@@ -22,10 +22,21 @@ export default function TrackOrderPage() {
   const [userOrders, setUserOrders] = useState<any[]>([])
   const [cancellingId, setCancellingId] = useState<string | null>(null)
 
+  const [whatsappNumber, setWhatsappNumber] = useState('01201450111')
+
   // Set document title
   useEffect(() => {
     document.title = t('track_title')
   }, [language, t])
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.whatsapp_number) setWhatsappNumber(data.whatsapp_number)
+      })
+      .catch(err => console.error('Error fetching settings in track page:', err))
+  }, [])
 
   const fetchLatestOrder = async () => {
     setLoading(true)
@@ -581,7 +592,7 @@ export default function TrackOrderPage() {
                               </p>
                             </div>
                             <a 
-                              href={`https://wa.me/201270029230?text=${encodeURIComponent(
+                              href={`https://wa.me/20${whatsappNumber.replace(/^0/, '')}?text=${encodeURIComponent(
                                 language === 'ar' 
                                   ? `أهلاً، أرغب في الاستفسار عن طلبي رقم #${ord.orderNumber}`
                                   : `Hello, I would like to inquire about my order #${ord.orderNumber}`

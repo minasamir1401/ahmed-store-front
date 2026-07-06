@@ -73,6 +73,19 @@ export function useAdminDashboard() {
   const [adminEmail, setAdminEmail] = useState('')
   const [adminName, setAdminName] = useState('')
   const [adminPassword, setAdminPassword] = useState('')
+  const [smtpHost, setSmtpHost] = useState('smtp.gmail.com')
+  const [smtpPort, setSmtpPort] = useState('587')
+  const [smtpSecure, setSmtpSecure] = useState('false')
+  const [smtpUser, setSmtpUser] = useState('')
+  const [smtpPass, setSmtpPass] = useState('')
+  const [fromEmail, setFromEmail] = useState('')
+  const [fromName, setFromName] = useState('The VitaHub')
+  const [whatsappNumber, setWhatsappNumber] = useState('01201450111')
+  const [receivingNumber, setReceivingNumber] = useState('01009596452')
+
+  const [testRecipient, setTestRecipient] = useState('')
+  const [testEmailLoading, setTestEmailLoading] = useState(false)
+  const [settingsSaveLoading, setSettingsSaveLoading] = useState(false)
   const [logs, setLogs] = useState<string[]>([])
   const [selectedOrderForWaybill, setSelectedOrderForWaybill] = useState<any>(null)
   const [selectedOrderForDetails, setSelectedOrderForDetails] = useState<any>(null)
@@ -273,12 +286,29 @@ export function useAdminDashboard() {
     if (activeTab === 'admin-settings') {
       setLoading(true)
       try {
-        const res = await fetchWithAdminAuth(`${BACKEND_API}/api/admin/profile?t=${Date.now()}`)
-        if (res.ok) {
-          const json = await res.json()
+        const [profileRes, settingsRes] = await Promise.all([
+          fetchWithAdminAuth(`${BACKEND_API}/api/admin/profile?t=${Date.now()}`),
+          fetchWithAdminAuth(`${BACKEND_API}/api/admin/settings?t=${Date.now()}`)
+        ])
+
+        if (profileRes.ok) {
+          const json = await profileRes.json()
           setAdminEmail(json.email || '')
           setAdminName(json.name || '')
           setAdminPassword('')
+        }
+
+        if (settingsRes.ok) {
+          const json = await settingsRes.json()
+          if (json.smtp_host !== undefined) setSmtpHost(json.smtp_host)
+          if (json.smtp_port !== undefined) setSmtpPort(json.smtp_port)
+          if (json.smtp_secure !== undefined) setSmtpSecure(json.smtp_secure)
+          if (json.smtp_user !== undefined) setSmtpUser(json.smtp_user)
+          if (json.smtp_pass !== undefined) setSmtpPass(json.smtp_pass)
+          if (json.from_email !== undefined) setFromEmail(json.from_email)
+          if (json.from_name !== undefined) setFromName(json.from_name)
+          if (json.whatsapp_number !== undefined) setWhatsappNumber(json.whatsapp_number)
+          if (json.receiving_number !== undefined) setReceivingNumber(json.receiving_number)
         }
       } catch (err) {
         console.error(err)
@@ -1183,6 +1213,64 @@ export function useAdminDashboard() {
     }
   }
 
+  const handleSaveGeneralSettings = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSettingsSaveLoading(true)
+    try {
+      const res = await fetchWithAdminAuth(`${BACKEND_API}/api/admin/settings`, {
+        method: 'POST',
+        body: JSON.stringify({
+          smtp_host: smtpHost,
+          smtp_port: smtpPort,
+          smtp_secure: smtpSecure,
+          smtp_user: smtpUser,
+          smtp_pass: smtpPass,
+          from_email: fromEmail,
+          from_name: fromName,
+          whatsapp_number: whatsappNumber,
+          receiving_number: receivingNumber
+        })
+      })
+      if (res.ok) {
+        await showAlert('تم حفظ إعدادات النظام SMTP وأرقام التواصل بنجاح! ✅', 'تحديث ناجح')
+      } else {
+        const err = await res.json()
+        await showAlert('فشل حفظ إعدادات النظام: ' + (err.error || 'خطأ غير معروف'), 'خطأ')
+      }
+    } catch (err: any) {
+      await showAlert('خطأ في الاتصال بالخادم: ' + err.message, 'خطأ')
+    } finally {
+      setSettingsSaveLoading(false)
+    }
+  }
+
+  const handleSendTestEmail = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!testRecipient.trim()) {
+      await showAlert('يرجى إدخال البريد الإلكتروني للمستلم لتجربة الإرسال.', 'حقل مطلوب')
+      return
+    }
+    setTestEmailLoading(true)
+    try {
+      const res = await fetchWithAdminAuth(`${BACKEND_API}/api/admin/settings/test-email`, {
+        method: 'POST',
+        body: JSON.stringify({
+          to: testRecipient
+        })
+      })
+      const json = await res.json()
+      if (res.ok) {
+        await showAlert('تم إرسال البريد الإلكتروني التجريبي بنجاح! تفقد صندوق بريدك الوارد (والـ Spam). ✅', 'تم الإرسال بنجاح')
+      } else {
+        await showAlert('فشل إرسال البريد التجريبي: ' + (json.error || 'خطأ غير معروف'), 'خطأ')
+      }
+    } catch (err: any) {
+      await showAlert('خطأ في الاتصال بالخادم: ' + err.message, 'خطأ')
+    } finally {
+      setTestEmailLoading(false)
+    }
+  }
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -1429,6 +1517,30 @@ export function useAdminDashboard() {
     handleCleanBase64Images,
     aiProvider,
     handleAiProviderChange,
+    smtpHost,
+    setSmtpHost,
+    smtpPort,
+    setSmtpPort,
+    smtpSecure,
+    setSmtpSecure,
+    smtpUser,
+    setSmtpUser,
+    smtpPass,
+    setSmtpPass,
+    fromEmail,
+    setFromEmail,
+    fromName,
+    setFromName,
+    whatsappNumber,
+    setWhatsappNumber,
+    receivingNumber,
+    setReceivingNumber,
+    testRecipient,
+    setTestRecipient,
+    testEmailLoading,
+    settingsSaveLoading,
+    handleSaveGeneralSettings,
+    handleSendTestEmail,
     tabs: ADMIN_TABS
   }
 }

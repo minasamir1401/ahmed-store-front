@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation'
 export default function FloatingActions() {
   const [showBackToTop, setShowBackToTop] = React.useState(false)
   const [stickyBarVisible, setStickyBarVisible] = React.useState(false)
+  const [whatsappNumber, setWhatsappNumber] = React.useState('01201450111')
   const pathname = usePathname()
   const isProductPage = pathname?.startsWith('/product/')
   const isAdmin = pathname?.startsWith('/admin')
@@ -18,6 +19,15 @@ export default function FloatingActions() {
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  React.useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.whatsapp_number) setWhatsappNumber(data.whatsapp_number)
+      })
+      .catch(err => console.error('Error fetching settings in FloatingActions:', err))
   }, [])
 
   React.useEffect(() => {
@@ -34,10 +44,6 @@ export default function FloatingActions() {
   }, [pathname])
 
   // Determine the bottom position based on the device and sticky bar status
-  // On mobile (below md/768px):
-  // - If sticky bar is visible: bottom-[176px] (on xs/475px+), bottom-[136px] (on <=475px), bottom-[124px] (on <=340px)
-  // - If sticky bar is hidden: bottom-20 (80px, leaving 20px above BottomNav's 60px) or bottom-[76px] (on <=340px)
-  // On desktop (md/768px and above): bottom-8
   const bottomClass = React.useMemo(() => {
     if (isProductPage && stickyBarVisible) {
       return 'bottom-[176px] max-[475px]:bottom-[136px] max-[340px]:bottom-[124px] md:bottom-8'
@@ -56,7 +62,7 @@ export default function FloatingActions() {
         whileTap={{ scale: 0.9 }}
         aria-label="تواصل معنا عبر واتساب"
         className="w-14 h-14 max-[340px]:w-10 max-[340px]:h-10 bg-green-500 text-white rounded-full flex items-center justify-center shadow-xl shadow-green-500/30"
-        onClick={() => window.open('https://wa.me/966500000000', '_blank')}
+        onClick={() => window.open(`https://wa.me/20${whatsappNumber.replace(/^0/, '')}`, '_blank')}
       >
         <MessageCircle className="w-7 h-7 max-[340px]:w-5 max-[340px]:h-5" />
       </motion.button>

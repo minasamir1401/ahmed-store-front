@@ -117,6 +117,30 @@ export default function AdminDashboard() {
     handleCleanBase64Images,
     rowSeoLoading,
     handleProductRowSEO,
+    smtpHost,
+    setSmtpHost,
+    smtpPort,
+    setSmtpPort,
+    smtpSecure,
+    setSmtpSecure,
+    smtpUser,
+    setSmtpUser,
+    smtpPass,
+    setSmtpPass,
+    fromEmail,
+    setFromEmail,
+    fromName,
+    setFromName,
+    whatsappNumber,
+    setWhatsappNumber,
+    receivingNumber,
+    setReceivingNumber,
+    testRecipient,
+    setTestRecipient,
+    testEmailLoading,
+    settingsSaveLoading,
+    handleSaveGeneralSettings,
+    handleSendTestEmail,
     tabs
   } = useAdminDashboard()
 
@@ -209,7 +233,31 @@ export default function AdminDashboard() {
     handleDownloadBackup,
     handleRestoreBackup,
     cleanLoading,
-    handleCleanBase64Images
+    handleCleanBase64Images,
+    smtpHost,
+    setSmtpHost,
+    smtpPort,
+    setSmtpPort,
+    smtpSecure,
+    setSmtpSecure,
+    smtpUser,
+    setSmtpUser,
+    smtpPass,
+    setSmtpPass,
+    fromEmail,
+    setFromEmail,
+    fromName,
+    setFromName,
+    whatsappNumber,
+    setWhatsappNumber,
+    receivingNumber,
+    setReceivingNumber,
+    testRecipient,
+    setTestRecipient,
+    testEmailLoading,
+    settingsSaveLoading,
+    handleSaveGeneralSettings,
+    handleSendTestEmail
   }
 
   const getTabIcon = (iconKey?: string) => {
@@ -724,7 +772,7 @@ export default function AdminDashboard() {
                   <span className="text-[8px] font-black text-slate-400 uppercase tracking-wider block">المرسل (الشاحن):</span>
                   <div className="font-black text-slate-800">The VitaHub</div>
                   <div className="text-[9px] text-slate-500 font-medium">القاهرة، جمهورية مصر العربية</div>
-                  <div className="text-[9px] text-slate-500 font-medium">هاتف: 01270029230</div>
+                  <div className="text-[9px] text-slate-500 font-medium">هاتف: {whatsappNumber || '01201450111'}</div>
                 </div>
 
                 {/* Consignee */}

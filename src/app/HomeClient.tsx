@@ -331,7 +331,7 @@ export default function HomeClient({
                   transition={{ duration: 0.8, delay: 0.2 }}
                   className="flex-1"
                 >
-                  <Link href={hero?.side1Link || '/categories'} className="w-full aspect-[2/1] rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#f0f7f4] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
+                  <Link href={hero?.side1Link || '/categories'} className="w-full aspect-square rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#f0f7f4] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
                     {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
                         <Image src={translate(hero.side1Image)} fill className="object-cover opacity-100 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Categories Banner" />
@@ -356,7 +356,7 @@ export default function HomeClient({
                   transition={{ duration: 0.8, delay: 0.3 }}
                   className="flex-1"
                 >
-                  <Link href={hero?.side2Link || '/offers'} className="w-full aspect-[2/1] rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#faf5f0] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
+                  <Link href={hero?.side2Link || '/offers'} className="w-full aspect-square rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#faf5f0] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
                     {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
                         <Image src={translate(hero.side2Image)} fill className="object-cover opacity-100 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Offers Banner" />

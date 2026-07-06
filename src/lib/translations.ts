@@ -678,7 +678,11 @@ export function translateText(text: string, lang: 'ar' | 'en'): string {
         if (parsed[lang] !== undefined && parsed[lang] !== null && parsed[lang] !== '') {
           return parsed[lang];
         }
-        return parsed['ar'] || parsed['en'] || text;
+        const otherLang = lang === 'ar' ? 'en' : 'ar';
+        if (parsed[otherLang] !== undefined && parsed[otherLang] !== null && parsed[otherLang] !== '') {
+          return parsed[otherLang];
+        }
+        return '';
       }
     } catch (e) {
       // Ignore JSON parse error, fallback to normal translation

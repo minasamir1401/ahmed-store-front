@@ -525,6 +525,7 @@ export default function CheckoutPage() {
                       {[
                         { id: 'instapay', name: language === 'ar' ? 'الدفع عبر إنستاباي (Instapay)' : 'Pay via Instapay', icon: Smartphone },
                         { id: 'wallet', name: language === 'ar' ? 'الدفع بالمحفظة الإلكترونية' : 'Pay via Mobile Wallet', icon: Smartphone },
+                        { id: 'cod', name: language === 'ar' ? 'الدفع عند الاستلام' : 'Cash on Delivery (COD)', icon: Truck },
                       ].map((method) => (
                         <label key={method.id} className={`flex items-center gap-3 xs:gap-4 p-4 xs:p-6 rounded-2xl border-2 cursor-pointer transition-all ${isRtl ? 'flex-row' : 'flex-row-reverse'} ${
                           paymentMethod === method.id ? 'border-primary bg-primary/5' : 'border-slate-100 hover:border-primary/50'
@@ -545,6 +546,7 @@ export default function CheckoutPage() {
                             <span className="font-bold block text-sm xs:text-base">{method.name}</span>
                             {method.id === 'instapay' && <span className="text-[10px] xs:text-xs text-muted block truncate">{language === 'ar' ? 'تحويل سريع ومباشر عبر التطبيق' : 'Direct instant bank transfer via app'}</span>}
                             {method.id === 'wallet' && <span className="text-[10px] xs:text-xs text-muted block truncate">{language === 'ar' ? 'فودافون كاش / اتصالات كاش / غيرها' : 'Vodafone Cash / Orange Cash / etc.'}</span>}
+                            {method.id === 'cod' && <span className="text-[10px] xs:text-xs text-muted block truncate">{language === 'ar' ? 'الدفع نقداً عند استلام الطلب (+15 ج.م مصاريف)' : 'Pay in cash upon delivery (+15 EGP fee)'}</span>}
                           </div>
                           <div className={`w-5 h-5 xs:w-6 xs:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                             paymentMethod === method.id ? 'border-primary bg-primary' : 'border-slate-300'
@@ -600,7 +602,9 @@ export default function CheckoutPage() {
                       onClick={handlePlaceOrder}
                       className="w-full bg-primary text-white h-14 xs:h-16 rounded-2xl font-bold text-base xs:text-lg hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 cursor-pointer"
                     >
-                      {language === 'ar' ? `تأكيد ودفع ${total} ج.م` : `Confirm & Pay ${total} EGP`}
+                      {language === 'ar' 
+                        ? (paymentMethod === 'cod' ? `تأكيد الطلب ${total} ج.م` : `تأكيد ودفع ${total} ج.م`) 
+                        : (paymentMethod === 'cod' ? `Confirm Order ${total} EGP` : `Confirm & Pay ${total} EGP`)}
                     </button>
                   </motion.div>
                 )}

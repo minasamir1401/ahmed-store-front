@@ -236,7 +236,7 @@ export default function HomeClient({
                         
                         <div className="absolute inset-0 w-full h-full">
                           <Image 
-                            src={slides[currentSlide].image || 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=700&q=80'} 
+                            src={translate(slides[currentSlide].image) || 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=700&q=80'} 
                             fill
                             priority
                             className="object-cover" 
@@ -307,7 +307,7 @@ export default function HomeClient({
                         initial={{ scale: 1.1, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 1 }}
-                        src={hero.image} 
+                        src={translate(hero.image)} 
                         fill
                         priority
                         className="object-cover" 
@@ -334,7 +334,7 @@ export default function HomeClient({
                   <Link href={hero?.side1Link || '/categories'} className="h-full w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#f0f7f4] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
                     {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
-                        <Image src={hero.side1Image} fill className="object-cover opacity-50 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Categories Banner" />
+                        <Image src={translate(hero.side1Image)} fill className="object-cover opacity-50 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Categories Banner" />
                         <div className={`relative z-10 p-4 sm:p-6 w-full ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                           <h3 className={`text-xs xs:text-sm sm:text-lg font-black text-slate-800 ${
                             language === 'ar' 
@@ -359,7 +359,7 @@ export default function HomeClient({
                   <Link href={hero?.side2Link || '/offers'} className="h-full w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#faf5f0] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
                     {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
-                        <Image src={hero.side2Image} fill className="object-cover opacity-50 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Offers Banner" />
+                        <Image src={translate(hero.side2Image)} fill className="object-cover opacity-50 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Offers Banner" />
                         <div className={`relative z-10 p-4 sm:p-6 w-full ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                           <h3 className={`text-xs xs:text-sm sm:text-lg font-black text-slate-800 ${
                             language === 'ar' 
@@ -387,10 +387,10 @@ export default function HomeClient({
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                   {[
-                    { id: hero.prod1Id, img: hero.prod1Image, type: hero.prod1Type || 'product' },
-                    { id: hero.prod2Id, img: hero.prod2Image, type: hero.prod2Type || 'product' },
-                    { id: hero.prod3Id, img: hero.prod3Image, type: hero.prod3Type || 'product' },
-                    { id: hero.prod4Id, img: hero.prod4Image, type: hero.prod4Type || 'product' }
+                    { id: hero.prod1Id, img: translate(hero.prod1Image), type: hero.prod1Type || 'product' },
+                    { id: hero.prod2Id, img: translate(hero.prod2Image), type: hero.prod2Type || 'product' },
+                    { id: hero.prod3Id, img: translate(hero.prod3Image), type: hero.prod3Type || 'product' },
+                    { id: hero.prod4Id, img: translate(hero.prod4Image), type: hero.prod4Type || 'product' }
                   ].map((item, idx) => {
                     if (!item.id && !item.img) return null;
                     

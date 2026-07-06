@@ -27,7 +27,8 @@ export default function HeroTab(props: any) {
 
   const [slides, setSlides] = useState<any[]>([]);
   const [productsList, setProductsList] = useState<any[]>([]);
-  const [slideUploading, setSlideUploading] = useState<number | null>(null);
+  const [slideUploading, setSlideUploading] = useState<string | null>(null);
+  const [localUploading, setLocalUploading] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/products')
@@ -101,33 +102,57 @@ export default function HeroTab(props: any) {
     setSlides(newSlides);
   };
 
-  const handleSlideImageUpload = async (file: File, slideIndex: number) => {
+  const uploadImage = async (file: File): Promise<string> => {
+    const uploadData = new FormData();
+    uploadData.append('image', file);
+    
+    const token = localStorage.getItem('mithaly_admin_token') || '';
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+    
+    const res = await fetch(`${backendUrl}/api/upload`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: uploadData
+    });
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || 'Upload failed');
+    return result.url;
+  };
+
+  const handleSlideImageUploadLocalized = async (file: File, slideIndex: number, lang: 'ar' | 'en') => {
     if (!file) return;
-    setSlideUploading(slideIndex);
+    setSlideUploading(`${lang}-${slideIndex}`);
     try {
-      const uploadData = new FormData();
-      uploadData.append('image', file);
-      
-      const token = localStorage.getItem('mithaly_admin_token') || '';
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
-      
-      const res = await fetch(`${backendUrl}/api/upload`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: uploadData
-      });
-      const result = await res.json();
-      
-      if (!res.ok) throw new Error(result.error || 'Upload failed');
-      
+      const url = await uploadImage(file);
       const newSlides = [...slides];
-      newSlides[slideIndex].image = result.url;
+      const currentLoc = getLocalizedValue(newSlides[slideIndex].image);
+      currentLoc[lang] = url;
+      newSlides[slideIndex].image = JSON.stringify(currentLoc);
       setSlides(newSlides);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('حدث خطأ أثناء رفع الصورة');
+      alert('حدث خطأ أثناء رفع الصورة: ' + err.message);
     } finally {
       setSlideUploading(null);
+    }
+  };
+
+  const handleSideImageUploadLocalized = async (file: File, field: string, lang: 'ar' | 'en') => {
+    if (!file) return;
+    setLocalUploading(`${field}-${lang}`);
+    try {
+      const url = await uploadImage(file);
+      const currentLoc = getLocalizedValue(formData[field]);
+      currentLoc[lang] = url;
+      setFormData((prev: any) => ({
+        ...prev,
+        [field]: JSON.stringify(currentLoc)
+      }));
+    } catch (err: any) {
+      console.error(err);
+      alert('حدث خطأ أثناء رفع الصورة: ' + err.message);
+    } finally {
+      setLocalUploading(null);
     }
   };
 
@@ -191,20 +216,39 @@ export default function HeroTab(props: any) {
                   </div>
                 </div>
                 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-slate-400 block mr-1">
-                    صورة البانر <span className="text-emerald-500 font-bold ml-1">(المقاس الموصى به: 1200x800)</span>
-                  </label>
-                  <div className="flex gap-2">
-                    <input type="text" value={slide.image || ''} onChange={e => handleSlideChange(index, 'image', e.target.value)} className="flex-1 bg-white focus:bg-white border border-slate-200 focus:border-emerald-500/50 rounded-2xl py-3 px-4 text-xs font-bold outline-none transition-all text-slate-700" placeholder="رابط الصورة" />
-                    <div className="relative shrink-0">
-                      <button type="button" className="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 px-4 h-full rounded-2xl font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors border border-emerald-100">
-                        {slideUploading === index ? <Loader2 className="animate-spin" size={16} /> : <Upload size={16} />}
-                      </button>
-                      <input type="file" onChange={(e) => e.target.files && handleSlideImageUpload(e.target.files[0], index)} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                {/* Localized Slide Image Upload Inputs */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-slate-400 block mr-1">
+                      صورة البانر (عربي) <span className="text-emerald-500 font-bold ml-1">(1200x800)</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <input type="text" value={getLocalizedValue(slide.image).ar} onChange={e => handleSlideChangeLocalized(index, 'image', 'ar', e.target.value)} className="flex-1 bg-white focus:bg-white border border-slate-200 focus:border-emerald-500/50 rounded-2xl py-3 px-4 text-xs font-bold outline-none transition-all text-slate-700" placeholder="رابط الصورة عربي" />
+                      <div className="relative shrink-0">
+                        <button type="button" className="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 px-4 h-full rounded-2xl font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors border border-emerald-100">
+                          {slideUploading === `ar-${index}` ? <Loader2 className="animate-spin" size={16} /> : <Upload size={16} />}
+                        </button>
+                        <input type="file" onChange={(e) => e.target.files && handleSlideImageUploadLocalized(e.target.files[0], index, 'ar')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                      </div>
                     </div>
+                    {getLocalizedValue(slide.image).ar && <img src={getLocalizedValue(slide.image).ar} className="mt-2 h-20 w-full object-cover rounded-2xl border border-slate-200" alt="Slide Ar Preview" />}
                   </div>
-                  {slide.image && <img src={slide.image} className="mt-2 h-24 w-full object-cover rounded-2xl border border-slate-200" alt="Slide Preview" />}
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-indigo-400 block mr-1">
+                      صورة البانر (إنجليزي) <span className="text-emerald-500 font-bold ml-1">(1200x800)</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <input type="text" value={getLocalizedValue(slide.image).en} onChange={e => handleSlideChangeLocalized(index, 'image', 'en', e.target.value)} className="flex-1 bg-white focus:bg-white border border-slate-200 focus:border-indigo-500/50 rounded-2xl py-3 px-4 text-xs font-bold outline-none transition-all text-slate-705 dir-ltr text-left" placeholder="English Image URL..." />
+                      <div className="relative shrink-0">
+                        <button type="button" className="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 h-full rounded-2xl font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors border border-slate-200">
+                          {slideUploading === `en-${index}` ? <Loader2 className="animate-spin" size={16} /> : <Upload size={16} />}
+                        </button>
+                        <input type="file" onChange={(e) => e.target.files && handleSlideImageUploadLocalized(e.target.files[0], index, 'en')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                      </div>
+                    </div>
+                    {getLocalizedValue(slide.image).en && <img src={getLocalizedValue(slide.image).en} className="mt-2 h-20 w-full object-cover rounded-2xl border border-slate-200" alt="Slide En Preview" />}
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -258,20 +302,40 @@ export default function HeroTab(props: any) {
                  </div>
                </div>
 
-               <div className="space-y-1">
-                  <label className="text-[9px] font-black text-slate-400 block mr-1">
-                    رابط صورة البانر 1 <span className="text-emerald-500 font-bold ml-1">(المقاس الموصى به: 800x400)</span>
-                  </label>
-                  <div className="flex gap-2">
-                     <input type="text" value={formData.side1Image || ''} onChange={e => setFormData({...formData, side1Image: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs" />
-                     <div className="relative shrink-0">
-                        <button type="button" className="bg-slate-100 p-2.5 rounded-xl border border-slate-200">
-                          {uploading ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />}
-                        </button>
-                        <input type="file" onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], 'side1')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
-                     </div>
-                  </div>
+               {/* Localized Side Banner 1 Image Inputs */}
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-1">
+                    <label className="text-[9px] font-black text-slate-400 block mr-1">
+                      صورة البانر 1 (عربي) <span className="text-emerald-500 font-bold ml-1">(800x400)</span>
+                    </label>
+                    <div className="flex gap-2">
+                       <input type="text" value={getLocalizedValue(formData.side1Image).ar} onChange={e => setFormData({...formData, side1Image: makeLocalizedValue(e.target.value, getLocalizedValue(formData.side1Image).en)})} className="w-full bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs" />
+                       <div className="relative shrink-0">
+                          <button type="button" className="bg-slate-100 p-2.5 rounded-xl border border-slate-200">
+                            {localUploading === 'side1Image-ar' ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />}
+                          </button>
+                          <input type="file" onChange={(e) => e.target.files && handleSideImageUploadLocalized(e.target.files[0], 'side1Image', 'ar')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                       </div>
+                    </div>
+                    {getLocalizedValue(formData.side1Image).ar && <img src={getLocalizedValue(formData.side1Image).ar} className="mt-1 h-12 w-full object-cover rounded-xl border border-slate-200" />}
+                 </div>
+                 <div className="space-y-1">
+                    <label className="text-[9px] font-black text-indigo-400 block mr-1">
+                      صورة البانر 1 (إنجليزي) <span className="text-emerald-500 font-bold ml-1">(800x400)</span>
+                    </label>
+                    <div className="flex gap-2">
+                       <input type="text" value={getLocalizedValue(formData.side1Image).en} onChange={e => setFormData({...formData, side1Image: makeLocalizedValue(getLocalizedValue(formData.side1Image).ar, e.target.value)})} className="w-full bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs dir-ltr text-left" />
+                       <div className="relative shrink-0">
+                          <button type="button" className="bg-slate-100 p-2.5 rounded-xl border border-slate-200">
+                            {localUploading === 'side1Image-en' ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />}
+                          </button>
+                          <input type="file" onChange={(e) => e.target.files && handleSideImageUploadLocalized(e.target.files[0], 'side1Image', 'en')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                       </div>
+                    </div>
+                    {getLocalizedValue(formData.side1Image).en && <img src={getLocalizedValue(formData.side1Image).en} className="mt-1 h-12 w-full object-cover rounded-xl border border-slate-200" />}
+                 </div>
                </div>
+               
                <input type="text" placeholder="رابط التوجيه عند الضغط" value={formData.side1Link || ''} onChange={e => setFormData({...formData, side1Link: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs" />
             </div>
             
@@ -303,20 +367,40 @@ export default function HeroTab(props: any) {
                  </div>
                </div>
 
-               <div className="space-y-1">
-                  <label className="text-[9px] font-black text-slate-400 block mr-1">
-                    رابط صورة البانر 2 <span className="text-emerald-500 font-bold ml-1">(المقاس الموصى به: 800x400)</span>
-                  </label>
-                  <div className="flex gap-2">
-                     <input type="text" value={formData.side2Image || ''} onChange={e => setFormData({...formData, side2Image: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs" />
-                     <div className="relative shrink-0">
-                        <button type="button" className="bg-slate-100 p-2.5 rounded-xl border border-slate-200">
-                          {uploading ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />}
-                        </button>
-                        <input type="file" onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], 'side2')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
-                     </div>
-                  </div>
+               {/* Localized Side Banner 2 Image Inputs */}
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-1">
+                    <label className="text-[9px] font-black text-slate-400 block mr-1">
+                      صورة البانر 2 (عربي) <span className="text-emerald-500 font-bold ml-1">(800x400)</span>
+                    </label>
+                    <div className="flex gap-2">
+                       <input type="text" value={getLocalizedValue(formData.side2Image).ar} onChange={e => setFormData({...formData, side2Image: makeLocalizedValue(e.target.value, getLocalizedValue(formData.side2Image).en)})} className="w-full bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs" />
+                       <div className="relative shrink-0">
+                          <button type="button" className="bg-slate-100 p-2.5 rounded-xl border border-slate-200">
+                            {localUploading === 'side2Image-ar' ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />}
+                          </button>
+                          <input type="file" onChange={(e) => e.target.files && handleSideImageUploadLocalized(e.target.files[0], 'side2Image', 'ar')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                       </div>
+                    </div>
+                    {getLocalizedValue(formData.side2Image).ar && <img src={getLocalizedValue(formData.side2Image).ar} className="mt-1 h-12 w-full object-cover rounded-xl border border-slate-200" />}
+                 </div>
+                 <div className="space-y-1">
+                    <label className="text-[9px] font-black text-indigo-400 block mr-1">
+                      صورة البانر 2 (إنجليزي) <span className="text-emerald-500 font-bold ml-1">(800x400)</span>
+                    </label>
+                    <div className="flex gap-2">
+                       <input type="text" value={getLocalizedValue(formData.side2Image).en} onChange={e => setFormData({...formData, side2Image: makeLocalizedValue(getLocalizedValue(formData.side2Image).ar, e.target.value)})} className="w-full bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs dir-ltr text-left" />
+                       <div className="relative shrink-0">
+                          <button type="button" className="bg-slate-100 p-2.5 rounded-xl border border-slate-200">
+                            {localUploading === 'side2Image-en' ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />}
+                          </button>
+                          <input type="file" onChange={(e) => e.target.files && handleSideImageUploadLocalized(e.target.files[0], 'side2Image', 'en')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                       </div>
+                    </div>
+                    {getLocalizedValue(formData.side2Image).en && <img src={getLocalizedValue(formData.side2Image).en} className="mt-1 h-12 w-full object-cover rounded-xl border border-slate-200" />}
+                 </div>
                </div>
+               
                <input type="text" placeholder="رابط التوجيه عند الضغط" value={formData.side2Link || ''} onChange={e => setFormData({...formData, side2Link: e.target.value})} className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs" />
             </div>
 
@@ -381,25 +465,48 @@ export default function HeroTab(props: any) {
                   )}
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-slate-400 block mr-1">
-                    صورة مخصصة <span className="text-emerald-500 font-bold ml-1">(اختياري)</span>
-                  </label>
-                  <div className="flex gap-2">
-                     <input 
-                       type="text" 
-                       value={formData[imageField] || ''} 
-                       onChange={e => setFormData({ ...formData, [imageField]: e.target.value })}
-                       className="flex-1 bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs" 
-                     />
-                     <div className="relative shrink-0">
-                        <button type="button" className="bg-slate-100 p-2.5 rounded-xl text-slate-600 hover:bg-slate-200 transition-colors">
-                          <Upload size={14} />
-                        </button>
-                        <input type="file" onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], `prod${num}` as any)} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
-                     </div>
+                {/* Localized Custom Images for Featured Items */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black text-slate-400 block mr-1">
+                      صورة مخصصة (عربي) <span className="text-emerald-500 font-bold ml-1">(اختياري)</span>
+                    </label>
+                    <div className="flex gap-2">
+                       <input 
+                         type="text" 
+                         value={getLocalizedValue(formData[imageField]).ar} 
+                         onChange={e => setFormData({ ...formData, [imageField]: makeLocalizedValue(e.target.value, getLocalizedValue(formData[imageField]).en) })}
+                         className="flex-1 bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs" 
+                       />
+                       <div className="relative shrink-0">
+                          <button type="button" className="bg-slate-100 p-2.5 rounded-xl text-slate-600 hover:bg-slate-200 transition-colors">
+                             {localUploading === `${String(imageField)}-ar` ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />}
+                          </button>
+                          <input type="file" onChange={(e) => e.target.files && handleSideImageUploadLocalized(e.target.files[0], String(imageField), 'ar')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                       </div>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-black text-indigo-400 block mr-1">
+                      صورة مخصصة (إنجليزي) <span className="text-emerald-500 font-bold ml-1">(اختياري)</span>
+                    </label>
+                    <div className="flex gap-2">
+                       <input 
+                         type="text" 
+                         value={getLocalizedValue(formData[imageField]).en} 
+                         onChange={e => setFormData({ ...formData, [imageField]: makeLocalizedValue(getLocalizedValue(formData[imageField]).ar, e.target.value) })}
+                         className="flex-1 bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs dir-ltr text-left" 
+                       />
+                       <div className="relative shrink-0">
+                          <button type="button" className="bg-slate-100 p-2.5 rounded-xl text-slate-600 hover:bg-slate-200 transition-colors">
+                             {localUploading === `${String(imageField)}-en` ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />}
+                          </button>
+                          <input type="file" onChange={(e) => e.target.files && handleSideImageUploadLocalized(e.target.files[0], String(imageField), 'en')} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                       </div>
+                    </div>
                   </div>
                 </div>
+
               </div>
             );
           })}

@@ -456,7 +456,7 @@ export default function HeroTab(props: any) {
                 </div>
 
                 {/* Localized Custom Images for Featured Items */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-1">
                     <label className="text-[9px] font-black text-slate-400 block mr-1">
                       صورة مخصصة (عربي) <span className="text-emerald-500 font-bold ml-1">(اختياري)</span>
@@ -466,7 +466,7 @@ export default function HeroTab(props: any) {
                          type="text" 
                          value={getLocalizedValue(formData[imageField]).ar} 
                          onChange={e => setFormData({ ...formData, [imageField]: makeLocalizedValue(e.target.value, getLocalizedValue(formData[imageField]).en) })}
-                         className="flex-1 bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs" 
+                         className="flex-grow min-w-0 bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs" 
                        />
                        <div className="relative shrink-0">
                           <button type="button" className="bg-slate-100 p-2.5 rounded-xl text-slate-600 hover:bg-slate-200 transition-colors">
@@ -485,7 +485,7 @@ export default function HeroTab(props: any) {
                          type="text" 
                          value={getLocalizedValue(formData[imageField]).en} 
                          onChange={e => setFormData({ ...formData, [imageField]: makeLocalizedValue(getLocalizedValue(formData[imageField]).ar, e.target.value) })}
-                         className="flex-1 bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs dir-ltr text-left" 
+                         className="flex-grow min-w-0 bg-white border border-slate-200 rounded-xl py-2 px-3 text-xs dir-ltr text-left" 
                        />
                        <div className="relative shrink-0">
                           <button type="button" className="bg-slate-100 p-2.5 rounded-xl text-slate-600 hover:bg-slate-200 transition-colors">

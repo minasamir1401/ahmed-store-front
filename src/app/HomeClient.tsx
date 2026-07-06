@@ -334,7 +334,7 @@ export default function HomeClient({
                   <Link href={hero?.side1Link || '/categories'} className="h-full w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#f0f7f4] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
                     {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
-                        <Image src={translate(hero.side1Image)} fill className="object-cover opacity-50 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Categories Banner" />
+                        <Image src={translate(hero.side1Image)} fill className="object-contain opacity-100 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Categories Banner" />
                         <div className={`relative z-10 p-4 sm:p-6 w-full ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                           <h3 className={`text-xs xs:text-sm sm:text-lg font-black text-slate-800 ${
                             language === 'ar' 
@@ -359,7 +359,7 @@ export default function HomeClient({
                   <Link href={hero?.side2Link || '/offers'} className="h-full w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#faf5f0] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
                     {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
-                        <Image src={translate(hero.side2Image)} fill className="object-cover opacity-50 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Offers Banner" />
+                        <Image src={translate(hero.side2Image)} fill className="object-contain opacity-100 group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 1024px) 50vw, 33vw" alt="Offers Banner" />
                         <div className={`relative z-10 p-4 sm:p-6 w-full ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                           <h3 className={`text-xs xs:text-sm sm:text-lg font-black text-slate-800 ${
                             language === 'ar' 

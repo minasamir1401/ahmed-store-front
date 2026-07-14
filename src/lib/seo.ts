@@ -39,5 +39,5 @@ export async function getServerSiteUrl(): Promise<string> {
   }
 
   // Fallback for static compilation/build-time metadataBase check
-  return 'http://localhost:3000'
+  return 'https://the-vitahub.com'
 }

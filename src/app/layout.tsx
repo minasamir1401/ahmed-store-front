@@ -111,7 +111,7 @@ async function JsonLdSchema() {
         "image": `${siteUrl}/favicon.ico`,
         "description": "تسوق أفضل المكملات الغذائية، الفيتامينات، البروتينات، حوارق الدهون، ومنتجات الرشاقة الأصلية 100% في مصر مع The VitaHub.",
         "telephone": "+201001234567",
-        "email": "thevitahub1@gmail.com",
+        "email": "the.vitaminshub@gmail.com",
         "priceRange": "$$",
         "areaServed": {
           "@type": "Country",

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Loader2, CheckCircle2, Smartphone, Mail, Send } from 'lucide-react';
+import { Loader2, CheckCircle2, Smartphone, Mail, Send, Eye, EyeOff } from 'lucide-react';
 
 export default function WhatsappTab(props: any) {
+  const [showSmtpPass, setShowSmtpPass] = React.useState(false);
   const { 
     whatsappStatus, handleWhatsappLogout, wsLoading,
     smtpHost, setSmtpHost,
@@ -249,15 +250,24 @@ export default function WhatsappTab(props: any) {
 
             <div className="space-y-1">
               <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">كلمة المرور / App Password (Gmail)</label>
-              <input 
-                type="password" 
-                value={smtpPass || ''} 
-                onChange={e => setSmtpPass(e.target.value)} 
-                className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
-                placeholder="كلمة مرور التطبيق المكونة من 16 حرفاً" 
-                required={!smtpPass}
-                disabled={settingsSaveLoading}
-              />
+              <div className="relative flex items-center">
+                <input 
+                  type={showSmtpPass ? "text" : "password"} 
+                  value={smtpPass || ''} 
+                  onChange={e => setSmtpPass(e.target.value)} 
+                  className="w-full bg-slate-50 rounded-2xl py-3.5 pr-4 pl-12 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
+                  placeholder="كلمة مرور التطبيق المكونة من 16 حرفاً" 
+                  required={!smtpPass}
+                  disabled={settingsSaveLoading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowSmtpPass(!showSmtpPass)}
+                  className="absolute left-4 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                >
+                  {showSmtpPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

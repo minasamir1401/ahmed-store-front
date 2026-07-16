@@ -3,7 +3,7 @@
 import React from 'react'
 import {
   LayoutDashboard, Package, Tag, Award, FileText, Plus, Edit2, Trash2, Eye,
-  Loader2, Lock, User, LogIn, X, Image as ImageIcon, Upload, CheckCircle2, AlertCircle, Layers, Building2, Search, RotateCcw, Sparkles, Menu, ShoppingCart, Printer, Truck, Calendar, Clock, Smartphone, Stethoscope
+  Loader2, Lock, User, LogIn, X, Image as ImageIcon, Upload, CheckCircle2, AlertCircle, Layers, Building2, Search, RotateCcw, Sparkles, Menu, ShoppingCart, Printer, Truck, Calendar, Clock, Smartphone, Stethoscope, Activity
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAdminDashboard } from './hooks/useAdminDashboard'
@@ -15,6 +15,7 @@ import IndexingTab from './components/IndexingTab'
 import ProductsForm from './components/ProductsForm'
 import OffersForm from './components/OffersForm'
 import MedicalTipsForm from './components/MedicalTipsForm'
+import PixelsTab from './components/PixelsTab'
 
 export default function AdminDashboard() {
   const {
@@ -282,6 +283,8 @@ export default function AdminDashboard() {
         return <User size={18} />
       case 'Search':
         return <Search size={18} />
+      case 'Activity':
+        return <Activity size={18} />
       default:
         return <Package size={18} />
     }
@@ -421,7 +424,7 @@ export default function AdminDashboard() {
               {/* Header actions bar */}
               <div className="p-4 md:p-6 border-b border-slate-50 flex flex-col lg:flex-row lg:items-center justify-between bg-slate-50/50 gap-4">
                 <div className="flex items-center gap-4 w-full lg:w-auto">
-                  {activeTab !== 'hero' && activeTab !== 'whatsapp' && activeTab !== 'admin-settings' && (
+                  {activeTab !== 'hero' && activeTab !== 'whatsapp' && activeTab !== 'admin-settings' && activeTab !== 'pixels' && (
                     <div className="bg-white p-2.5 rounded-2xl border border-slate-100 flex items-center gap-2 shadow-sm w-full lg:min-w-[320px]">
                       <Search size={16} className="text-slate-400" />
                       <input type="text" placeholder="ابحث في هذه القائمة..." className="bg-transparent text-xs font-bold w-full outline-none text-slate-600" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
@@ -460,7 +463,7 @@ export default function AdminDashboard() {
                       </button>
                     </>
                   )}
-                  {activeTab !== 'hero' && activeTab !== 'orders' && activeTab !== 'whatsapp' && activeTab !== 'admin-settings' && (
+                  {activeTab !== 'hero' && activeTab !== 'orders' && activeTab !== 'whatsapp' && activeTab !== 'admin-settings' && activeTab !== 'pixels' && (
                     <button onClick={() => handleOpenModal()} className="bg-emerald-600 text-white flex-1 md:flex-none px-6 md:px-8 py-3 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer">
                       <Plus size={16} /> إضافة عنصر جديد
                     </button>
@@ -511,7 +514,7 @@ export default function AdminDashboard() {
               </div>
               
               {/* Active Tab Main Tables List */}
-              {activeTab === 'hero' ? ( <HeroTab {...propsObj} /> ) : activeTab === 'admin-settings' ? ( <AdminSettingsTab {...propsObj} /> ) : activeTab === 'whatsapp' ? ( <WhatsappTab {...propsObj} /> ) : activeTab === 'indexing' ? ( <IndexingTab {...propsObj} /> ) : (
+              {activeTab === 'hero' ? ( <HeroTab {...propsObj} /> ) : activeTab === 'admin-settings' ? ( <AdminSettingsTab {...propsObj} /> ) : activeTab === 'whatsapp' ? ( <WhatsappTab {...propsObj} /> ) : activeTab === 'indexing' ? ( <IndexingTab {...propsObj} /> ) : activeTab === 'pixels' ? ( <PixelsTab {...propsObj} /> ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-right border-collapse min-w-[700px]">
                     <thead className="bg-slate-50/50 text-slate-400 text-[10px] font-black uppercase border-b border-slate-100 tracking-wider">

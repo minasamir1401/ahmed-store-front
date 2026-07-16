@@ -38,11 +38,42 @@ const logDebug = (platform: string, event: string, data?: any) => {
   }
 };
 
+const BACKEND_API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+const sendEventToBackend = async (eventName: string, metadata?: any) => {
+  if (typeof window === 'undefined') return;
+  try {
+    const url = window.location.href;
+    const token = localStorage.getItem('vitamins_hub_auth_token');
+    const headers: any = {
+      'Content-Type': 'application/json'
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    await fetch(`${BACKEND_API}/api/pixel-events`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        eventName,
+        url,
+        metadata
+      })
+    });
+  } catch (err) {
+    console.error('Error sending pixel event to backend:', err);
+  }
+};
+
 /**
  * Sends a PageView event to all configured pixels
  */
 export const trackPageView = (url: string) => {
   if (typeof window === 'undefined') return;
+
+  // Send to backend database
+  sendEventToBackend('PageView', { path: url });
 
   // Meta (Facebook)
   if (typeof (window as any).fbq === 'function') {
@@ -75,6 +106,9 @@ export const trackPageView = (url: string) => {
  */
 export const trackViewContent = (product: TrackedProduct) => {
   if (typeof window === 'undefined' || !product) return;
+
+  // Send to backend database
+  sendEventToBackend('ViewContent', product);
 
   const value = Number(product.price) || 0;
   const currency = 'EGP';
@@ -138,6 +172,9 @@ export const trackViewContent = (product: TrackedProduct) => {
  */
 export const trackAddToCart = (product: TrackedProduct) => {
   if (typeof window === 'undefined' || !product) return;
+
+  // Send to backend database
+  sendEventToBackend('AddToCart', product);
 
   const value = Number(product.price) || 0;
   const quantity = Number(product.quantity) || 1;
@@ -204,6 +241,9 @@ export const trackAddToCart = (product: TrackedProduct) => {
 export const trackAddToWishlist = (product: TrackedProduct) => {
   if (typeof window === 'undefined' || !product) return;
 
+  // Send to backend database
+  sendEventToBackend('AddToWishlist', product);
+
   const value = Number(product.price) || 0;
   const currency = 'EGP';
 
@@ -267,6 +307,9 @@ export const trackAddToWishlist = (product: TrackedProduct) => {
 export const trackInitiateCheckout = (cart: TrackedProduct[], total: number) => {
   if (typeof window === 'undefined' || !cart || cart.length === 0) return;
 
+  // Send to backend database
+  sendEventToBackend('InitiateCheckout', { cart, total });
+
   const value = Number(total) || 0;
   const currency = 'EGP';
   const itemIds = cart.map(i => i.id);
@@ -329,6 +372,9 @@ export const trackInitiateCheckout = (cart: TrackedProduct[], total: number) => 
  */
 export const trackPurchase = (order: TrackedOrder) => {
   if (typeof window === 'undefined' || !order) return;
+
+  // Send to backend database
+  sendEventToBackend('Purchase', order);
 
   const value = Number(order.total) || 0;
   const currency = 'EGP';

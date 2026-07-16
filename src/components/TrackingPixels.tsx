@@ -9,7 +9,7 @@ function TrackingPixelsContent() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const facebookId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID
+  const facebookId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || "2785073648526058"
   const googleId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID
   const tiktokId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID
   const snapchatId = process.env.NEXT_PUBLIC_SNAPCHAT_PIXEL_ID
@@ -40,6 +40,7 @@ function TrackingPixelsContent() {
                 s.parentNode.insertBefore(t,s)}(window, document,'script',
                 'https://connect.facebook.net/en_US/fbevents.js');
                 fbq('init', '${facebookId}');
+                fbq('track', 'PageView');
               `,
             }}
           />

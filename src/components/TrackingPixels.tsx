@@ -3,7 +3,7 @@
 import React, { useEffect, Suspense } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import Script from 'next/script'
-import { trackPageView } from '@/lib/tracking'
+import { trackPageView, trackSearch } from '@/lib/tracking'
 
 function TrackingPixelsContent() {
   const pathname = usePathname()
@@ -14,11 +14,16 @@ function TrackingPixelsContent() {
   const tiktokId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID
   const snapchatId = process.env.NEXT_PUBLIC_SNAPCHAT_PIXEL_ID
 
-  // Track page view on route/path changes
+  // Track page view and search on route/path changes
   useEffect(() => {
     if (!pathname) return
     const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '')
     trackPageView(url)
+
+    const searchQuery = searchParams?.get('search') || searchParams?.get('q')
+    if (searchQuery && searchQuery.trim()) {
+      trackSearch(searchQuery.trim())
+    }
   }, [pathname, searchParams])
 
   return (
@@ -40,7 +45,6 @@ function TrackingPixelsContent() {
                 s.parentNode.insertBefore(t,s)}(window, document,'script',
                 'https://connect.facebook.net/en_US/fbevents.js');
                 fbq('init', '${facebookId}');
-                fbq('track', 'PageView');
               `,
             }}
           />

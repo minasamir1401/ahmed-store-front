@@ -160,6 +160,20 @@ export default function CheckoutPage() {
     }
 
     try {
+      const getCookieVal = (name: string) => {
+        if (typeof document === 'undefined') return null;
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match && match[2] ? decodeURIComponent(match[2]) : null;
+      };
+      let fbcVal = getCookieVal('_fbc');
+      if (!fbcVal && typeof window !== 'undefined') {
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const fbclid = params.get('fbclid');
+          if (fbclid) fbcVal = `fb.1.${Date.now()}.${fbclid}`;
+        } catch(e) {}
+      }
+
       const orderPayload = {
         customerName: formData.name,
         customerEmail: formData.email,
@@ -176,7 +190,9 @@ export default function CheckoutPage() {
         shippingFee: shippingFee + codFee,
         items: cart,
         userId: user?.id || null,
-        language: language
+        language: language,
+        fbp: getCookieVal('_fbp') || null,
+        fbc: fbcVal || null
       }
 
       const response = await fetch('/api/orders', {

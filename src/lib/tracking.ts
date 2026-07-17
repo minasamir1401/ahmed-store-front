@@ -40,10 +40,40 @@ const logDebug = (platform: string, event: string, data?: any) => {
 
 const BACKEND_API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-const sendEventToBackend = async (eventName: string, metadata?: any) => {
+// Helper to read cookie values by name
+const getCookie = (name: string): string | null => {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  if (match && match[2]) return decodeURIComponent(match[2]);
+  return null;
+};
+
+// Helper to get or construct _fbc cookie from URL query parameter
+const getFbc = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  let fbc = getCookie('_fbc');
+  if (fbc) return fbc;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const fbclid = params.get('fbclid');
+    if (fbclid) {
+      fbc = `fb.1.${Date.now()}.${fbclid}`;
+    }
+  } catch (e) {}
+  return fbc || null;
+};
+
+// Helper to generate unique eventId for non-Purchase events
+const generateEventId = (): string => {
+  return 'evt_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+};
+
+const sendEventToBackend = async (eventName: string, metadata?: any, eventId?: string) => {
   if (typeof window === 'undefined') return;
   try {
     const url = window.location.href;
+    const fbp = getCookie('_fbp') || null;
+    const fbc = getFbc() || null;
     const token = localStorage.getItem('vitamins_hub_auth_token');
     const headers: any = {
       'Content-Type': 'application/json'
@@ -58,7 +88,10 @@ const sendEventToBackend = async (eventName: string, metadata?: any) => {
       body: JSON.stringify({
         eventName,
         url,
-        metadata
+        metadata,
+        eventId,
+        fbp,
+        fbc
       })
     });
   } catch (err) {
@@ -72,13 +105,15 @@ const sendEventToBackend = async (eventName: string, metadata?: any) => {
 export const trackPageView = (url: string) => {
   if (typeof window === 'undefined') return;
 
-  // Send to backend database
-  sendEventToBackend('PageView', { path: url });
+  const eventId = generateEventId();
+
+  // Send to backend database and CAPI
+  sendEventToBackend('PageView', { path: url }, eventId);
 
   // Meta (Facebook)
   if (typeof (window as any).fbq === 'function') {
-    (window as any).fbq('track', 'PageView');
-    logDebug('Meta', 'PageView', { url });
+    (window as any).fbq('track', 'PageView', {}, { eventID: eventId });
+    logDebug('Meta', 'PageView', { url, eventId });
   }
 
   // Google Analytics
@@ -107,8 +142,10 @@ export const trackPageView = (url: string) => {
 export const trackViewContent = (product: TrackedProduct) => {
   if (typeof window === 'undefined' || !product) return;
 
-  // Send to backend database
-  sendEventToBackend('ViewContent', product);
+  const eventId = generateEventId();
+
+  // Send to backend database and CAPI
+  sendEventToBackend('ViewContent', product, eventId);
 
   const value = Number(product.price) || 0;
   const currency = 'EGP';
@@ -121,8 +158,8 @@ export const trackViewContent = (product: TrackedProduct) => {
       content_type: 'product',
       value,
       currency,
-    });
-    logDebug('Meta', 'ViewContent', { id: product.id, title: product.title, value });
+    }, { eventID: eventId });
+    logDebug('Meta', 'ViewContent', { id: product.id, title: product.title, value, eventId });
   }
 
   // Google Analytics
@@ -168,13 +205,60 @@ export const trackViewContent = (product: TrackedProduct) => {
 };
 
 /**
+ * Track Search when a user searches for products or terms
+ */
+export const trackSearch = (searchQuery: string) => {
+  if (typeof window === 'undefined' || !searchQuery?.trim()) return;
+
+  const query = searchQuery.trim();
+  const eventId = generateEventId();
+
+  // Send to backend database and CAPI
+  sendEventToBackend('Search', { search_string: query }, eventId);
+
+  // Meta (Facebook)
+  if (typeof (window as any).fbq === 'function') {
+    (window as any).fbq('track', 'Search', {
+      search_string: query,
+    }, { eventID: eventId });
+    logDebug('Meta', 'Search', { search_string: query, eventId });
+  }
+
+  // Google Analytics
+  if (typeof (window as any).gtag === 'function') {
+    (window as any).gtag('event', 'search', {
+      search_term: query
+    });
+    logDebug('Google', 'search', { search_term: query });
+  }
+
+  // TikTok
+  if (typeof (window as any).ttq?.track === 'function') {
+    (window as any).ttq.track('Search', {
+      query
+    });
+    logDebug('TikTok', 'Search', { query });
+  }
+
+  // Snapchat
+  if (typeof (window as any).snaptr === 'function') {
+    (window as any).snaptr('track', 'SEARCH', {
+      search_string: query
+    });
+    logDebug('Snapchat', 'SEARCH', { query });
+  }
+};
+
+/**
  * Track AddToCart when a product is added to cart
  */
 export const trackAddToCart = (product: TrackedProduct) => {
   if (typeof window === 'undefined' || !product) return;
 
-  // Send to backend database
-  sendEventToBackend('AddToCart', product);
+  const eventId = generateEventId();
+
+  // Send to backend database and CAPI
+  sendEventToBackend('AddToCart', product, eventId);
 
   const value = Number(product.price) || 0;
   const quantity = Number(product.quantity) || 1;
@@ -189,8 +273,8 @@ export const trackAddToCart = (product: TrackedProduct) => {
       content_type: 'product',
       value: totalValue,
       currency,
-    });
-    logDebug('Meta', 'AddToCart', { id: product.id, title: product.title, value: totalValue, quantity });
+    }, { eventID: eventId });
+    logDebug('Meta', 'AddToCart', { id: product.id, title: product.title, value: totalValue, quantity, eventId });
   }
 
   // Google Analytics
@@ -241,8 +325,10 @@ export const trackAddToCart = (product: TrackedProduct) => {
 export const trackAddToWishlist = (product: TrackedProduct) => {
   if (typeof window === 'undefined' || !product) return;
 
-  // Send to backend database
-  sendEventToBackend('AddToWishlist', product);
+  const eventId = generateEventId();
+
+  // Send to backend database and CAPI
+  sendEventToBackend('AddToWishlist', product, eventId);
 
   const value = Number(product.price) || 0;
   const currency = 'EGP';
@@ -255,8 +341,8 @@ export const trackAddToWishlist = (product: TrackedProduct) => {
       content_type: 'product',
       value,
       currency,
-    });
-    logDebug('Meta', 'AddToWishlist', { id: product.id, title: product.title, value });
+    }, { eventID: eventId });
+    logDebug('Meta', 'AddToWishlist', { id: product.id, title: product.title, value, eventId });
   }
 
   // Google Analytics
@@ -307,8 +393,10 @@ export const trackAddToWishlist = (product: TrackedProduct) => {
 export const trackInitiateCheckout = (cart: TrackedProduct[], total: number) => {
   if (typeof window === 'undefined' || !cart || cart.length === 0) return;
 
-  // Send to backend database
-  sendEventToBackend('InitiateCheckout', { cart, total });
+  const eventId = generateEventId();
+
+  // Send to backend database and CAPI
+  sendEventToBackend('InitiateCheckout', { cart, total }, eventId);
 
   const value = Number(total) || 0;
   const currency = 'EGP';
@@ -321,8 +409,8 @@ export const trackInitiateCheckout = (cart: TrackedProduct[], total: number) => 
       content_type: 'product',
       value,
       currency,
-    });
-    logDebug('Meta', 'InitiateCheckout', { itemIds, value });
+    }, { eventID: eventId });
+    logDebug('Meta', 'InitiateCheckout', { itemIds, value, eventId });
   }
 
   // Google Analytics
@@ -373,8 +461,11 @@ export const trackInitiateCheckout = (cart: TrackedProduct[], total: number) => 
 export const trackPurchase = (order: TrackedOrder) => {
   if (typeof window === 'undefined' || !order) return;
 
-  // Send to backend database
-  sendEventToBackend('Purchase', order);
+  // Use orderNumber or order id as eventId for exact deduplication against server-side CAPI event
+  const eventId = order.orderNumber || order.id || ('ORD_' + Date.now());
+
+  // Send to backend database for analytics
+  sendEventToBackend('Purchase', order, eventId);
 
   const value = Number(order.total) || 0;
   const currency = 'EGP';
@@ -387,8 +478,8 @@ export const trackPurchase = (order: TrackedOrder) => {
       content_type: 'product',
       value,
       currency,
-    });
-    logDebug('Meta', 'Purchase', { transactionId: order.orderNumber, itemIds, value });
+    }, { eventID: eventId });
+    logDebug('Meta', 'Purchase', { transactionId: order.orderNumber, itemIds, value, eventId });
   }
 
   // Google Analytics
@@ -436,3 +527,4 @@ export const trackPurchase = (order: TrackedOrder) => {
     logDebug('Snapchat', 'PURCHASE', { transactionId: order.orderNumber, itemIds, value });
   }
 };
+

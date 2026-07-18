@@ -154,7 +154,8 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
   }, [product, language])
 
   useEffect(() => {
-    fetch(`/api/products/${productId}`)
+    const realId = productId.includes('-') ? productId.split('-').pop() : productId;
+    fetch(`/api/products/${realId}`)
       .then(res => {
         if (!res.ok) throw new Error('Not found')
         return res.json()

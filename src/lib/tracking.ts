@@ -38,7 +38,7 @@ const logDebug = (platform: string, event: string, data?: any) => {
   }
 };
 
-const BACKEND_API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const BACKEND_API = process.env.NEXT_PUBLIC_API_URL || 'https://the-vitahub.com';
 
 // Helper to read cookie values by name
 const getCookie = (name: string): string | null => {

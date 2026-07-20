@@ -166,7 +166,15 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
                   loading="lazy"
                   onError={() => setImgError(true)}
+                  style={{ pointerEvents: 'none' }}
+                />
+                {/* Right-click catch layer for downloading framed image */}
+                <img 
+                  src={`/api/og/product?url=${encodeURIComponent(cardImage)}`}
+                  alt={imgAlt}
+                  className="absolute inset-0 w-full h-full object-contain opacity-0 z-20"
                   style={{ pointerEvents: 'auto' }}
+                  loading="lazy"
                 />
               </>
             ) : (

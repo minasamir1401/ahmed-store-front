@@ -7,8 +7,7 @@ import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
 import Image from 'next/image'
 import { getProductUrlParam } from '@/lib/slug'
-import InnerImageZoom from 'react-inner-image-zoom'
-import 'react-inner-image-zoom/lib/styles.min.css'
+// Removed InnerImageZoom styles
 import { newestProducts } from '@/lib/product-display'
 import { Star, ShieldCheck, Truck, RotateCcw, Plus, Minus, Heart, ShoppingCart, Check, ChevronLeft, CheckCircle2, Building2, Sparkles, Droplet, Sun, Activity, Info, Moon, Dumbbell, Flame, Calendar, Clock } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
@@ -466,18 +465,21 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     className="aspect-[4/5] flex items-center justify-center relative group"
                   >
                     <div className="w-full h-full relative z-10 p-4 sm:p-8 flex items-center justify-center pointer-events-auto">
-                      <InnerImageZoom
+                      <Image
                         src={activeImage}
-                        zoomSrc={`/api/og/product?url=${encodeURIComponent(activeImage)}`}
-                        zoomType="hover"
-                        zoomScale={1.5}
-                        hideCloseButton={true}
-                        hideHint={true}
-                        className="w-full h-full mix-blend-multiply"
-                        imgAttributes={{
-                          className: "w-full h-full object-contain group-hover:scale-105 transition-transform duration-500",
-                          alt: mainImageAlt
-                        }}
+                        alt={mainImageAlt}
+                        fill
+                        className="object-contain"
+                        style={{ pointerEvents: 'none' }}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        priority
+                      />
+                      {/* Right-click catch layer for downloading framed image */}
+                      <img 
+                        src={`/api/og/product?url=${encodeURIComponent(activeImage)}`}
+                        alt={mainImageAlt}
+                        className="absolute inset-0 w-full h-full object-contain opacity-0 z-20 cursor-pointer"
+                        style={{ pointerEvents: 'auto' }}
                       />
                     </div>
 
@@ -510,18 +512,20 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                       className={`aspect-[4/5] cursor-pointer transition-all relative flex items-center justify-center ${activeImage === img ? 'opacity-100 scale-105' : 'opacity-60 hover:opacity-100'}`}
                     >
                       <div className="w-full h-full relative z-10 p-2 pointer-events-auto">
-                        <InnerImageZoom
+                        <Image
                           src={productImageThumb(img) || img}
-                          zoomSrc={`/api/og/product?url=${encodeURIComponent(img)}`}
-                          zoomType="hover"
-                          zoomScale={1.5}
-                          hideCloseButton={true}
-                          hideHint={true}
-                          className="w-full h-full mix-blend-multiply"
-                          imgAttributes={{
-                            className: "w-full h-full object-contain",
-                            alt: `${mainImageAlt} ${i + 1}`
-                          }}
+                          alt={`${mainImageAlt} ${i + 1}`}
+                          fill
+                          className="object-contain"
+                          style={{ pointerEvents: 'none' }}
+                          sizes="100px"
+                        />
+                        {/* Right-click catch layer */}
+                        <img 
+                          src={`/api/og/product?url=${encodeURIComponent(img)}`}
+                          alt={`${mainImageAlt} ${i + 1}`}
+                          className="absolute inset-0 w-full h-full object-contain opacity-0 z-20 cursor-pointer"
+                          style={{ pointerEvents: 'auto' }}
                         />
                       </div>
 

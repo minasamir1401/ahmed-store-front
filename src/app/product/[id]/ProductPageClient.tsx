@@ -479,15 +479,6 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                           alt: mainImageAlt
                         }}
                       />
-                      {/* Visible Frame Overlay */}
-                      <Image
-                        src="/frame.png"
-                        alt="Frame"
-                        fill
-                        className="object-contain relative z-15 pointer-events-none"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        priority
-                      />
                     </div>
 
                     {/* Discount badge on image */}
@@ -531,14 +522,6 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                             className: "w-full h-full object-contain",
                             alt: `${mainImageAlt} ${i + 1}`
                           }}
-                        />
-                        {/* Visible Frame Overlay */}
-                        <Image
-                          src="/frame.png"
-                          alt="Frame"
-                          fill
-                          className="object-contain relative z-15 pointer-events-none"
-                          sizes="100px"
                         />
                       </div>
 

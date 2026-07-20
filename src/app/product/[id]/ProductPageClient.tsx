@@ -7,8 +7,8 @@ import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
 import Image from 'next/image'
 import { getProductUrlParam } from '@/lib/slug'
-import Zoom from 'react-medium-image-zoom'
-import 'react-medium-image-zoom/dist/styles.css'
+import InnerImageZoom from 'react-inner-image-zoom'
+import 'react-inner-image-zoom/lib/InnerImageZoom/styles.min.css'
 import { newestProducts } from '@/lib/product-display'
 import { Star, ShieldCheck, Truck, RotateCcw, Plus, Minus, Heart, ShoppingCart, Check, ChevronLeft, CheckCircle2, Building2, Sparkles, Droplet, Sun, Activity, Info, Moon, Dumbbell, Flame, Calendar, Clock } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
@@ -466,9 +466,21 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     className="aspect-[4/5] rounded-2xl sm:rounded-[3rem] bg-[#f0f7f4] overflow-hidden border border-[#e8f0ed] flex items-center justify-center relative shadow-sm group"
                   >
                     <Image src="/frame.png" alt="Frame" fill className="object-cover pointer-events-none z-0" />
-                    <Zoom>
-                      <Image src={activeImage} width={typeof mainImageWidth === 'number' ? mainImageWidth : parseInt(mainImageWidth)} height={typeof mainImageHeight === 'number' ? mainImageHeight : parseInt(mainImageHeight)} className="w-full h-full object-contain p-12 sm:p-24 mix-blend-multiply group-hover:scale-105 transition-transform duration-500 relative z-10" alt={mainImageAlt} priority sizes="(max-width: 768px) 100vw, 800px" style={{ pointerEvents: 'auto' }} />
-                    </Zoom>
+                    <div className="w-full h-full relative z-10 p-12 sm:p-24 flex items-center justify-center pointer-events-auto">
+                      <InnerImageZoom
+                        src={activeImage}
+                        zoomSrc={activeImage}
+                        zoomType="hover"
+                        zoomScale={1.5}
+                        hideCloseButton={true}
+                        hideHint={true}
+                        className="w-full h-full mix-blend-multiply"
+                        imgAttributes={{
+                          className: "w-full h-full object-contain group-hover:scale-105 transition-transform duration-500",
+                          alt: mainImageAlt
+                        }}
+                      />
+                    </div>
 
                     {/* Discount badge on image */}
                     {discountPercent && (
@@ -499,9 +511,21 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                       className={`aspect-[4/5] rounded-xl xs:rounded-2xl bg-[#f0f7f4] border-2 cursor-pointer transition-all overflow-hidden relative ${activeImage === img ? 'border-primary shadow-md shadow-primary/10' : 'border-[#e8f0ed] hover:border-primary/50'}`}
                     >
                       <Image src="/frame.png" alt="Frame" fill className="object-cover pointer-events-none z-0" />
-                      <Zoom>
-                        <Image src={productImageThumb(img) || img} width={160} height={160} className="w-full h-full object-contain p-5 mix-blend-multiply relative z-10" alt={`${mainImageAlt} ${i + 1}`} sizes="160px" style={{ pointerEvents: 'auto' }} />
-                      </Zoom>
+                      <div className="w-full h-full relative z-10 p-5 pointer-events-auto">
+                        <InnerImageZoom
+                          src={productImageThumb(img) || img}
+                          zoomSrc={img}
+                          zoomType="hover"
+                          zoomScale={1.5}
+                          hideCloseButton={true}
+                          hideHint={true}
+                          className="w-full h-full mix-blend-multiply"
+                          imgAttributes={{
+                            className: "w-full h-full object-contain",
+                            alt: `${mainImageAlt} ${i + 1}`
+                          }}
+                        />
+                      </div>
 
                     </motion.div>
                   ))}

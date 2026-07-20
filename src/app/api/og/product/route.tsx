@@ -7,12 +7,14 @@ import fs from 'fs/promises'
 export const runtime = 'nodejs'
 
 async function fetchWithFallbacks(urlPath: string, req: NextRequest): Promise<Buffer> {
-  // 1. Try local file system
-  try {
-    const localPath = path.join(process.cwd(), 'public', urlPath.split('?')[0])
-    return await fs.readFile(localPath)
-  } catch (err) {
-    console.warn(`Local file not found for ${urlPath}, trying fetch...`)
+  // 1. Try local file system (only if it's not a remote upload)
+  if (!urlPath.startsWith('/uploads/') && !urlPath.startsWith('uploads/')) {
+    try {
+      const localPath = path.join(process.cwd(), 'public', urlPath.split('?')[0])
+      return await fs.readFile(localPath)
+    } catch (err) {
+      // Silent catch
+    }
   }
 
   // 2. Try localhost fetch
@@ -28,14 +30,31 @@ async function fetchWithFallbacks(urlPath: string, req: NextRequest): Promise<Bu
   }
 
   // 3. Try absolute url based on request host
-  const host = req.headers.get('host') || 'localhost:3000'
-  const protocol = host.includes('localhost') ? 'http' : 'https'
-  const absoluteUrl = `${protocol}://${host}${urlPath.startsWith('/') ? '' : '/'}${urlPath}`
-  const res = await fetch(absoluteUrl)
-  if (!res.ok) {
-    throw new Error(`Failed to fetch image from all fallbacks: ${res.statusText}`)
+  try {
+    const host = req.headers.get('host') || 'localhost:3000'
+    const protocol = host.includes('localhost') ? 'http' : 'https'
+    const absoluteUrl = `${protocol}://${host}${urlPath.startsWith('/') ? '' : '/'}${urlPath}`
+    const res = await fetch(absoluteUrl)
+    if (res.ok) {
+      return Buffer.from(await res.arrayBuffer())
+    }
+  } catch (err) {
+    console.warn(`Host-based fetch failed for ${urlPath}`)
   }
-  return Buffer.from(await res.arrayBuffer())
+
+  // 4. Try public/production API URL as fallback (vital for local development)
+  try {
+    const publicApiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.the-vitahub.com'
+    const absoluteUrl = `${publicApiUrl}${urlPath.startsWith('/') ? '' : '/'}${urlPath}`
+    const res = await fetch(absoluteUrl)
+    if (res.ok) {
+      return Buffer.from(await res.arrayBuffer())
+    }
+  } catch (err) {
+    console.warn(`Public API fallback fetch failed for ${urlPath}`)
+  }
+
+  throw new Error(`Failed to fetch image from all fallbacks for path: ${urlPath}`)
 }
 
 export async function GET(req: NextRequest) {

@@ -46,8 +46,6 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
   const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({ opacity: 0, position: 'absolute', pointerEvents: 'none' })
   const [naturalSize, setNaturalSize] = useState({ w: 1080, h: 1080 })
 
-  const mergedUrl = `/api/og/product?url=${encodeURIComponent(src)}`
-
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = containerRef.current?.getBoundingClientRect()
     if (!rect) return
@@ -78,20 +76,30 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Merged display image (Product + Frame combined by backend) */}
+      {/* Frame overlay - z-10 (behind product) */}
       <img
-        src={mergedUrl}
-        alt={alt}
-        className="w-full h-full object-contain select-none"
-        draggable={false}
-        onLoad={(e) => {
-          const img = e.target as HTMLImageElement
-          if (img.naturalWidth > 0) setNaturalSize({ w: img.naturalWidth, h: img.naturalHeight })
-        }}
+        src="/frame.png"
+        alt=""
+        aria-hidden
+        className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+        style={{ zIndex: 10 }}
       />
-      {/* WooCommerce-style zoom image (also uses mergedUrl so frame is visible during zoom) */}
+      {/* Product display image - z-[15] (on top of frame) and scaled to fit inside frame */}
+      <div className="absolute inset-[8%]" style={{ zIndex: 15 }}>
+        <img
+          src={src}
+          alt={alt}
+          className="w-full h-full object-contain mix-blend-multiply select-none"
+          draggable={false}
+          onLoad={(e) => {
+            const img = e.target as HTMLImageElement
+            if (img.naturalWidth > 0) setNaturalSize({ w: img.naturalWidth, h: img.naturalHeight })
+          }}
+        />
+      </div>
+      {/* WooCommerce-style zoom image (follows cursor) - z-20 */}
       <img
-        src={mergedUrl}
+        src={src}
         alt=""
         aria-hidden
         style={zoomStyle}

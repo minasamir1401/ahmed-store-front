@@ -465,7 +465,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                     className="aspect-[4/5] flex items-center justify-center relative group"
                   >
-                    <div className="w-full h-full relative z-10 p-8 sm:p-16 flex items-center justify-center pointer-events-auto">
+                    <div className="w-full h-full relative z-10 p-4 sm:p-8 flex items-center justify-center pointer-events-auto">
                       <InnerImageZoom
                         src={activeImage}
                         zoomSrc={`/api/og/product?url=${encodeURIComponent(activeImage)}`}

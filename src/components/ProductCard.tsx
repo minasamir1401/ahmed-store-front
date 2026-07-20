@@ -162,7 +162,7 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
                   src={cardImage}
                   alt={imgAlt}
                   fill
-                  className="object-contain p-8 xs:p-12 relative z-10"
+                  className="object-contain relative z-10"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
                   loading="lazy"
                   onError={() => setImgError(true)}

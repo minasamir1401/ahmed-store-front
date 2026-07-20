@@ -1,55 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2, CheckCircle2, Upload, Plus, Edit2, Trash2, Eye, Search, Smartphone, Shield, LogIn, Lock as LockIcon, Database, DownloadCloud, Sparkles, Mail, Send, Truck, ArrowRight, ShieldCheck } from 'lucide-react';
 
-const ShippingRatesEditor = ({ value, onChange, disabled }: { value: string, onChange: (v: string) => void, disabled: boolean }) => {
-  const [rates, setRates] = useState<Record<string, number>>({});
-  const [newLoc, setNewLoc] = useState('');
-  const [newPrice, setNewPrice] = useState('');
-
-  useEffect(() => {
-    try { setRates(JSON.parse(value || '{}')) } catch { setRates({}) }
-  }, [value]);
-
-  const updateRates = (nextRates: Record<string, number>) => {
-    onChange(JSON.stringify(nextRates));
-  };
-
-  const handleAdd = () => {
-    if (newLoc.trim() && newPrice) {
-      const nextRates = { ...rates, [newLoc.trim()]: Number(newPrice) };
-      updateRates(nextRates);
-      setNewLoc('');
-      setNewPrice('');
-    }
-  };
-
-  const handleRemove = (loc: string) => {
-    const nextRates = { ...rates };
-    delete nextRates[loc];
-    updateRates(nextRates);
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {Object.entries(rates).map(([loc, price]) => (
-          <div key={loc} className="flex justify-between items-center bg-slate-50 border border-slate-100 p-3 rounded-2xl">
-             <span className="font-bold text-xs text-slate-700">{loc}</span>
-             <div className="flex gap-4 items-center">
-               <span className="text-blue-600 font-black text-xs">{price} ج.م</span>
-               <button type="button" disabled={disabled} onClick={() => handleRemove(loc)} className="text-slate-400 hover:text-red-500 transition-colors"><Trash2 size={16}/></button>
-             </div>
-          </div>
-        ))}
-      </div>
-      <div className="flex flex-col sm:flex-row gap-2 bg-slate-50 p-2 rounded-2xl border border-slate-100">
-        <input type="text" disabled={disabled} value={newLoc} onChange={e=>setNewLoc(e.target.value)} placeholder="المحافظة أو المركز (مثال: القاهرة أو مركز الفتح)" className="flex-1 bg-white rounded-xl py-2.5 px-3 font-bold outline-none border border-slate-200 focus:border-blue-500/50 text-xs text-slate-700" />
-        <input type="number" disabled={disabled} value={newPrice} onChange={e=>setNewPrice(e.target.value)} placeholder="السعر" className="w-full sm:w-24 bg-white rounded-xl py-2.5 px-3 font-bold outline-none border border-slate-200 focus:border-blue-500/50 text-xs text-slate-700" />
-        <button type="button" disabled={disabled || !newLoc.trim() || !newPrice} onClick={handleAdd} className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white rounded-xl px-4 py-2.5 font-black text-xs flex items-center justify-center gap-2 transition-all">إضافة</button>
-      </div>
-    </div>
-  )
-}
 
 export default function AdminSettingsTab(props: any) {
   const { 
@@ -142,8 +93,8 @@ export default function AdminSettingsTab(props: any) {
                       <div className="bg-blue-50 w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-blue-600">
                         <Smartphone size={22} />
                       </div>
-                      <h3 className="text-lg font-black text-slate-800">إعدادات المتجر العامة</h3>
-                      <p className="text-[10px] text-slate-400 font-bold">أرقام التواصل وأسعار الشحن</p>
+                      <h3 className="text-lg font-black text-slate-800">إعدادات أرقام التواصل</h3>
+                      <p className="text-[10px] text-slate-400 font-bold">أرقام التواصل وإشعارات الواتساب</p>
                     </div>
 
                     <div className="space-y-4">
@@ -171,26 +122,7 @@ export default function AdminSettingsTab(props: any) {
                         />
                       </div>
 
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase mr-1 flex items-center gap-1.5"><Truck size={14}/> أسعار الشحن للمحافظات والمراكز</label>
-                        <ShippingRatesEditor 
-                          value={props.shippingRates} 
-                          onChange={props.setShippingRates} 
-                          disabled={settingsSaveLoading} 
-                        />
-                      </div>
 
-                      <div className="space-y-1 pt-4 border-t border-slate-50">
-                        <label className="text-[10px] font-black text-slate-400 uppercase mr-1 flex items-center gap-1.5"><ShieldCheck size={14}/> سياسة الاستبدال والاسترجاع (تظهر في صفحة الدفع)</label>
-                        <textarea 
-                          value={returnPolicy} 
-                          onChange={e => setReturnPolicy(e.target.value)} 
-                          className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-blue-500/20 focus:bg-white transition-all text-xs text-slate-700" 
-                          rows={4}
-                          placeholder="مثال: يحق للعميل استرجاع المنتج خلال 14 يوماً من تاريخ الاستلام بشرط عدم فتح العبوة..." 
-                          disabled={settingsSaveLoading}
-                        />
-                      </div>
                     </div>
 
                     <div className="flex justify-end pt-4 border-t border-slate-50">

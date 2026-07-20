@@ -37,6 +37,7 @@ export const ADMIN_TABS = [
   { id: 'whatsapp', label: 'إعدادات واتساب', endpoint: 'whatsapp', iconKey: 'Smartphone' },
   { id: 'indexing', label: 'أرشفة جوجل', endpoint: 'admin/indexing/logs', iconKey: 'Search' },
   { id: 'pixels', label: 'إحصائيات Pixel والعملاء', endpoint: 'admin/pixel-events', iconKey: 'Activity' },
+  { id: 'shipping-returns', label: 'الشحن والإرجاع', endpoint: 'admin/profile', iconKey: 'Truck' },
   { id: 'admin-settings', label: 'إعدادات المتجر والحساب', endpoint: 'admin/profile', iconKey: 'User' }
 ]
 

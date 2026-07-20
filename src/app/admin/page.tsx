@@ -10,6 +10,7 @@ import { useAdminDashboard } from './hooks/useAdminDashboard'
 import AdminLoginForm from './components/AdminLoginForm'
 import HeroTab from './components/HeroTab'
 import AdminSettingsTab from './components/AdminSettingsTab'
+import ShippingReturnsTab from './components/ShippingReturnsTab'
 import WhatsappTab from './components/WhatsappTab'
 import IndexingTab from './components/IndexingTab'
 import ProductsForm from './components/ProductsForm'
@@ -514,7 +515,7 @@ export default function AdminDashboard() {
               </div>
               
               {/* Active Tab Main Tables List */}
-              {activeTab === 'hero' ? ( <HeroTab {...propsObj} /> ) : activeTab === 'admin-settings' ? ( <AdminSettingsTab {...propsObj} /> ) : activeTab === 'whatsapp' ? ( <WhatsappTab {...propsObj} /> ) : activeTab === 'indexing' ? ( <IndexingTab {...propsObj} /> ) : activeTab === 'pixels' ? ( <PixelsTab {...propsObj} /> ) : (
+              {activeTab === 'hero' ? ( <HeroTab {...propsObj} /> ) : activeTab === 'shipping-returns' ? ( <ShippingReturnsTab {...propsObj} /> ) : activeTab === 'admin-settings' ? ( <AdminSettingsTab {...propsObj} /> ) : activeTab === 'whatsapp' ? ( <WhatsappTab {...propsObj} /> ) : activeTab === 'indexing' ? ( <IndexingTab {...propsObj} /> ) : activeTab === 'pixels' ? ( <PixelsTab {...propsObj} /> ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-right border-collapse min-w-[700px]">
                     <thead className="bg-slate-50/50 text-slate-400 text-[10px] font-black uppercase border-b border-slate-100 tracking-wider">

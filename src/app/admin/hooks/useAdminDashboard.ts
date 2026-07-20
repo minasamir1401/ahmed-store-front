@@ -83,6 +83,7 @@ export function useAdminDashboard() {
   const [whatsappNumber, setWhatsappNumber] = useState('01201450111')
   const [receivingNumber, setReceivingNumber] = useState('01009596452')
   const [shippingRates, setShippingRates] = useState('{}')
+  const [returnPolicy, setReturnPolicy] = useState('')
 
   const [testRecipient, setTestRecipient] = useState('')
   const [testEmailLoading, setTestEmailLoading] = useState(false)
@@ -303,6 +304,201 @@ export function useAdminDashboard() {
           if (json.smtp_host !== undefined) setSmtpHost(json.smtp_host)
           if (json.smtp_port !== undefined) setSmtpPort(json.smtp_port)
           if (json.smtp_secure !== undefined) setSmtpSecure(json.smtp_secure)
+    if (!trimmed.startsWith('{')) return { ar: value, en: '' }
+    try {
+      const parsed = JSON.parse(trimmed)
+      if (parsed && typeof parsed === 'object' && ('ar' in parsed || 'en' in parsed)) {
+        return { ar: parsed.ar || '', en: parsed.en || '' }
+      }
+    } catch {
+      // Keep original value if it is not a bilingual JSON string.
+    }
+    return { ar: value, en: '' }
+  }
+
+  const normalizeProductTranslations = (item: any) => {
+    const title = splitLocalizedText(item.title)
+    const desc = splitLocalizedText(item.desc)
+    const features = splitLocalizedText(item.features)
+    const usage = splitLocalizedText(item.usage)
+    const ingredients = splitLocalizedText(item.ingredients)
+    const warnings = splitLocalizedText(item.warnings)
+    const disclaimer = splitLocalizedText(item.disclaimer)
+    const seoKeywords = splitLocalizedText(item.seoKeywords)
+    const seoDesc = splitLocalizedText(item.seoDesc)
+
+    return {
+      ...item,
+      title: title.ar,
+      titleEn: item.titleEn || title.en || '',
+      desc: desc.ar,
+      descEn: item.descEn || desc.en || '',
+      features: features.ar,
+      featuresEn: item.featuresEn || features.en || '',
+      usage: usage.ar,
+      usageEn: item.usageEn || usage.en || '',
+      directions: item.directions || usage.ar || '',
+      ingredients: ingredients.ar,
+      ingredientsEn: item.ingredientsEn || ingredients.en || '',
+      warnings: warnings.ar,
+      warningsEn: item.warningsEn || warnings.en || '',
+      disclaimer: disclaimer.ar,
+      disclaimerEn: item.disclaimerEn || disclaimer.en || '',
+      seoKeywords: seoKeywords.ar,
+      seoKeywordsEn: item.seoKeywordsEn || seoKeywords.en || '',
+      seoDesc: seoDesc.ar,
+      seoDescEn: item.seoDescEn || seoDesc.en || ''
+    }
+  }
+
+  const mergeSeoKeywords = (currentKeywords = '', newKeywords = '') => {
+    const seen = new Set<string>()
+    return [currentKeywords, newKeywords]
+      .flatMap(value => value.split(/[،,]/))
+      .map(value => value.trim())
+      .filter(value => {
+        if (!value) return false
+        const normalized = value.toLowerCase()
+        if (seen.has(normalized)) return false
+        seen.add(normalized)
+        return true
+      })
+      .join(', ')
+  }
+
+  const appendSeoText = (currentText = '', newText = '') => {
+    const current = currentText.trim()
+    const next = newText.trim()
+    if (!next) return current
+    if (!current) return next
+    if (current.toLowerCase().includes(next.toLowerCase())) return current
+    return `${current}\n\n${next}`
+  }
+
+  const getAuthHeaders = (contentType: string | null = 'application/json') => {
+    const token = localStorage.getItem('mithaly_admin_token')
+    const headers: any = {}
+    if (contentType) headers['Content-Type'] = contentType
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    return headers
+  }
+
+  const fetchWithAdminAuth = async (url: string, init: RequestInit = {}, contentType: string | null = 'application/json') => {
+    const token = localStorage.getItem('mithaly_admin_token')
+    if (!token) {
+      clearAdminSession()
+      throw new Error('يجب تسجيل الدخول كمسؤول أولاً')
+    }
+
+    const headers = new Headers(getAuthHeaders(contentType))
+    new Headers(init.headers).forEach((value, key) => headers.set(key, value))
+
+    const res = await fetch(url, { ...init, headers })
+    if (res.status === 401) {
+      clearAdminSession()
+      await showAlert('انتهت جلسة المسؤول. سجل الدخول مرة أخرى ثم أعد رفع الصورة.', 'انتهت الجلسة')
+      const error = new Error('انتهت جلسة المسؤول')
+        ; (error as any).isAdminUnauthorized = true
+      throw error
+    }
+    return res
+  }
+
+  const fetchWhatsappStatus = async () => {
+    try {
+      const res = await fetchWithAdminAuth(`${BACKEND_API}/api/whatsapp/status?t=${Date.now()}`)
+      if (res.ok) setWhatsappStatus(await res.json())
+    } catch (err) {
+      console.error('Error fetching WhatsApp status:', err)
+    }
+  }
+
+  const fetchStats = async () => {
+    try {
+      const [ordRes, prodRes, brandRes, catRes] = await Promise.all([
+        fetchWithAdminAuth(`${BACKEND_API}/api/orders?t=${Date.now()}`),
+        fetch(`${BACKEND_API}/api/products?t=${Date.now()}`),
+        fetch(`${BACKEND_API}/api/brands?t=${Date.now()}`),
+        fetch(`${BACKEND_API}/api/categories?t=${Date.now()}`)
+      ])
+
+      let ords: any[] = []
+      let prods: any[] = []
+      let bnds: any[] = []
+      let cats: any[] = []
+
+      if (ordRes.ok) ords = await ordRes.json()
+      if (prodRes.ok) prods = await prodRes.json()
+      if (brandRes.ok) bnds = await brandRes.json()
+      if (catRes.ok) cats = await catRes.json()
+
+      const sales = ords.reduce((acc: number, o: any) => acc + (o.status === 'delivered' ? o.total : 0), 0)
+      const pending = ords.filter((o: any) => o.status === 'pending').length
+
+      setStats({
+        totalSales: sales,
+        totalOrders: ords.length,
+        totalProducts: prods.length,
+        totalBrands: bnds.length,
+        totalCategories: cats.length,
+        pendingOrders: pending
+      })
+    } catch (err) {
+      console.error('Error fetching stats:', err)
+    }
+  }
+
+  const fetchMeta = async () => {
+    try {
+      addLog('جاري تحديث البيانات...')
+      const [catRes, brandRes, prodRes] = await Promise.all([
+        fetch(`${BACKEND_API}/api/categories?t=${Date.now()}`),
+        fetch(`${BACKEND_API}/api/brands?t=${Date.now()}`),
+        fetch(`${BACKEND_API}/api/products?t=${Date.now()}`)
+      ])
+
+      if (catRes.ok) {
+        const cats = await catRes.json()
+        setCategories(Array.isArray(cats) ? cats : [])
+        addLog(`تم تحميل ${Array.isArray(cats) ? cats.length : 0} قسم`)
+      }
+      if (brandRes.ok) {
+        const bnds = await brandRes.json()
+        setBrands(Array.isArray(bnds) ? bnds : [])
+        addLog(`تم تحميل ${Array.isArray(bnds) ? bnds.length : 0} ماركة`)
+      }
+      if (prodRes.ok) {
+        const prods = await prodRes.json()
+        setProductsList(Array.isArray(prods) ? prods : [])
+        addLog(`تم تحميل ${Array.isArray(prods) ? prods.length : 0} منتج`)
+      }
+    } catch (err: any) {
+      addLog(`خطأ في البيانات الأساسية: ${err.message}`)
+    }
+  }
+
+  const fetchData = async () => {
+    if (!isLoggedIn) return
+    if (activeTab === 'whatsapp' || activeTab === 'admin-settings') {
+      setLoading(true)
+      try {
+        const [profileRes, settingsRes] = await Promise.all([
+          fetchWithAdminAuth(`${BACKEND_API}/api/admin/profile?t=${Date.now()}`),
+          fetchWithAdminAuth(`${BACKEND_API}/api/admin/settings?t=${Date.now()}`)
+        ])
+
+        if (profileRes.ok) {
+          const json = await profileRes.json()
+          setAdminEmail(json.email || '')
+          setAdminName(json.name || '')
+          setAdminPassword('')
+        }
+
+        if (settingsRes.ok) {
+          const json = await settingsRes.json()
+          if (json.smtp_host !== undefined) setSmtpHost(json.smtp_host)
+          if (json.smtp_port !== undefined) setSmtpPort(json.smtp_port)
+          if (json.smtp_secure !== undefined) setSmtpSecure(json.smtp_secure)
           if (json.smtp_user !== undefined) setSmtpUser(json.smtp_user)
           if (json.smtp_pass !== undefined) setSmtpPass(json.smtp_pass)
           if (json.from_email !== undefined) setFromEmail(json.from_email)
@@ -310,6 +506,7 @@ export function useAdminDashboard() {
           if (json.whatsapp_number !== undefined) setWhatsappNumber(json.whatsapp_number)
           if (json.receiving_number !== undefined) setReceivingNumber(json.receiving_number)
           if (json.shipping_rates !== undefined) setShippingRates(json.shipping_rates)
+          if (json.return_policy !== undefined) setReturnPolicy(json.return_policy)
         }
       } catch (err) {
         console.error(err)
@@ -1244,7 +1441,8 @@ export function useAdminDashboard() {
           from_name: fromName,
           whatsapp_number: whatsappNumber,
           receiving_number: receivingNumber,
-          shipping_rates: shippingRates
+          shipping_rates: shippingRates,
+          return_policy: returnPolicy
         })
       })
       if (res.ok) {
@@ -1559,6 +1757,8 @@ export function useAdminDashboard() {
     handleSendTestEmail,
     shippingRates,
     setShippingRates,
+    returnPolicy,
+    setReturnPolicy,
     tabs: ADMIN_TABS
   }
 }

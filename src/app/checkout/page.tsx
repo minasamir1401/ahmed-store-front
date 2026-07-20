@@ -59,6 +59,7 @@ export default function CheckoutPage() {
   const [whatsappNumber, setWhatsappNumber] = useState('01201450111')
   const [receivingNumber, setReceivingNumber] = useState('01009596452')
   const [shippingRates, setShippingRates] = useState<Record<string, number>>({})
+  const [returnPolicy, setReturnPolicy] = useState('')
 
   React.useEffect(() => {
     fetch('/api/settings')
@@ -70,6 +71,9 @@ export default function CheckoutPage() {
           try {
             setShippingRates(JSON.parse(data.shipping_rates))
           } catch(e) {}
+        }
+        if (data.return_policy) {
+          setReturnPolicy(data.return_policy)
         }
       })
       .catch(err => console.error('Error fetching settings in checkout:', err))
@@ -262,7 +266,7 @@ export default function CheckoutPage() {
     }
   }
 
-  const shippingFee = shippingRates[formData.governorate] ?? 0 
+  const shippingFee = shippingRates[formData.district] !== undefined ? shippingRates[formData.district] : (shippingRates[formData.governorate] ?? 0)
   const codFee = paymentMethod === 'cod' ? 15 : 0
   const total = cartTotal + shippingFee + codFee
   const isRtl = language === 'ar'
@@ -683,6 +687,12 @@ export default function CheckoutPage() {
                     <Truck size={18} className="text-primary flex-shrink-0" />
                     <span>{language === 'ar' ? 'توصيل سريع لباب المنزل' : 'Fast home delivery'}</span>
                   </div>
+                  {returnPolicy && (
+                    <div className={`flex items-start gap-3 text-[10px] xs:text-xs text-muted ${isRtl ? 'flex-row' : 'flex-row-reverse'} mt-2`}>
+                      <ShieldCheck size={18} className="text-orange-500 flex-shrink-0 mt-0.5" />
+                      <div className="whitespace-pre-wrap">{returnPolicy}</div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

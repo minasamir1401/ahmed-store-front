@@ -37,7 +37,7 @@ export const ADMIN_TABS = [
   { id: 'whatsapp', label: 'إعدادات واتساب', endpoint: 'whatsapp', iconKey: 'Smartphone' },
   { id: 'indexing', label: 'أرشفة جوجل', endpoint: 'admin/indexing/logs', iconKey: 'Search' },
   { id: 'pixels', label: 'إحصائيات Pixel والعملاء', endpoint: 'admin/pixel-events', iconKey: 'Activity' },
-  { id: 'admin-settings', label: 'إعدادات الحساب', endpoint: 'admin/profile', iconKey: 'User' }
+  { id: 'admin-settings', label: 'إعدادات المتجر والحساب', endpoint: 'admin/profile', iconKey: 'User' }
 ]
 
 export const parseAIJSON = (str: string) => {

@@ -7,8 +7,7 @@ import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
 import Image from 'next/image'
 import { getProductUrlParam } from '@/lib/slug'
-import InnerImageZoom from 'react-inner-image-zoom'
-import 'react-inner-image-zoom/lib/styles.min.css'
+
 import { newestProducts } from '@/lib/product-display'
 import { Star, ShieldCheck, Truck, RotateCcw, Plus, Minus, Heart, ShoppingCart, Check, ChevronLeft, CheckCircle2, Building2, Sparkles, Droplet, Sun, Activity, Info, Moon, Dumbbell, Flame, Calendar, Clock } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
@@ -39,6 +38,72 @@ const scaleIn: any = {
 
 const stagger: any = {
   show: { transition: { staggerChildren: 0.08 } }
+}
+
+// ── WooCommerce-style cursor-following zoom ──────────────────────────────────
+function WooZoom({ src, alt }: { src: string; alt: string }) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({ opacity: 0, position: 'absolute', pointerEvents: 'none' })
+  const [naturalSize, setNaturalSize] = useState({ w: 1920, h: 1920 })
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = containerRef.current?.getBoundingClientRect()
+    if (!rect) return
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    setZoomStyle({
+      position: 'absolute',
+      top: `${-(y / rect.height) * naturalSize.h}px`,
+      left: `${-(x / rect.width) * naturalSize.w}px`,
+      width: `${naturalSize.w}px`,
+      height: `${naturalSize.h}px`,
+      opacity: 1,
+      maxWidth: 'none',
+      maxHeight: 'none',
+      pointerEvents: 'none',
+      zIndex: 3,
+    })
+  }
+
+  const handleMouseLeave = () => {
+    setZoomStyle(prev => ({ ...prev, opacity: 0 }))
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="w-full h-full relative overflow-hidden"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Normal display image */}
+      <img
+        src={src}
+        alt={alt}
+        className="w-full h-full object-contain mix-blend-multiply select-none"
+        draggable={false}
+        onLoad={(e) => {
+          const img = e.target as HTMLImageElement
+          if (img.naturalWidth > 0) setNaturalSize({ w: img.naturalWidth, h: img.naturalHeight })
+        }}
+      />
+      {/* Frame overlay - always on top */}
+      <img
+        src="/frame.png"
+        alt=""
+        aria-hidden
+        className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+        style={{ zIndex: 10 }}
+      />
+      {/* WooCommerce-style zoom image (follows cursor) */}
+      <img
+        src={src}
+        alt=""
+        aria-hidden
+        style={zoomStyle}
+      />
+    </div>
+  )
 }
 
 // ── Skeleton loader ────────────────────────────────────────────────────
@@ -465,20 +530,8 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                     className="aspect-[4/5] flex items-center justify-center relative group"
                   >
-                    <div className="w-full h-full relative z-10 p-4 sm:p-8 flex items-center justify-center pointer-events-auto">
-                      <InnerImageZoom
-                        src={activeImage}
-                        zoomSrc={activeImage}
-                        zoomType="hover"
-                        zoomScale={2}
-                        hideCloseButton={true}
-                        hideHint={true}
-                        className="w-full h-full mix-blend-multiply"
-                        imgAttributes={{
-                          className: "w-full h-full object-contain group-hover:scale-105 transition-transform duration-500",
-                          alt: mainImageAlt
-                        }}
-                      />
+                    <div className="w-full h-full relative z-10 p-2 sm:p-4 pointer-events-auto" style={{ overflow: 'hidden' }}>
+                      <WooZoom src={activeImage} alt={mainImageAlt} />
                     </div>
 
                     {/* Discount badge on image */}

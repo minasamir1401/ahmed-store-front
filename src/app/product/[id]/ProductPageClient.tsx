@@ -465,8 +465,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                     className="aspect-[4/5] rounded-2xl sm:rounded-[3rem] bg-[#f0f7f4] overflow-hidden border border-[#e8f0ed] flex items-center justify-center relative shadow-sm group"
                   >
-                    <Image src="/frame.png" alt="Frame" fill className="object-cover pointer-events-none z-0" />
-                    <div className="w-full h-full relative z-10 p-12 sm:p-24 flex items-center justify-center pointer-events-auto">
+                    <div className="w-full h-full relative z-10 p-4 sm:p-8 flex items-center justify-center pointer-events-auto">
                       <InnerImageZoom
                         src={activeImage}
                         zoomSrc={activeImage}
@@ -510,8 +509,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                       whileTap={{ scale: 0.95 }}
                       className={`aspect-[4/5] rounded-xl xs:rounded-2xl bg-[#f0f7f4] border-2 cursor-pointer transition-all overflow-hidden relative ${activeImage === img ? 'border-primary shadow-md shadow-primary/10' : 'border-[#e8f0ed] hover:border-primary/50'}`}
                     >
-                      <Image src="/frame.png" alt="Frame" fill className="object-cover pointer-events-none z-0" />
-                      <div className="w-full h-full relative z-10 p-5 pointer-events-auto">
+                      <div className="w-full h-full relative z-10 p-2 pointer-events-auto">
                         <InnerImageZoom
                           src={productImageThumb(img) || img}
                           zoomSrc={img}

@@ -83,6 +83,64 @@ export default function AdminSettingsTab(props: any) {
                     </div>
                   </form>
 
+                  {/* General Settings Section */}
+                  <form onSubmit={handleSaveGeneralSettings} className="bg-white border border-slate-100 rounded-[2.5rem] p-6 md:p-10 space-y-6 shadow-sm max-w-xl mx-auto relative overflow-hidden mt-8">
+                    <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-blue-500 to-indigo-500" />
+                    
+                    <div className="text-center space-y-2 mb-6">
+                      <div className="bg-blue-50 w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-blue-600">
+                        <Smartphone size={22} />
+                      </div>
+                      <h3 className="text-lg font-black text-slate-800">إعدادات المتجر العامة</h3>
+                      <p className="text-[10px] text-slate-400 font-bold">أرقام التواصل وأسعار الشحن</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase mr-1">رقم الواتساب (للتواصل)</label>
+                        <input 
+                          type="text" 
+                          value={whatsappNumber} 
+                          onChange={e => setWhatsappNumber(e.target.value)} 
+                          className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-blue-500/20 focus:bg-white transition-all text-xs text-slate-700 dir-ltr text-left" 
+                          placeholder="01xxxxxxxxx" 
+                          disabled={settingsSaveLoading}
+                        />
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase mr-1">رقم استقبال الطلبات (إشعار SMS)</label>
+                        <input 
+                          type="text" 
+                          value={receivingNumber} 
+                          onChange={e => setReceivingNumber(e.target.value)} 
+                          className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-blue-500/20 focus:bg-white transition-all text-xs text-slate-700 dir-ltr text-left" 
+                          placeholder="01xxxxxxxxx" 
+                          disabled={settingsSaveLoading}
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase mr-1">أسعار الشحن (JSON)</label>
+                        <textarea 
+                          value={props.shippingRates} 
+                          onChange={e => props.setShippingRates(e.target.value)} 
+                          className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-blue-500/20 focus:bg-white transition-all text-xs text-slate-700 font-mono dir-ltr text-left" 
+                          rows={6}
+                          placeholder='{"القاهرة": 50, "الإسكندرية": 60}' 
+                          disabled={settingsSaveLoading}
+                        />
+                        <p className="text-[9px] text-slate-400 mt-1">يجب أن يكون بتنسيق JSON صحيح مثل {"{\"القاهرة\": 50}"}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end pt-4 border-t border-slate-50">
+                      <button type="submit" disabled={settingsSaveLoading} className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white py-4 rounded-2xl font-black text-xs shadow-lg shadow-blue-600/10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer">
+                        {settingsSaveLoading ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />} حفظ الإعدادات
+                      </button>
+                    </div>
+                  </form>
+
                   {/* Backup & Restore Section */}
                   <div className="bg-white border border-slate-100 rounded-[2.5rem] p-6 md:p-10 space-y-6 shadow-sm max-w-xl mx-auto relative overflow-hidden mt-8">
                     <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600" />

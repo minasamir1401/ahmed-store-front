@@ -58,6 +58,7 @@ export default function CheckoutPage() {
   const [placedOrder, setPlacedOrder] = useState<any>(null)
   const [whatsappNumber, setWhatsappNumber] = useState('01201450111')
   const [receivingNumber, setReceivingNumber] = useState('01009596452')
+  const [shippingRates, setShippingRates] = useState<Record<string, number>>({})
 
   React.useEffect(() => {
     fetch('/api/settings')
@@ -65,6 +66,11 @@ export default function CheckoutPage() {
       .then(data => {
         if (data.whatsapp_number) setWhatsappNumber(data.whatsapp_number)
         if (data.receiving_number) setReceivingNumber(data.receiving_number)
+        if (data.shipping_rates) {
+          try {
+            setShippingRates(JSON.parse(data.shipping_rates))
+          } catch(e) {}
+        }
       })
       .catch(err => console.error('Error fetching settings in checkout:', err))
   }, [])
@@ -256,7 +262,7 @@ export default function CheckoutPage() {
     }
   }
 
-  const shippingFee = 0 
+  const shippingFee = shippingRates[formData.governorate] ?? 0 
   const codFee = paymentMethod === 'cod' ? 15 : 0
   const total = cartTotal + shippingFee + codFee
   const isRtl = language === 'ar'
@@ -652,9 +658,9 @@ export default function CheckoutPage() {
                     <span className="text-muted">{t('cart_subtotal')}</span>
                     <span className="font-bold">{cartTotal} {t('currency')}</span>
                   </div>
-                  <div className={`flex justify-between ${isRtl ? '' : 'flex-row-reverse'}`}>
-                    <span className="text-muted">{t('cart_shipping')}</span>
-                    <span className="text-green-500 font-bold">{shippingFee === 0 ? t('cart_shipping_free') : `${shippingFee} ${t('currency')}`}</span>
+                  <div className="flex justify-between items-center text-sm font-bold">
+                    <span className="text-slate-600">{language === 'ar' ? 'مصاريف الشحن' : 'Shipping'}</span>
+                    <span>{shippingFee === 0 ? (language === 'ar' ? 'مجاناً' : 'Free') : `${shippingFee} ج.م`}</span>
                   </div>
                   {paymentMethod === 'cod' && (
                     <div className={`flex justify-between ${isRtl ? '' : 'flex-row-reverse'}`}>

@@ -142,7 +142,7 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
 
       {/* Product Image */}
       <Link href={`/product/${getProductUrlParam({ id, title, titleEn })}`} className="block">
-        <div className="aspect-square overflow-hidden flex items-center justify-center p-2 xs:p-4 relative" style={{ background: '#f0f7f4' }}>
+        <div className="aspect-[4/5] overflow-hidden flex items-center justify-center p-2 xs:p-4 relative" style={{ background: '#f0f7f4' }}>
           {/* Discount Badge */}
           {(displayTag || discountPercent) && (
             <motion.div
@@ -157,15 +157,24 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
 
           <div className="relative w-full h-full">
             {cardImage ? (
-              <Image
-                src={cardImage}
-                alt={imgAlt}
-                fill
-                className="object-contain"
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
-                loading="lazy"
-                onError={() => setImgError(true)}
-              />
+              <>
+                <Image
+                  src={cardImage}
+                  alt={imgAlt}
+                  fill
+                  className="object-contain p-6 xs:p-8"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
+                  loading="lazy"
+                  onError={() => setImgError(true)}
+                  style={{ pointerEvents: 'auto' }}
+                />
+                <Image
+                  src="/frame.png"
+                  alt="Frame"
+                  fill
+                  className="object-cover pointer-events-none z-20"
+                />
+              </>
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 opacity-40">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2e7d5e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

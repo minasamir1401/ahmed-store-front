@@ -6,6 +6,9 @@ import SmartDosageCalculator from './components/SmartDosageCalculator';
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
 import Image from 'next/image'
+import { getProductUrlParam } from '@/lib/slug'
+import Zoom from 'react-medium-image-zoom'
+import 'react-medium-image-zoom/dist/styles.css'
 import { newestProducts } from '@/lib/product-display'
 import { Star, ShieldCheck, Truck, RotateCcw, Plus, Minus, Heart, ShoppingCart, Check, ChevronLeft, CheckCircle2, Building2, Sparkles, Droplet, Sun, Activity, Info, Moon, Dumbbell, Flame, Calendar, Clock } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
@@ -460,9 +463,13 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 1.02 }}
                     transition={{ duration: 0.35, ease: 'easeOut' }}
-                    className="aspect-square rounded-2xl sm:rounded-[3rem] bg-[#f0f7f4] overflow-hidden border border-[#e8f0ed] p-4 sm:p-12 flex items-center justify-center relative shadow-sm group"
+                    className="aspect-[4/5] rounded-2xl sm:rounded-[3rem] bg-[#f0f7f4] overflow-hidden border border-[#e8f0ed] flex items-center justify-center relative shadow-sm group"
                   >
-                    <Image src={activeImage} width={typeof mainImageWidth === 'number' ? mainImageWidth : parseInt(mainImageWidth)} height={typeof mainImageHeight === 'number' ? mainImageHeight : parseInt(mainImageHeight)} className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" alt={mainImageAlt} priority sizes="(max-width: 768px) 100vw, 800px" />
+                    <Zoom>
+                      <Image src={activeImage} width={typeof mainImageWidth === 'number' ? mainImageWidth : parseInt(mainImageWidth)} height={typeof mainImageHeight === 'number' ? mainImageHeight : parseInt(mainImageHeight)} className="w-full h-full object-contain p-10 sm:p-20 mix-blend-multiply group-hover:scale-105 transition-transform duration-500 relative z-10" alt={mainImageAlt} priority sizes="(max-width: 768px) 100vw, 800px" style={{ pointerEvents: 'auto' }} />
+                    </Zoom>
+                    <Image src="/frame.png" alt="Frame" fill className="object-cover pointer-events-none z-20 opacity-90" />
+
                     {/* Discount badge on image */}
                     {discountPercent && (
                       <div className="absolute top-3 left-3 xs:top-5 xs:left-5 bg-red-500 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-md">
@@ -489,9 +496,13 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                       onClick={() => setActiveImage(img)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`aspect-square rounded-xl xs:rounded-2xl bg-[#f0f7f4] border-2 cursor-pointer transition-all p-1.5 max-[340px]:p-1 xs:p-3 overflow-hidden ${activeImage === img ? 'border-primary shadow-md shadow-primary/10' : 'border-[#e8f0ed] hover:border-primary/50'}`}
+                      className={`aspect-[4/5] rounded-xl xs:rounded-2xl bg-[#f0f7f4] border-2 cursor-pointer transition-all overflow-hidden relative ${activeImage === img ? 'border-primary shadow-md shadow-primary/10' : 'border-[#e8f0ed] hover:border-primary/50'}`}
                     >
-                      <Image src={productImageThumb(img) || img} width={160} height={160} className="w-full h-full object-contain mix-blend-multiply" alt={`${mainImageAlt} ${i + 1}`} sizes="160px" />
+                      <Zoom>
+                        <Image src={productImageThumb(img) || img} width={160} height={160} className="w-full h-full object-contain p-4 mix-blend-multiply relative z-10" alt={`${mainImageAlt} ${i + 1}`} sizes="160px" style={{ pointerEvents: 'auto' }} />
+                      </Zoom>
+                      <Image src="/frame.png" alt="Frame" fill className="object-cover pointer-events-none z-20" />
+
                     </motion.div>
                   ))}
                 </motion.div>

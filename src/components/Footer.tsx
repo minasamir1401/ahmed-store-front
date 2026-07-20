@@ -73,6 +73,7 @@ export default function Footer() {
             <ul className="space-y-2 text-xs text-gray-600">
               <li><Link href="/shipping" className="hover:text-emerald-700 transition-colors">{t('footer_shipping')}</Link></li>
               <li><Link href="/returns" className="hover:text-emerald-700 transition-colors">{t('footer_returns')}</Link></li>
+              <li><Link href="/privacy-policy" className="hover:text-emerald-700 transition-colors">{t('footer_privacy')}</Link></li>
               <li><Link href="/track" className="hover:text-emerald-700 transition-colors">{t('nav_track_order')}</Link></li>
               <li><Link href="/bmi-calculator" className="hover:text-emerald-700 transition-colors">{t('nav_bmi')}</Link></li>
             </ul>
@@ -91,6 +92,10 @@ export default function Footer() {
                 <a href={`https://wa.me/20${whatsappNumber.replace(/^0/, '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-600 transition-colors">
                   {whatsappNumber}
                 </a>
+              </li>
+              <li className="flex items-start gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {t('footer_address')}
               </li>
             </ul>
             <div className="flex gap-2 pt-1">

@@ -82,6 +82,7 @@ export function useAdminDashboard() {
   const [fromName, setFromName] = useState('The VitaHub')
   const [whatsappNumber, setWhatsappNumber] = useState('01201450111')
   const [receivingNumber, setReceivingNumber] = useState('01009596452')
+  const [shippingRates, setShippingRates] = useState('{}')
 
   const [testRecipient, setTestRecipient] = useState('')
   const [testEmailLoading, setTestEmailLoading] = useState(false)
@@ -308,6 +309,7 @@ export function useAdminDashboard() {
           if (json.from_name !== undefined) setFromName(json.from_name)
           if (json.whatsapp_number !== undefined) setWhatsappNumber(json.whatsapp_number)
           if (json.receiving_number !== undefined) setReceivingNumber(json.receiving_number)
+          if (json.shipping_rates !== undefined) setShippingRates(json.shipping_rates)
         }
       } catch (err) {
         console.error(err)
@@ -592,7 +594,7 @@ export function useAdminDashboard() {
 
 الهيكل المطلوب:
 {
-  "title": "إعادة كتابة اسم المنتج المدخل ليكون اسماً احترافياً ومختصراً ومناسباً لعنوان منتج في متجر الكتروني (مثال: أوبتيموم نيوترشن كرياتين ميكرونيزد 600 جرام). لا تذكر اسم المتجر The VitaHub هنا أبداً.",
+  "title": "إعادة كتابة اسم المنتج المدخل ليكون اسماً احترافياً ومختصراً ومندمجاً بين الإنجليزية والعربية في نفس النص (مثال: NOW Foods Adam Multivitamin 90 Softgels - ناو فودز آدم متعدد الفيتامينات 90 كبسولة طرية). لا تذكر اسم المتجر The VitaHub هنا أبداً.",
   "titleEn": "اسم المنتج الاحترافي باللغة الإنجليزية (مثال: Optimum Nutrition Micronized Creatine Monohydrate 600g). لا تذكر اسم المتجر The VitaHub هنا أبداً.",
   "desc": "وصف منتج عملي ومباشر ومفصل ومطول جداً (يتجاوز 350 كلمة)، يشرح الوظيفة الرئيسية للمنتج بالتفصيل والفوائد المهمة ولماذا يشتريه العميل، بصياغة سهلة ومناسبة للسوق المصري، وبدون مبالغة.",
   "features": "قائمة مميزات المنتج والفوائد والمكونات النشطة الأساسية، كل ميزة في سطر منفصل (مثال: ميزة 1\\nميزة 2\\nميزة 3)",
@@ -606,7 +608,7 @@ export function useAdminDashboard() {
   "supplementFacts": "[{\\"name\\": \\"Vitamin C\\", \\"amount\\": \\"500mg\\", \\"dv\\": \\"556%\\"}]",
   "seoKeywords": "قائمة ضخمة ومكثفة تتكون من 300 كلمة أو عبارة بحث مفتاحية متنوعة وقوية باللغة العربية مفصولة بفواصل لتغطية كافة عمليات البحث الممكنة بشكل كامل.",
   "seoDesc": "وصف ميتا قصير ومقنع يشرح المنتج ويشجع على الشراء ويحتوي على الكلمات الأساسية المهمة بشكل طبيعي",
-  "faqs": "[{\\"question_ar\\": \\"سؤال بالعربي\\", \\"answer_ar\\": \\"إجابة بالعربي\\", \\"question_en\\": \\"Question in English\\", \\"answer_en\\": \\"Answer in English\\"}]",
+  "faqs": "[{\\"question_ar\\": \\"سؤال بالعربي 1\\", \\"answer_ar\\": \\"إجابة بالعربي\\", \\"question_en\\": \\"Question in English 1\\", \\"answer_en\\": \\"Answer in English\\"}, {\\"question_ar\\": \\"سؤال بالعربي 2\\", \\"answer_ar\\": \\"إجابة بالعربي\\", \\"question_en\\": \\"Question in English 2\\", \\"answer_en\\": \\"Answer in English\\"}, {\\"question_ar\\": \\"سؤال بالعربي 3\\", \\"answer_ar\\": \\"إجابة بالعربي\\", \\"question_en\\": \\"Question in English 3\\", \\"answer_en\\": \\"Answer in English\\"}, {\\"question_ar\\": \\"سؤال بالعربي 4\\", \\"answer_ar\\": \\"إجابة بالعربي\\", \\"question_en\\": \\"Question in English 4\\", \\"answer_en\\": \\"Answer in English\\"}, {\\"question_ar\\": \\"سؤال بالعربي 5\\", \\"answer_ar\\": \\"إجابة بالعربي\\", \\"question_en\\": \\"Question in English 5\\", \\"answer_en\\": \\"Answer in English\\"}]",
   "dosageCalculator": "{\\"enabled\\": true/false (true if product requires dose calc like vitamins/minerals/sports supplements, false for general creams/beauty), \\"genderTarget\\": \\"both\\"/\\"male\\"/\\"female\\", \\"title\\": \\"حاسبة الجرعة الموصى بها (مثال: حاسبة جرعة المغنيسيوم الذكية)\\", \\"icon\\": \\"Activity\\"/\\"Sun\\"/\\"Droplet\\"/\\"Moon\\"/\\"Dumbbell\\"/\\"Sparkles\\", \\"optionsLabel\\": \\"الهدف الأساسي:\\", \\"rules\\": [{\\"value\\": \\"sleep\\", \\"label\\": \\"النوم والاسترخاء\\", \\"icon\\": \\"Moon\\", \\"maleDose\\": \\"400 ملجم من المغنيسيوم العنصري\\", \\"maleCapsules\\": \\"كبسولتين يومياً\\", \\"maleTip\\": \\"يفضل تناوله قبل النوم بـ 30-60 دقيقة.\\", \\"femaleDose\\": \\"320 ملجم من المغنيسيوم العنصري\\", \\"femaleCapsules\\": \\"كبسولتين يومياً\\", \\"femaleTip\\": \\"يفضل تناوله قبل النوم بـ 30-60 دقيقة.\\"}]}"
 }`
             },
@@ -765,6 +767,18 @@ export function useAdminDashboard() {
       "answer_ar": "إجابة احترافية 3 بالعربية.",
       "question_en": "Question 3 in English?",
       "answer_en": "Professional answer 3 in English."
+    },
+    {
+      "question_ar": "سؤال شائع 4 بالعربية؟",
+      "answer_ar": "إجابة احترافية 4 بالعربية.",
+      "question_en": "Question 4 in English?",
+      "answer_en": "Professional answer 4 in English."
+    },
+    {
+      "question_ar": "سؤال شائع 5 بالعربية؟",
+      "answer_ar": "إجابة احترافية 5 بالعربية.",
+      "question_en": "Question 5 in English?",
+      "answer_en": "Professional answer 5 in English."
     }
   ]
 }`
@@ -1229,7 +1243,8 @@ export function useAdminDashboard() {
           from_email: fromEmail,
           from_name: fromName,
           whatsapp_number: whatsappNumber,
-          receiving_number: receivingNumber
+          receiving_number: receivingNumber,
+          shipping_rates: shippingRates
         })
       })
       if (res.ok) {
@@ -1542,6 +1557,8 @@ export function useAdminDashboard() {
     settingsSaveLoading,
     handleSaveGeneralSettings,
     handleSendTestEmail,
+    shippingRates,
+    setShippingRates,
     tabs: ADMIN_TABS
   }
 }

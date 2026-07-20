@@ -35,7 +35,9 @@ export const translations: Record<string, Record<string, string>> = {
     footer_about_us: "من نحن",
     footer_shipping: "سياسة الشحن",
     footer_returns: "سياسة الإرجاع",
+    footer_privacy: "سياسة الخصوصية",
     footer_faq: "الأسئلة الشائعة",
+    footer_address: "شارع مصطفى النحاس، مدينة نصر، القاهرة، مصر",
 
     // Common Buttons / Labels
     add_to_cart: "أضف للعربة",
@@ -291,6 +293,9 @@ export const translations: Record<string, Record<string, string>> = {
     policy_returns_title: "سياسة الإرجاع والاستبدال | The VitaHub",
     policy_returns_heading: "سياسة الإرجاع والاستبدال",
     policy_returns_content: "صحتك ورضاك هما أولويتنا القصوى في The VitaHub. لذلك نقدم سياسة إرجاع واستبدال مرنة:\n\n- يحق للعميل طلب إرجاع أو استبدال المنتج خلال 7 أيام من تاريخ الاستلام.\n- يشترط أن يكون المنتج في حالته الأصلية، غير مفتوح، ومغلفاً بغلافه الأصلي مع وجود ملصق الأمان وسليماً بالكامل.\n- المنتجات المفتوحة أو المستخدمة لا يمكن إرجاعها أو استبدالها حفاظاً على السلامة العامة والاشتراطات الصحية.\n- في حال وجود عيب مصنعي أو خطأ في الطلب من طرفنا، نتحمل كامل مصاريف الشحن للإرجاع والاستبدال.\n- يتم استرداد المبلغ المدفوع بنفس طريقة الدفع أو كحوالة بريدية أو محفظة إلكترونية بعد فحص المنتج والتأكد من سلامته.",
+    policy_privacy_title: "سياسة الخصوصية | The VitaHub",
+    policy_privacy_heading: "سياسة الخصوصية",
+    policy_privacy_content: "في The VitaHub، نولي أهمية قصوى لحماية خصوصيتك وبياناتك الشخصية. توضح هذه السياسة كيف نجمع ونستخدم معلوماتك:\n\n- جمع البيانات: نقوم بجمع المعلومات الضرورية فقط لإتمام طلبك وتحسين تجربتك في التسوق، مثل الاسم، رقم الهاتف، والعنوان.\n- الاستخدام: تستخدم بياناتك لمعالجة الطلبات، توصيل الشحنات، وإرسال التحديثات أو العروض الخاصة إذا اشتركت في النشرة البريدية.\n- حماية البيانات: نتخذ إجراءات أمنية صارمة لحماية معلوماتك من الوصول غير المصرح به أو الاستخدام أو التعديل.\n- مشاركة البيانات: نحن لا نبيع أو نؤجر معلوماتك الشخصية لأي جهات خارجية. قد نشارك بعض البيانات الضرورية فقط مع شركاء الشحن لضمان توصيل طلبك.\n- حقوقك: يحق لك في أي وقت تعديل أو حذف بياناتك الشخصية من خلال إعدادات حسابك أو بالتواصل مع خدمة العملاء.",
   },
   en: {
     // Navigation
@@ -328,7 +333,9 @@ export const translations: Record<string, Record<string, string>> = {
     footer_about_us: "About Us",
     footer_shipping: "Shipping Policy",
     footer_returns: "Returns Policy",
+    footer_privacy: "Privacy Policy",
     footer_faq: "FAQ",
+    footer_address: "Mostafa El-Nahas St, Nasr City, Cairo, Egypt",
 
     // Common Buttons / Labels
     add_to_cart: "Add to Cart",
@@ -584,6 +591,9 @@ export const translations: Record<string, Record<string, string>> = {
     policy_returns_title: "Returns & Exchange Policy | The VitaHub",
     policy_returns_heading: "Returns & Exchange Policy",
     policy_returns_content: "Your health and satisfaction are our top priority at The VitaHub. That's why we offer a flexible return and exchange policy:\n\n- Customers have the right to request a return or exchange within 7 days of receipt.\n- The product must be in its original condition, unopened, in its original packaging with safety seals intact.\n- Opened or used products cannot be returned or exchanged due to health and safety regulations.\n- If there is a manufacturing defect or an error in the order on our part, we cover all return and exchange shipping costs.\n- Refunds are processed to the original payment method, postal transfer, or mobile wallet after checking product integrity.",
+    policy_privacy_title: "Privacy Policy | The VitaHub",
+    policy_privacy_heading: "Privacy Policy",
+    policy_privacy_content: "At The VitaHub, we place the utmost importance on protecting your privacy and personal data. This policy explains how we collect and use your information:\n\n- Data Collection: We collect only the information necessary to process your order and improve your shopping experience, such as name, phone number, and address.\n- Usage: Your data is used to process orders, deliver shipments, and send updates or special offers if you subscribe to our newsletter.\n- Data Protection: We take strict security measures to protect your information from unauthorized access, use, or modification.\n- Data Sharing: We do not sell or rent your personal information to third parties. We may only share necessary data with shipping partners to ensure your order is delivered.\n- Your Rights: You have the right at any time to modify or delete your personal data through your account settings or by contacting customer service.",
   }
 };
 

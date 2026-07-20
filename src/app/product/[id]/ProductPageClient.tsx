@@ -463,9 +463,9 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 1.02 }}
                     transition={{ duration: 0.35, ease: 'easeOut' }}
-                    className="aspect-[4/5] rounded-2xl sm:rounded-[3rem] bg-[#f0f7f4] overflow-hidden border border-[#e8f0ed] flex items-center justify-center relative shadow-sm group"
+                    className="aspect-[4/5] flex items-center justify-center relative group"
                   >
-                    <div className="w-full h-full relative z-10 p-4 sm:p-8 flex items-center justify-center pointer-events-auto">
+                    <div className="w-full h-full relative z-10 p-8 sm:p-16 flex items-center justify-center pointer-events-auto">
                       <InnerImageZoom
                         src={activeImage}
                         zoomSrc={activeImage}
@@ -507,7 +507,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                       onClick={() => setActiveImage(img)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`aspect-[4/5] rounded-xl xs:rounded-2xl bg-[#f0f7f4] border-2 cursor-pointer transition-all overflow-hidden relative ${activeImage === img ? 'border-primary shadow-md shadow-primary/10' : 'border-[#e8f0ed] hover:border-primary/50'}`}
+                      className={`aspect-[4/5] cursor-pointer transition-all relative flex items-center justify-center ${activeImage === img ? 'opacity-100 scale-105' : 'opacity-60 hover:opacity-100'}`}
                     >
                       <div className="w-full h-full relative z-10 p-2 pointer-events-auto">
                         <InnerImageZoom

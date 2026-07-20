@@ -10,7 +10,7 @@ import { getProductUrlParam } from '@/lib/slug'
 import InnerImageZoom from 'react-inner-image-zoom'
 import 'react-inner-image-zoom/lib/styles.min.css'
 import { newestProducts } from '@/lib/product-display'
-import { Star, ShieldCheck, Truck, RotateCcw, Plus, Minus, Heart, ShoppingCart, Check, ChevronLeft, CheckCircle2, Building2, Sparkles, Droplet, Sun, Activity, Info, Moon, Dumbbell, Flame, Calendar, Clock, Download } from 'lucide-react'
+import { Star, ShieldCheck, Truck, RotateCcw, Plus, Minus, Heart, ShoppingCart, Check, ChevronLeft, CheckCircle2, Building2, Sparkles, Droplet, Sun, Activity, Info, Moon, Dumbbell, Flame, Calendar, Clock } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -480,19 +480,6 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                         }}
                       />
                     </div>
-
-                    {/* Download Image Button */}
-                    <a
-                      href={`/api/og/product?url=${encodeURIComponent(activeImage)}`}
-                      download={`${getProductUrlParam(product)}.jpg`}
-                      className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm text-gray-700 hover:text-primary hover:bg-white p-2.5 rounded-full shadow-lg z-20 transition-all duration-300 hover:scale-110 flex items-center justify-center gap-2 group/btn"
-                      title={language === 'ar' ? 'تحميل الصورة' : 'Download Image'}
-                    >
-                      <Download size={18} />
-                      <span className="text-[10px] font-black hidden group-hover/btn:block opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pr-1">
-                        {language === 'ar' ? 'حفظ الصورة' : 'Save Image'}
-                      </span>
-                    </a>
 
                     {/* Discount badge on image */}
                     {discountPercent && (

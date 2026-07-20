@@ -159,12 +159,6 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
             {cardImage ? (
               <>
                 <Image
-                  src="/frame.png"
-                  alt="Frame"
-                  fill
-                  className="object-cover pointer-events-none z-0"
-                />
-                <Image
                   src={cardImage}
                   alt={imgAlt}
                   fill

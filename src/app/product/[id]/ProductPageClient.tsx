@@ -468,7 +468,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     <div className="w-full h-full relative z-10 p-8 sm:p-16 flex items-center justify-center pointer-events-auto">
                       <InnerImageZoom
                         src={activeImage}
-                        zoomSrc={activeImage}
+                        zoomSrc={`/api/og/product?url=${encodeURIComponent(activeImage)}`}
                         zoomType="hover"
                         zoomScale={1.5}
                         hideCloseButton={true}
@@ -512,7 +512,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                       <div className="w-full h-full relative z-10 p-2 pointer-events-auto">
                         <InnerImageZoom
                           src={productImageThumb(img) || img}
-                          zoomSrc={img}
+                          zoomSrc={`/api/og/product?url=${encodeURIComponent(img)}`}
                           zoomType="hover"
                           zoomScale={1.5}
                           hideCloseButton={true}

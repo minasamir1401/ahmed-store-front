@@ -112,7 +112,9 @@ const productSeoDescription = (product: ProductData, isEn: boolean) => {
 
 const productSeoImage = (product: ProductData, siteUrl: string) => {
   const imageUrl = absoluteProductImageUrl(productMainImage(product.image), siteUrl) || `${siteUrl}/logo-header.jpg`
-  return withImageVersion(imageUrl, productImageVersion(product))
+  const baseImg = withImageVersion(imageUrl, productImageVersion(product))
+  // Use the OG endpoint to composite the frame for SEO
+  return `${siteUrl}/api/og/product?url=${encodeURIComponent(baseImg)}`
 }
 
 // dynamic SEO metadata generation on the server

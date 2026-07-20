@@ -24,6 +24,17 @@ function HeaderContent() {
   const { wishlist } = useWishlist()
   const { language, toggleLanguage, t } = useLanguage()
 
+  const getLanguageSwitchUrl = () => {
+    const params = new URLSearchParams(searchParams?.toString() || '')
+    if (language === 'ar') {
+      params.set('lang', 'en')
+    } else {
+      params.delete('lang')
+    }
+    const query = params.toString()
+    return `${pathname}${query ? `?${query}` : ''}`
+  }
+
   React.useEffect(() => {
     queueMicrotask(() => setSearchQuery(searchParams?.get('search') || ''))
   }, [searchParams])
@@ -132,15 +143,15 @@ function HeaderContent() {
 
               {/* Left Side: Actions */}
               <div className="flex items-center gap-1.5 xs:gap-2 md:gap-4 flex-shrink-0">
-                {/* Language Switcher */}
-                <button
-                  onClick={toggleLanguage}
+                {/* Language Switcher - Link for SEO Crawling */}
+                <Link
+                  href={getLanguageSwitchUrl()}
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-slate-200 hover:border-primary hover:bg-primary/5 transition-all text-[11px] font-black text-slate-700 cursor-pointer"
                   aria-label="Language switcher"
                 >
                   <Globe className="w-3.5 h-3.5 text-primary" />
                   <span>{language === 'ar' ? 'EN' : 'العربية'}</span>
-                </button>
+                </Link>
 
                 {user ? (
                   <Link href="/profile" className="flex items-center gap-2 text-muted hover:text-primary transition-colors">
@@ -378,17 +389,15 @@ function HeaderContent() {
 
               {/* Drawer Footer */}
               <div className="p-4 xs:p-6 border-t border-[#e8f0ed] bg-gray-50/50 relative z-10 flex flex-col gap-3">
-                {/* Mobile Drawer Language switcher */}
-                <button
-                  onClick={() => {
-                    toggleLanguage()
-                    setIsMenuOpen(false)
-                  }}
+                {/* Mobile Drawer Language switcher - Link for SEO Crawling */}
+                <Link
+                  href={getLanguageSwitchUrl()}
+                  onClick={() => setIsMenuOpen(false)}
                   className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 py-3 rounded-2xl font-black text-xs xs:text-sm flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer"
                 >
                   <Globe size={18} className="text-primary" />
                   {language === 'ar' ? 'English' : 'العربية'}
-                </button>
+                </Link>
 
                 <div className="flex flex-col gap-3 xs:gap-4">
                   {user ? (

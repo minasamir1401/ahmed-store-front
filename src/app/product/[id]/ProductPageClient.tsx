@@ -44,7 +44,9 @@ const stagger: any = {
 function WooZoom({ src, alt }: { src: string; alt: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({ opacity: 0, position: 'absolute', pointerEvents: 'none' })
-  const [naturalSize, setNaturalSize] = useState({ w: 1920, h: 1920 })
+  const [naturalSize, setNaturalSize] = useState({ w: 1080, h: 1080 })
+
+  const mergedUrl = `/api/og/product?url=${encodeURIComponent(src)}`
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = containerRef.current?.getBoundingClientRect()
@@ -72,34 +74,24 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full relative overflow-hidden"
+      className="w-full h-full relative overflow-hidden cursor-zoom-in"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Frame overlay - z-10 (at the back) */}
+      {/* Merged display image (Product + Frame combined by backend) */}
       <img
-        src="/frame.png"
-        alt=""
-        aria-hidden
-        className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-        style={{ zIndex: 10 }}
+        src={mergedUrl}
+        alt={alt}
+        className="w-full h-full object-contain select-none"
+        draggable={false}
+        onLoad={(e) => {
+          const img = e.target as HTMLImageElement
+          if (img.naturalWidth > 0) setNaturalSize({ w: img.naturalWidth, h: img.naturalHeight })
+        }}
       />
-      {/* Normal display image - z-[15] (on top of frame) and scaled to fit inside frame */}
-      <div className="absolute inset-[8%]" style={{ zIndex: 15 }}>
-        <img
-          src={src}
-          alt={alt}
-          className="w-full h-full object-contain mix-blend-multiply select-none"
-          draggable={false}
-          onLoad={(e) => {
-            const img = e.target as HTMLImageElement
-            if (img.naturalWidth > 0) setNaturalSize({ w: img.naturalWidth, h: img.naturalHeight })
-          }}
-        />
-      </div>
-      {/* WooCommerce-style zoom image (follows cursor) - z-[20] (on top of both) */}
+      {/* WooCommerce-style zoom image (also uses mergedUrl so frame is visible during zoom) */}
       <img
-        src={src}
+        src={mergedUrl}
         alt=""
         aria-hidden
         style={zoomStyle}

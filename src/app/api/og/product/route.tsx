@@ -6,6 +6,38 @@ import fs from 'fs/promises'
 // Use Node.js runtime instead of Edge because sharp relies on native Node.js addons
 export const runtime = 'nodejs'
 
+async function fetchWithFallbacks(urlPath: string, req: NextRequest): Promise<Buffer> {
+  // 1. Try local file system
+  try {
+    const localPath = path.join(process.cwd(), 'public', urlPath.split('?')[0])
+    return await fs.readFile(localPath)
+  } catch (err) {
+    console.warn(`Local file not found for ${urlPath}, trying fetch...`)
+  }
+
+  // 2. Try localhost fetch
+  try {
+    const port = process.env.PORT || 3000
+    const localUrl = `http://127.0.0.1:${port}${urlPath.startsWith('/') ? '' : '/'}${urlPath}`
+    const res = await fetch(localUrl)
+    if (res.ok) {
+      return Buffer.from(await res.arrayBuffer())
+    }
+  } catch (err) {
+    console.warn(`Localhost fetch failed for ${urlPath}, trying absolute url...`)
+  }
+
+  // 3. Try absolute url based on request host
+  const host = req.headers.get('host') || 'localhost:3000'
+  const protocol = host.includes('localhost') ? 'http' : 'https'
+  const absoluteUrl = `${protocol}://${host}${urlPath.startsWith('/') ? '' : '/'}${urlPath}`
+  const res = await fetch(absoluteUrl)
+  if (!res.ok) {
+    throw new Error(`Failed to fetch image from all fallbacks: ${res.statusText}`)
+  }
+  return Buffer.from(await res.arrayBuffer())
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -24,58 +56,54 @@ export async function GET(req: NextRequest) {
       // Ignore
     }
 
-    let productBuffer: Buffer | null = null
-
-    // If it's a local upload, read it directly from public folder to avoid fetch issues
-    if (imgUrl.startsWith('/uploads/')) {
-      const filePath = path.join(process.cwd(), 'public', imgUrl)
-      try {
-        productBuffer = await fs.readFile(filePath)
-      } catch (err) {
-        console.warn(`Local file not found: ${filePath}, falling back to fetch.`)
+    let productBuffer: Buffer
+    try {
+      if (imgUrl.startsWith('http')) {
+        const res = await fetch(imgUrl)
+        if (!res.ok) throw new Error('External fetch failed')
+        productBuffer = Buffer.from(await res.arrayBuffer())
+      } else {
+        productBuffer = await fetchWithFallbacks(imgUrl, req)
       }
+    } catch (e: any) {
+      return new NextResponse(`Product image not found: ${e.message}`, { 
+        status: 500, 
+        headers: { 'X-Error-Context': 'product-fetch', 'X-Error-Message': e.message || 'Unknown' } 
+      })
     }
 
-    // Fallback to fetch if not found locally or if it's an external URL
-    if (!productBuffer) {
-      const host = req.headers.get('host') || 'localhost:3000'
-      const protocol = host.includes('localhost') ? 'http' : 'https'
-      const baseUrl = `${protocol}://${host}`
-      
-      const finalImgUrl = imgUrl.startsWith('http') ? imgUrl : `${baseUrl}${imgUrl.startsWith('/') ? '' : '/'}${imgUrl}`
-
-      const imgRes = await fetch(finalImgUrl)
-      if (!imgRes.ok) throw new Error(`Failed to fetch image: ${imgRes.statusText}`)
-      const arrayBuffer = await imgRes.arrayBuffer()
-      productBuffer = Buffer.from(arrayBuffer)
-    }
-
-    // Load frame from public folder
-    const framePath = path.join(process.cwd(), 'public', 'frame.png')
     let frameBuffer: Buffer;
     try {
-      frameBuffer = await fs.readFile(framePath)
-    } catch (err) {
-      console.error('Frame image not found at public/frame.png')
-      return new NextResponse('Frame image not found', { status: 500 })
+      frameBuffer = await fetchWithFallbacks('/frame.png', req)
+    } catch (e: any) {
+      return new NextResponse(`Frame image not found: ${e.message}`, { 
+        status: 500,
+        headers: { 'X-Error-Context': 'frame-fetch', 'X-Error-Message': e.message || 'Unknown' }
+      })
     }
     
     // Process image with Sharp
-    // 1. Resize product image to fit inside 1080x1080 canvas with white background
-    const resizedProduct = await sharp(productBuffer)
-      .resize(1080, 1080, {
-        fit: 'contain',
-        background: { r: 255, g: 255, b: 255, alpha: 1 }
+    let finalImage: Buffer
+    try {
+      const resizedProduct = await sharp(productBuffer)
+        .resize(1080, 1080, {
+          fit: 'contain',
+          background: { r: 255, g: 255, b: 255, alpha: 1 }
+        })
+        .toBuffer()
+
+      finalImage = await sharp(resizedProduct)
+        .composite([{ input: frameBuffer, gravity: 'center' }])
+        .jpeg({ quality: 90 }) // Convert output to JPEG for maximum compatibility
+        .toBuffer()
+    } catch (e: any) {
+      return new NextResponse(`Sharp processing failed: ${e.message}`, {
+        status: 500,
+        headers: { 'X-Error-Context': 'sharp-processing', 'X-Error-Message': e.message || 'Unknown' }
       })
-      .toBuffer()
+    }
 
-    // 2. Composite the frame over the resized product image
-    const finalImage = await sharp(resizedProduct)
-      .composite([{ input: frameBuffer, gravity: 'center' }])
-      .jpeg({ quality: 90 }) // Convert output to JPEG for maximum compatibility
-      .toBuffer()
-
-    return new NextResponse(finalImage, {
+    return new NextResponse(finalImage as any, {
       headers: {
         'Content-Type': 'image/jpeg',
         'Cache-Control': 'public, max-age=31536000, immutable',
@@ -83,6 +111,9 @@ export async function GET(req: NextRequest) {
     })
   } catch (e: any) {
     console.error('OG Image Generation Error:', e)
-    return new NextResponse('Failed to generate image', { status: 500 })
+    return new NextResponse(`Critical Error: ${e.message}`, { 
+      status: 500,
+      headers: { 'X-Error-Context': 'global', 'X-Error-Message': e.message || 'Unknown' }
+    })
   }
 }

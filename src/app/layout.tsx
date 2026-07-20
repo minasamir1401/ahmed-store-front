@@ -192,6 +192,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ModalProvider } from "@/context/ModalContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import ConsoleManager from "@/components/ConsoleManager";
+import { headers } from 'next/headers'
 import TrackingPixels from "@/components/TrackingPixels";
 
 // ─── Root Layout ────────────────────────────────────────────────────────────
@@ -200,10 +201,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const requestHeaders = await headers();
+  const lang = requestHeaders.get('x-lang') || 'ar';
+  const dir = lang === 'en' ? 'ltr' : 'rtl';
+
   return (
     <html
-      lang="ar"
-      dir="rtl"
+      lang={lang}
+      dir={dir}
       className="h-full antialiased"
     >
       <head>

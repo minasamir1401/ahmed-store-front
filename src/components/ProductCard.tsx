@@ -168,6 +168,14 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
                   onError={() => setImgError(true)}
                   style={{ pointerEvents: 'none' }}
                 />
+                {/* Visible Frame Overlay */}
+                <Image
+                  src="/frame.png"
+                  alt="Frame"
+                  fill
+                  className="object-contain relative z-15 pointer-events-none"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
+                />
                 {/* Right-click catch layer for downloading framed image */}
                 <img 
                   src={`/api/og/product?url=${encodeURIComponent(cardImage)}`}

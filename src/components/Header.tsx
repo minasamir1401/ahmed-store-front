@@ -105,7 +105,7 @@ function HeaderContent() {
                     {t('nav_health_tips')}
                     <span className="absolute bottom-[-6px] right-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
                   </Link>
-                  <Link href="/track" className="relative group text-foreground/70 hover:text-primary transition-all duration-300 whitespace-nowrap">
+                  <Link href="/order-status" className="relative group text-foreground/70 hover:text-primary transition-all duration-300 whitespace-nowrap">
                     {t('nav_track_order')}
                     <span className="absolute bottom-[-6px] right-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
                   </Link>
@@ -313,7 +313,7 @@ function HeaderContent() {
                       badge: null
                     },
                     {
-                      href: "/track",
+                      href: "/order-status",
                       label: language === 'ar' ? "تتبع الطلب" : "Track Order",
                       icon: (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">

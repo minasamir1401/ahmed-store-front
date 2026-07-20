@@ -468,9 +468,9 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     <div className="w-full h-full relative z-10 p-4 sm:p-8 flex items-center justify-center pointer-events-auto">
                       <InnerImageZoom
                         src={activeImage}
-                        zoomSrc={`/api/og/product?url=${encodeURIComponent(activeImage)}`}
+                        zoomSrc={activeImage}
                         zoomType="hover"
-                        zoomScale={1.5}
+                        zoomScale={2}
                         hideCloseButton={true}
                         hideHint={true}
                         className="w-full h-full mix-blend-multiply"
@@ -509,21 +509,15 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                       whileTap={{ scale: 0.95 }}
                       className={`aspect-[4/5] cursor-pointer transition-all relative flex items-center justify-center ${activeImage === img ? 'opacity-100 scale-105' : 'opacity-60 hover:opacity-100'}`}
                     >
-                      <div className="w-full h-full relative z-10 p-2 pointer-events-auto">
-                        <InnerImageZoom
-                          src={productImageThumb(img) || img}
-                          zoomSrc={`/api/og/product?url=${encodeURIComponent(img)}`}
-                          zoomType="hover"
-                          zoomScale={1.5}
-                          hideCloseButton={true}
-                          hideHint={true}
-                          className="w-full h-full mix-blend-multiply"
-                          imgAttributes={{
-                            className: "w-full h-full object-contain",
-                            alt: `${mainImageAlt} ${i + 1}`
-                          }}
-                        />
-                      </div>
+                        <div className="w-full h-full relative z-10 p-2 pointer-events-auto">
+                          <Image
+                            src={productImageThumb(img) || img}
+                            alt={`${mainImageAlt} ${i + 1}`}
+                            fill
+                            className="object-contain mix-blend-multiply"
+                            sizes="(max-width: 768px) 25vw, 150px"
+                          />
+                        </div>
 
                     </motion.div>
                   ))}

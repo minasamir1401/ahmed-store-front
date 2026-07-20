@@ -73,6 +73,12 @@ const nextConfig = {
         destination: 'https://the-vitahub.com/:path*',
         permanent: true, // 301 Redirect
       },
+      // Redirect old /track URL to /order-status (avoids ad blocker blocking)
+      {
+        source: '/track',
+        destination: '/order-status',
+        permanent: true,
+      },
     ];
   },
 

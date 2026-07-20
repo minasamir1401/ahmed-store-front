@@ -74,7 +74,7 @@ export default function Footer() {
               <li><Link href="/shipping" className="hover:text-emerald-700 transition-colors">{t('footer_shipping')}</Link></li>
               <li><Link href="/returns" className="hover:text-emerald-700 transition-colors">{t('footer_returns')}</Link></li>
               <li><Link href="/privacy-policy" className="hover:text-emerald-700 transition-colors">{t('footer_privacy')}</Link></li>
-              <li><Link href="/track" className="hover:text-emerald-700 transition-colors">{t('nav_track_order')}</Link></li>
+              <li><Link href="/order-status" className="hover:text-emerald-700 transition-colors">{t('nav_track_order')}</Link></li>
               <li><Link href="/bmi-calculator" className="hover:text-emerald-700 transition-colors">{t('nav_bmi')}</Link></li>
             </ul>
           </div>

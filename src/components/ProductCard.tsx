@@ -158,25 +158,28 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
           <div className="relative w-full h-full">
             {cardImage ? (
               <>
-                <Image
-                  src={cardImage}
-                  alt={imgAlt}
-                  fill
-                  className="object-contain relative z-10"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
-                  loading="lazy"
-                  onError={() => setImgError(true)}
-                  style={{ pointerEvents: 'none' }}
-                />
-                {/* Visible Frame Overlay */}
+                {/* Product image - inset 8% so frame border is visible around it */}
+                <div className="absolute inset-[8%] z-10">
+                  <Image
+                    src={cardImage}
+                    alt={imgAlt}
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
+                    loading="lazy"
+                    onError={() => setImgError(true)}
+                    style={{ pointerEvents: 'none' }}
+                  />
+                </div>
+                {/* Frame overlay - z-[15] so it renders ON TOP of product */}
                 <Image
                   src="/frame.png"
                   alt="Frame"
                   fill
-                  className="object-contain relative z-15 pointer-events-none"
+                  className="object-contain z-[15] pointer-events-none"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
                 />
-                {/* Right-click catch layer for downloading framed image */}
+                {/* Hidden merged image for right-click save (product + frame composited) */}
                 <img 
                   src={`/api/og/product?url=${encodeURIComponent(cardImage)}`}
                   alt={imgAlt}

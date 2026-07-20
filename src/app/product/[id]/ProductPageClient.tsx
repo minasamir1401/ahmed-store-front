@@ -465,10 +465,10 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                     className="aspect-[4/5] rounded-2xl sm:rounded-[3rem] bg-[#f0f7f4] overflow-hidden border border-[#e8f0ed] flex items-center justify-center relative shadow-sm group"
                   >
+                    <Image src="/frame.png" alt="Frame" fill className="object-cover pointer-events-none z-0" />
                     <Zoom>
-                      <Image src={activeImage} width={typeof mainImageWidth === 'number' ? mainImageWidth : parseInt(mainImageWidth)} height={typeof mainImageHeight === 'number' ? mainImageHeight : parseInt(mainImageHeight)} className="w-full h-full object-contain p-10 sm:p-20 mix-blend-multiply group-hover:scale-105 transition-transform duration-500 relative z-10" alt={mainImageAlt} priority sizes="(max-width: 768px) 100vw, 800px" style={{ pointerEvents: 'auto' }} />
+                      <Image src={activeImage} width={typeof mainImageWidth === 'number' ? mainImageWidth : parseInt(mainImageWidth)} height={typeof mainImageHeight === 'number' ? mainImageHeight : parseInt(mainImageHeight)} className="w-full h-full object-contain p-12 sm:p-24 mix-blend-multiply group-hover:scale-105 transition-transform duration-500 relative z-10" alt={mainImageAlt} priority sizes="(max-width: 768px) 100vw, 800px" style={{ pointerEvents: 'auto' }} />
                     </Zoom>
-                    <Image src="/frame.png" alt="Frame" fill className="object-cover pointer-events-none z-20 opacity-90" />
 
                     {/* Discount badge on image */}
                     {discountPercent && (
@@ -498,10 +498,10 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                       whileTap={{ scale: 0.95 }}
                       className={`aspect-[4/5] rounded-xl xs:rounded-2xl bg-[#f0f7f4] border-2 cursor-pointer transition-all overflow-hidden relative ${activeImage === img ? 'border-primary shadow-md shadow-primary/10' : 'border-[#e8f0ed] hover:border-primary/50'}`}
                     >
+                      <Image src="/frame.png" alt="Frame" fill className="object-cover pointer-events-none z-0" />
                       <Zoom>
-                        <Image src={productImageThumb(img) || img} width={160} height={160} className="w-full h-full object-contain p-4 mix-blend-multiply relative z-10" alt={`${mainImageAlt} ${i + 1}`} sizes="160px" style={{ pointerEvents: 'auto' }} />
+                        <Image src={productImageThumb(img) || img} width={160} height={160} className="w-full h-full object-contain p-5 mix-blend-multiply relative z-10" alt={`${mainImageAlt} ${i + 1}`} sizes="160px" style={{ pointerEvents: 'auto' }} />
                       </Zoom>
-                      <Image src="/frame.png" alt="Frame" fill className="object-cover pointer-events-none z-20" />
 
                     </motion.div>
                   ))}

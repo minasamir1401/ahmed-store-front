@@ -103,7 +103,10 @@ export async function GET(req: NextRequest) {
       })
     }
 
-    return new NextResponse(finalImage as any, {
+    // Create an unshared ArrayBuffer copy to avoid 'SharedArrayBuffer is not allowed' errors in Next.js
+    const safeBuffer = finalImage.buffer.slice(finalImage.byteOffset, finalImage.byteOffset + finalImage.byteLength)
+
+    return new NextResponse(safeBuffer as ArrayBuffer, {
       headers: {
         'Content-Type': 'image/jpeg',
         'Cache-Control': 'public, max-age=31536000, immutable',

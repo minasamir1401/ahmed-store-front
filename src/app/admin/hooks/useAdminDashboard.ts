@@ -198,15 +198,23 @@ export function useAdminDashboard() {
     const headers = new Headers(getAuthHeaders(contentType))
     new Headers(init.headers).forEach((value, key) => headers.set(key, value))
 
-    const res = await fetch(url, { ...init, headers })
-    if (res.status === 401) {
-      clearAdminSession()
-      await showAlert('انتهت جلسة المسؤول. سجل الدخول مرة أخرى ثم أعد رفع الصورة.', 'انتهت الجلسة')
-      const error = new Error('انتهت جلسة المسؤول')
-        ; (error as any).isAdminUnauthorized = true
-      throw error
+    try {
+      const res = await fetch(url, { ...init, headers })
+      if (res.status === 401) {
+        clearAdminSession()
+        await showAlert('انتهت جلسة المسؤول. سجل الدخول مرة أخرى ثم أعد إكمال طلبك.', 'انتهت الجلسة')
+        const error = new Error('انتهت جلسة المسؤول')
+          ; (error as any).isAdminUnauthorized = true
+        throw error
+      }
+      return res
+    } catch (err: any) {
+      if (err.isAdminUnauthorized) throw err
+      if (err.name === 'TypeError' || err.message?.includes('Failed to fetch')) {
+        throw new Error('تم حظر الطلب بواسطة المتصفح أو أداة حظر الإعلانات (AdBlock). يرجى إيقاف AdBlock للموقع ثم المحاولة.')
+      }
+      throw err
     }
-    return res
   }
 
   const fetchWhatsappStatus = async () => {
@@ -677,9 +685,10 @@ export function useAdminDashboard() {
       } else {
         throw new Error(data.error?.message || 'Invalid Response')
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
-      addLog('فشل الذكاء الاصطناعي، يرجى المحاولة مرة أخرى.')
+      addLog(`فشل الذكاء الاصطناعي: ${err.message || 'يرجى المحاولة مرة أخرى'}`)
+      await showAlert(`فشل توليد تفاصيل المنتج: ${err.message || 'يرجى المحاولة مرة أخرى'}`, 'خطأ في الذكاء الاصطناعي')
     } finally {
       setIsAILoading(false)
     }
@@ -831,6 +840,7 @@ export function useAdminDashboard() {
     } catch (err: any) {
       console.error(err)
       addLog(`فشل توليد الـ SEO: ${err.message}`)
+      await showAlert(`فشل توليد الـ SEO: ${err.message}`, 'خطأ في توليد الـ SEO')
     } finally {
       setIsSEOLoading(false)
     }

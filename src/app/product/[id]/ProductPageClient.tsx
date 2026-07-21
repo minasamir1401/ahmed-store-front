@@ -73,7 +73,7 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
         style={{ zIndex: 10 }}
       />
       {/* Product display image - z-[15] (on top of frame) with contained cursor zoom */}
-      <div className="absolute top-[13%] bottom-[13%] left-[6%] right-[6%] overflow-hidden" style={{ zIndex: 15 }}>
+      <div className="absolute top-[17.5%] bottom-[19.5%] left-[9%] right-[9%] overflow-hidden" style={{ zIndex: 15 }}>
         <img
           src={src}
           alt={alt}

@@ -167,7 +167,7 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
                 />
                 {/* Product image - constrained inside frame inner box */}
-                <div className="absolute top-[13%] bottom-[13%] left-[6%] right-[6%] z-[15]">
+                <div className="absolute top-[17.5%] bottom-[19.5%] left-[9%] right-[9%] z-[15]">
                   <Image
                     src={cardImage}
                     alt={imgAlt}

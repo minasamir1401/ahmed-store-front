@@ -27,7 +27,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (isAdmin) {
       document.documentElement.lang = 'ar';
       document.documentElement.dir = 'rtl';
-      queueMicrotask(() => setLanguageState('ar'));
+      setLanguageState('ar');
       return;
     }
     
@@ -39,7 +39,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('vitamins_hub_lang', urlLang);
         document.documentElement.lang = urlLang;
         document.documentElement.dir = urlLang === 'ar' ? 'rtl' : 'ltr';
-        queueMicrotask(() => setLanguageState(urlLang));
+        setLanguageState(urlLang);
         return;
       }
     }
@@ -48,7 +48,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (saved && (saved === 'ar' || saved === 'en')) {
       document.documentElement.lang = saved;
       document.documentElement.dir = saved === 'ar' ? 'rtl' : 'ltr';
-      queueMicrotask(() => setLanguageState(saved));
+      setLanguageState(saved);
     } else {
       document.documentElement.lang = 'ar';
       document.documentElement.dir = 'rtl';

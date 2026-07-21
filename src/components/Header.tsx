@@ -146,6 +146,7 @@ function HeaderContent() {
                 {/* Language Switcher - Link for SEO Crawling */}
                 <Link
                   href={getLanguageSwitchUrl()}
+                  onClick={() => toggleLanguage()}
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-slate-200 hover:border-primary hover:bg-primary/5 transition-all text-[11px] font-black text-slate-700 cursor-pointer"
                   aria-label="Language switcher"
                 >
@@ -392,7 +393,10 @@ function HeaderContent() {
                 {/* Mobile Drawer Language switcher - Link for SEO Crawling */}
                 <Link
                   href={getLanguageSwitchUrl()}
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => {
+                    toggleLanguage()
+                    setIsMenuOpen(false)
+                  }}
                   className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 py-3 rounded-2xl font-black text-xs xs:text-sm flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer"
                 >
                   <Globe size={18} className="text-primary" />

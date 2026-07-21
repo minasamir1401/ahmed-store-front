@@ -76,16 +76,8 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Frame overlay - z-10 (behind product) */}
-      <img
-        src="/frame.png"
-        alt=""
-        aria-hidden
-        className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-        style={{ zIndex: 10 }}
-      />
-      {/* Product display image - z-[15] (on top of frame) and scaled to fit inside frame */}
-      <div className="absolute inset-[8%]" style={{ zIndex: 15 }}>
+      {/* Product display image - z-10 (behind frame) and scaled to fit inside frame */}
+      <div className="absolute inset-[8%]" style={{ zIndex: 10 }}>
         <img
           src={src}
           alt={alt}
@@ -97,6 +89,14 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
           }}
         />
       </div>
+      {/* Frame overlay - z-[15] (on top of product) */}
+      <img
+        src="/frame.png"
+        alt=""
+        aria-hidden
+        className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+        style={{ zIndex: 15 }}
+      />
       {/* WooCommerce-style zoom image (follows cursor) - z-20 */}
       <img
         src={src}

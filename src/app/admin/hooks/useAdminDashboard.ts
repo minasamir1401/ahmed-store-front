@@ -573,11 +573,12 @@ export function useAdminDashboard() {
         body: JSON.stringify({
           provider: activeProvider,
           max_tokens: AI_MAX_TOKENS.productFill,
-          model: 'openai/gpt-oss-120b:free',
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
+          response_format: { type: 'json_object' },
           models: [
-            'openai/gpt-oss-120b:free',
-            'openai/gpt-oss-20b:free',
-            'google/gemini-2.5-flash'
+            'meta-llama/llama-3.3-70b-instruct:free',
+            'qwen/qwen-2.5-72b-instruct:free',
+            'google/gemini-2.0-flash-exp:free'
           ],
           messages: [
             {
@@ -718,11 +719,12 @@ export function useAdminDashboard() {
         body: JSON.stringify({
           provider: activeProvider,
           max_tokens: 3000,
-          model: 'openai/gpt-oss-120b:free',
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
+          response_format: { type: 'json_object' },
           models: [
-            'openai/gpt-oss-120b:free',
-            'openai/gpt-oss-20b:free',
-            'google/gemini-2.5-flash'
+            'meta-llama/llama-3.3-70b-instruct:free',
+            'qwen/qwen-2.5-72b-instruct:free',
+            'google/gemini-2.0-flash-exp:free'
           ],
           messages: [
             {
@@ -1025,11 +1027,12 @@ export function useAdminDashboard() {
         body: JSON.stringify({
           provider: aiProvider,
           max_tokens: AI_MAX_TOKENS.tip,
-          model: 'openai/gpt-oss-120b:free',
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
+          response_format: { type: 'json_object' },
           models: [
-            'openai/gpt-oss-120b:free',
-            'openai/gpt-oss-20b:free',
-            'google/gemini-2.5-flash'
+            'meta-llama/llama-3.3-70b-instruct:free',
+            'qwen/qwen-2.5-72b-instruct:free',
+            'google/gemini-2.0-flash-exp:free'
           ],
           messages: [
             {

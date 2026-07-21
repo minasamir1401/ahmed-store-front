@@ -42,29 +42,80 @@ export const ADMIN_TABS = [
 ]
 
 export const parseAIJSON = (str: string) => {
-  let cleaned = str.trim()
-  const match = cleaned.match(/\{[\s\S]*\}/)
-  if (match) cleaned = match[0]
-  cleaned = cleaned.replace(/\\(?!["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '\\\\')
+  if (!str || typeof str !== 'string') {
+    throw new Error('رد الذكاء الاصطناعي فارغ')
+  }
 
-  let insideQuote = false
-  let result = ''
+  let cleaned = str.trim()
+
+  // Remove markdown code fences if present
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
+  }
+
+  // Extract the outermost JSON object {...}
+  const firstBrace = cleaned.indexOf('{')
+  const lastBrace = cleaned.lastIndexOf('}')
+
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    cleaned = cleaned.substring(firstBrace, lastBrace + 1)
+  } else {
+    if (cleaned.startsWith('عذرًا') || cleaned.startsWith('عذرا') || cleaned.toLowerCase().includes('sorry')) {
+      throw new Error(`اعتذر الذكاء الاصطناعي عن تلبية الطلب: "${cleaned.slice(0, 120)}..."`)
+    }
+    throw new Error(`رد الذكاء الاصطناعي ليس بصيغة JSON: "${cleaned.slice(0, 100)}..."`)
+  }
+
+  // 1. Try standard JSON.parse first (fastest & preserves valid JSON quotes)
+  try {
+    return JSON.parse(cleaned)
+  } catch (e1) {
+    // Continue to repair common LLM JSON syntax issues
+  }
+
+  // 2. Fix trailing commas before } or ]
+  cleaned = cleaned.replace(/,(\s*[\}\]])/g, '$1')
+
+  try {
+    return JSON.parse(cleaned)
+  } catch (e2) {
+    // Continue fixing
+  }
+
+  // 3. Fix unescaped newlines, carriage returns, and tabs inside quotes
+  let insideString = false
+  let fixedStr = ''
   for (let i = 0; i < cleaned.length; i++) {
     const char = cleaned[i]
-    const isEscaped = i > 0 && cleaned[i - 1] === '\\' && (i < 2 || cleaned[i - 2] !== '\\')
+    const prevChar = i > 0 ? cleaned[i - 1] : ''
+    const isEscaped = prevChar === '\\' && (i < 2 || cleaned[i - 2] !== '\\')
 
     if (char === '"' && !isEscaped) {
-      insideQuote = !insideQuote
-      result += char
-    } else if (insideQuote) {
-      if (char === '\n') result += '\\n'
-      else if (char === '\r') result += '\\r'
-      else if (char === '\t') result += '\\t'
-      else result += char
+      insideString = !insideString
+      fixedStr += char
+    } else if (insideString) {
+      if (char === '\n') fixedStr += '\\n'
+      else if (char === '\r') fixedStr += '\\r'
+      else if (char === '\t') fixedStr += '\\t'
+      else fixedStr += char
     } else {
-      result += char
+      fixedStr += char
     }
   }
 
-  return JSON.parse(result)
+  try {
+    return JSON.parse(fixedStr)
+  } catch (e3) {
+    // 4. Safe fallback via Function constructor for minor loose syntax
+    try {
+      const sanitized = fixedStr.replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+      return new Function(`return (${sanitized})`)()
+    } catch (e4) {
+      if (str.startsWith('عذرًا') || str.startsWith('عذرا')) {
+        throw new Error(`اعتذر الذكاء الاصطناعي: "${str.slice(0, 120)}..."`)
+      }
+      throw new Error(`تعذر تحليل استجابة الذكاء الاصطناعي (JSON غير صالح). يرجى الضغط على التوليد مرة أخرى.`)
+    }
+  }
 }
+

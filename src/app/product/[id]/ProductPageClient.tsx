@@ -43,30 +43,18 @@ const stagger: any = {
 // ── WooCommerce-style cursor-following zoom ──────────────────────────────────
 function WooZoom({ src, alt }: { src: string; alt: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({ opacity: 0, position: 'absolute', pointerEvents: 'none' })
-  const [naturalSize, setNaturalSize] = useState({ w: 1080, h: 1080 })
+  const [zoomState, setZoomState] = useState({ isHovered: false, x: 50, y: 50 })
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = containerRef.current?.getBoundingClientRect()
     if (!rect) return
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-    setZoomStyle({
-      position: 'absolute',
-      top: `${-(y / rect.height) * naturalSize.h}px`,
-      left: `${-(x / rect.width) * naturalSize.w}px`,
-      width: `${naturalSize.w}px`,
-      height: `${naturalSize.h}px`,
-      opacity: 1,
-      maxWidth: 'none',
-      maxHeight: 'none',
-      pointerEvents: 'none',
-      zIndex: 20,
-    })
+    const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100))
+    const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100))
+    setZoomState({ isHovered: true, x, y })
   }
 
   const handleMouseLeave = () => {
-    setZoomStyle(prev => ({ ...prev, opacity: 0 }))
+    setZoomState({ isHovered: false, x: 50, y: 50 })
   }
 
   return (
@@ -84,26 +72,19 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
         className="absolute inset-0 w-full h-full object-contain pointer-events-none"
         style={{ zIndex: 10 }}
       />
-      {/* Product display image - z-[15] (on top of frame) and scaled to fit inside frame */}
-      <div className="absolute top-[22%] bottom-[24%] left-[12%] right-[12%]" style={{ zIndex: 15 }}>
+      {/* Product display image - z-[15] (on top of frame) with contained cursor zoom */}
+      <div className="absolute top-[22%] bottom-[24%] left-[12%] right-[12%] overflow-hidden" style={{ zIndex: 15 }}>
         <img
           src={src}
           alt={alt}
-          className="w-full h-full object-contain mix-blend-multiply select-none"
+          className="w-full h-full object-contain mix-blend-multiply select-none transition-transform duration-150 ease-out pointer-events-none"
           draggable={false}
-          onLoad={(e) => {
-            const img = e.target as HTMLImageElement
-            if (img.naturalWidth > 0) setNaturalSize({ w: img.naturalWidth, h: img.naturalHeight })
+          style={{
+            transform: zoomState.isHovered ? 'scale(1.8)' : 'scale(1)',
+            transformOrigin: `${zoomState.x}% ${zoomState.y}%`
           }}
         />
       </div>
-      {/* WooCommerce-style zoom image (follows cursor) - z-20 */}
-      <img
-        src={src}
-        alt=""
-        aria-hidden
-        style={zoomStyle}
-      />
     </div>
   )
 }

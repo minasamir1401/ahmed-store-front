@@ -85,7 +85,7 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
         style={{ zIndex: 10 }}
       />
       {/* Product display image - z-[15] (on top of frame) and scaled to fit inside frame */}
-      <div className="absolute inset-[14%]" style={{ zIndex: 15 }}>
+      <div className="absolute top-[18%] bottom-[21%] left-[8%] right-[8%]" style={{ zIndex: 15 }}>
         <img
           src={src}
           alt={alt}

@@ -142,7 +142,7 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
 
       {/* Product Image */}
       <Link href={`/product/${getProductUrlParam({ id, title, titleEn })}`} className="block">
-        <div className="aspect-[4/5] overflow-hidden flex items-center justify-center p-2 xs:p-4 relative" style={{ background: '#f0f7f4' }}>
+        <div className="aspect-[4/5] overflow-hidden flex items-center justify-center relative" style={{ background: '#f0f7f4' }}>
           {/* Discount Badge */}
           {(displayTag || discountPercent) && (
             <motion.div
@@ -166,8 +166,8 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
                   className="object-contain z-10 pointer-events-none"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
                 />
-                {/* Product image - inset 18% and z-[15] (on top of frame) */}
-                <div className="absolute inset-[18%] z-[15]">
+                {/* Product image - inset 10% and z-[15] (on top of frame) */}
+                <div className="absolute inset-[10%] z-[15]">
                   <Image
                     src={cardImage}
                     alt={imgAlt}

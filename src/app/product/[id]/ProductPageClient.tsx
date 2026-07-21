@@ -85,7 +85,7 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
         style={{ zIndex: 10 }}
       />
       {/* Product display image - z-[15] (on top of frame) and scaled to fit inside frame */}
-      <div className="absolute inset-[18%]" style={{ zIndex: 15 }}>
+      <div className="absolute inset-[10%]" style={{ zIndex: 15 }}>
         <img
           src={src}
           alt={alt}
@@ -491,7 +491,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
             variants={stagger}
             initial="hidden"
             animate="show"
-            className="flex items-center gap-2 text-xs font-bold text-gray-400 mb-8 overflow-x-auto whitespace-nowrap"
+            className="flex items-center gap-2 text-xs font-bold text-gray-400 mb-2 overflow-x-auto whitespace-nowrap"
           >
             {[
               { label: t('bottom_home'), action: () => router.push('/') },
@@ -532,7 +532,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                     className="aspect-[4/5] flex items-center justify-center relative group"
                   >
-                    <div className="w-full h-full relative z-10 p-2 sm:p-4 pointer-events-auto" style={{ overflow: 'hidden' }}>
+                    <div className="w-full h-full relative z-10 pointer-events-auto" style={{ overflow: 'hidden' }}>
                       <WooZoom src={activeImage} alt={mainImageAlt} />
                     </div>
 

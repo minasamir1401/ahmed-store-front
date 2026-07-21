@@ -693,7 +693,7 @@ export function useAdminDashboard() {
     setIsSEOLoading(true)
     const activeProvider = providerOverride || aiProvider
     const providerNames: Record<AIProvider, string> = { openrouter: 'OpenRouter', apifree: 'APIFreeLLM' }
-    
+
     // Extract metadata dynamically to populate the prompt placeholders
     const activeCategory = categories.find((c: any) => c.id === formData.categoryId)?.name || 'فيتامينات ومكملات غذائية';
     const concentration = formData.title.match(/\d+\s*(mg|mcg|iu|g|ملجم|جم|وحدة)/i)?.[0] || 'غير محدد في الاسم';
@@ -703,7 +703,7 @@ export function useAdminDashboard() {
 
     try {
       addLog(`جاري توليد الكلمات المفتاحية والـ Meta للمنتج باستخدام ${providerNames[activeProvider]}...`)
-      
+
       const response = await fetchWithAdminAuth(`${BACKEND_API}/api/ai/generate`, {
         method: 'POST',
         body: JSON.stringify({
@@ -800,7 +800,7 @@ export function useAdminDashboard() {
       const data = await response.json()
       if (data.choices && data.choices[0] && data.choices[0].message) {
         const parsed = parseAIJSON(data.choices[0].message.content)
-        
+
         const addAboveExisting = (generated: string | undefined, current: string | undefined, separator: string) => {
           const generatedText = generated?.trim()
           const currentText = current?.trim()

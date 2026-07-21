@@ -166,8 +166,8 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
                   className="object-contain z-10 pointer-events-none"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
                 />
-                {/* Product image - inset 10% and z-[15] (on top of frame) */}
-                <div className="absolute inset-[10%] z-[15]">
+                {/* Product image - inset 14% and z-[15] (on top of frame) */}
+                <div className="absolute inset-[14%] z-[15]">
                   <Image
                     src={cardImage}
                     alt={imgAlt}

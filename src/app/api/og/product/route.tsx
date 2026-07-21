@@ -104,37 +104,25 @@ export async function GET(req: NextRequest) {
     // Process image with Sharp: Composite product ON TOP of frame
     let finalImage: Buffer
     try {
-      // 1. Create a white background 1080x1080
-      const baseBackground = await sharp({
-        create: {
-          width: 1080,
-          height: 1080,
-          channels: 4,
+      // 1. Resize base frame to 1080x1080
+      const baseFrame = await sharp(frameBuffer)
+        .resize(1080, 1080, {
+          fit: 'fill',
           background: { r: 255, g: 255, b: 255, alpha: 1 }
-        }
-      })
-      .png()
-      .toBuffer()
-
-      // 2. Resize frame to 1080x1080
-      const resizedFrame = await sharp(frameBuffer)
-        .resize(1080, 1080, { fit: 'fill' })
+        })
         .toBuffer()
 
-      // 3. Resize product to 900x900 (with transparent background) to sit inside the frame
+      // 2. Resize product to 750x750 (with transparent background) to sit inside the frame
       const resizedProduct = await sharp(productBuffer)
-        .resize(900, 900, {
+        .resize(750, 750, {
           fit: 'contain',
           background: { r: 255, g: 255, b: 255, alpha: 0 }
         })
         .toBuffer()
 
-      // 4. Composite product first, then frame on top
-      finalImage = await sharp(baseBackground)
-        .composite([
-          { input: resizedProduct, gravity: 'center' },
-          { input: resizedFrame, gravity: 'center' }
-        ])
+      // 3. Composite product image on top of the frame
+      finalImage = await sharp(baseFrame)
+        .composite([{ input: resizedProduct, gravity: 'center' }])
         .jpeg({ quality: 90 }) // Convert output to JPEG for maximum compatibility
         .toBuffer()
     } catch (e: any) {

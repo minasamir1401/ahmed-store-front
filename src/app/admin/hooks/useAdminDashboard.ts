@@ -585,42 +585,27 @@ export function useAdminDashboard() {
               role: 'system',
               content: `أنت خبير محتوى منتجات وSEO للمتاجر الإلكترونية.
 سيتم إعطاؤك اسم منتج فقط.
-مهمتك هي كتابة معلومات منتج عملية ومباشرة تساعد العميل على الشراء، بدون أسلوب إنشائي أو مبالغة أو كلام تسويقي فارغ.
-اكتب باللهجة العربية المصرية الواضحة، وبنبرة بيع محترمة ومختصرة، وركز على:
-- ماذا يفعل المنتج
-- أهم فوائده الفعلية
-- لمن يناسب
-- طريقة الاستخدام أو أهم النقاط العملية إن كانت معروفة من اسم المنتج
-- أي تفاصيل مفيدة للشراء أو المقارنة
+مهمتك هي كتابة معلومات عملية واحترافية تسويقية ومباشرة تساعد العميل على الشراء بدون كلام إنشائي.
+اكتب بلغة عربية واضحة ومباشرة.
 
-قم بإرجاع تفاصيل هذا المنتج بصيغة JSON فقط، بدون أي نص إضافي.
-يجب أن يكون الوصف واضحاً ومفيداً ومقسماً بشكل يسهل قراءته.
-يرجى تحليل مواصفات ومكونات المنتج وتحديد قيم الشهادات الستة التالية بدقة كقيم منطقية (true أو false) بداخل كائن certifications:
-- خالي من الجلوتين (glutenFree)
-- خالي من الألبان (dairyFree)
-- خالي من الصويا (soyFree)
-- خالي من المكسرات (treeNutFree)
-- غير معدل وراثياً (nonGmo)
-- منتج عضوي (organic)
-
-الهيكل المطلوب:
+أرجع كائن JSON فقط بدون أي نص خارجه بالهيكل التالي:
 {
-  "title": "إعادة كتابة اسم المنتج المدخل ليكون اسماً احترافياً ومختصراً ومندمجاً بين الإنجليزية والعربية في نفس النص (مثال: NOW Foods Adam Multivitamin 90 Softgels - ناو فودز آدم متعدد الفيتامينات 90 كبسولة طرية). لا تذكر اسم المتجر The VitaHub هنا أبداً.",
-  "titleEn": "اسم المنتج الاحترافي باللغة الإنجليزية (مثال: Optimum Nutrition Micronized Creatine Monohydrate 600g). لا تذكر اسم المتجر The VitaHub هنا أبداً.",
-  "desc": "وصف منتج عملي ومباشر ومفصل ومطول جداً (يتجاوز 350 كلمة)، يشرح الوظيفة الرئيسية للمنتج بالتفصيل والفوائد المهمة ولماذا يشتريه العميل، بصياغة سهلة ومناسبة للسوق المصري، وبدون مبالغة.",
-  "features": "قائمة مميزات المنتج والفوائد والمكونات النشطة الأساسية، كل ميزة في سطر منفصل (مثال: ميزة 1\\nميزة 2\\nميزة 3)",
-  "brandImage": "رابط لوجو الشركة (استخدم https://www.google.com/s2/favicons?domain=brandname.com&sz=128)",
-  "productSpecs": "{\\"authentic\\": true, \\"sku\\": \\"رمز\\", \\"shippingWeight\\": \\"وزن\\"}",
-  "keyInfo": "{\\"servingSize\\": \\"حجم الجرعة\\", \\"totalServings\\": \\"إجمالي الحصص\\", \\"bestBefore\\": \\"تاريخ\\", \\"origin\\": \\"المنشأ\\"}",
-  "certifications": "{\\"glutenFree\\": true/false, \\"dairyFree\\": true/false, \\"soyFree\\": true/false, \\"treeNutFree\\": true/false, \\"nonGmo\\": true/false, \\"organic\\": true/false}",
-  "warnings": "تحذيرات (نص)",
-  "directions": "طريقة الاستخدام (نص)",
-  "ingredients": "المكونات (نص)",
-  "supplementFacts": "[{\\"name\\": \\"Vitamin C\\", \\"amount\\": \\"500mg\\", \\"dv\\": \\"556%\\"}]",
-  "seoKeywords": "قائمة ضخمة ومكثفة تتكون من 300 كلمة أو عبارة بحث مفتاحية متنوعة وقوية باللغة العربية مفصولة بفواصل لتغطية كافة عمليات البحث الممكنة بشكل كامل.",
-  "seoDesc": "وصف ميتا قصير ومقنع يشرح المنتج ويشجع على الشراء ويحتوي على الكلمات الأساسية المهمة بشكل طبيعي",
-  "faqs": "[{\\"question_ar\\": \\"سؤال بالعربي 1\\", \\"answer_ar\\": \\"إجابة بالعربي\\", \\"question_en\\": \\"Question in English 1\\", \\"answer_en\\": \\"Answer in English\\"}, {\\"question_ar\\": \\"سؤال بالعربي 2\\", \\"answer_ar\\": \\"إجابة بالعربي\\", \\"question_en\\": \\"Question in English 2\\", \\"answer_en\\": \\"Answer in English\\"}, {\\"question_ar\\": \\"سؤال بالعربي 3\\", \\"answer_ar\\": \\"إجابة بالعربي\\", \\"question_en\\": \\"Question in English 3\\", \\"answer_en\\": \\"Answer in English\\"}, {\\"question_ar\\": \\"سؤال بالعربي 4\\", \\"answer_ar\\": \\"إجابة بالعربي\\", \\"question_en\\": \\"Question in English 4\\", \\"answer_en\\": \\"Answer in English\\"}, {\\"question_ar\\": \\"سؤال بالعربي 5\\", \\"answer_ar\\": \\"إجابة بالعربي\\", \\"question_en\\": \\"Question in English 5\\", \\"answer_en\\": \\"Answer in English\\"}]",
-  "dosageCalculator": "{\\"enabled\\": true/false (true if product requires dose calc like vitamins/minerals/sports supplements, false for general creams/beauty), \\"genderTarget\\": \\"both\\"/\\"male\\"/\\"female\\", \\"title\\": \\"حاسبة الجرعة الموصى بها (مثال: حاسبة جرعة المغنيسيوم الذكية)\\", \\"icon\\": \\"Activity\\"/\\"Sun\\"/\\"Droplet\\"/\\"Moon\\"/\\"Dumbbell\\"/\\"Sparkles\\", \\"optionsLabel\\": \\"الهدف الأساسي:\\", \\"rules\\": [{\\"value\\": \\"sleep\\", \\"label\\": \\"النوم والاسترخاء\\", \\"icon\\": \\"Moon\\", \\"maleDose\\": \\"400 ملجم من المغنيسيوم العنصري\\", \\"maleCapsules\\": \\"كبسولتين يومياً\\", \\"maleTip\\": \\"يفضل تناوله قبل النوم بـ 30-60 دقيقة.\\", \\"femaleDose\\": \\"320 ملجم من المغنيسيوم العنصري\\", \\"femaleCapsules\\": \\"كبسولتين يومياً\\", \\"femaleTip\\": \\"يفضل تناوله قبل النوم بـ 30-60 دقيقة.\\"}]}"
+  "title": "اسم المنتج الاحترافي المزدوج (عربي وإنجليزي معا)",
+  "titleEn": "اسم المنتج بالإنجليزية فقط",
+  "desc": "وصف مفيد وشامل للمنتج يوضح فوائده واستخداماته الرئيسية (بين 100 و150 كلمة).",
+  "features": "قائمة المميزات والفوائد، كل ميزة في سطر منفصل",
+  "brandImage": "",
+  "productSpecs": "{\"authentic\": true, \"sku\": \"\", \"shippingWeight\": \"\"}",
+  "keyInfo": "{\"servingSize\": \"جرعة يومية\", \"totalServings\": \"عدد الحصص\", \"bestBefore\": \"\", \"origin\": \"الولايات المتحدة الأمريكية\"}",
+  "certifications": "{\"glutenFree\": true, \"dairyFree\": false, \"soyFree\": true, \"treeNutFree\": true, \"nonGmo\": true, \"organic\": false}",
+  "warnings": "محاذير الاستخدام ونصائح الجرعة",
+  "directions": "طريقة الاستخدام",
+  "ingredients": "المكونات الرئيسية",
+  "supplementFacts": "[{\"name\": \"المكون 1\", \"amount\": \"500mg\", \"dv\": \"100%\"}]",
+  "seoKeywords": "قائمة مكثفة تتكون من 30 كلمة وعبارة مفتاحية مهمة مفصولة بفواصل عربية '،'.",
+  "seoDesc": "وصف ميتا قصير ومقنع للبحث (حوالي 150 حرفاً).",
+  "faqs": "[{\"question_ar\": \"سؤال 1؟\", \"answer_ar\": \"إجابة 1\", \"question_en\": \"Question 1?\", \"answer_en\": \"Answer 1\"}]",
+  "dosageCalculator": "{\"enabled\": true, \"genderTarget\": \"both\", \"title\": \"حاسبة الجرعة الموصى بها\", \"icon\": \"Activity\", \"optionsLabel\": \"الهدف:\", \"rules\": []}"
 }`
             },
             { role: 'user', content: formData.title }

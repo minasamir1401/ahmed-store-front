@@ -64,13 +64,12 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Frame overlay - z-10 (behind product) */}
-      <img
-        src="/frame.png"
-        alt=""
-        aria-hidden
-        className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-        style={{ zIndex: 10 }}
+      {/* Frame overlay - CSS background so search engine bots do not index the empty frame as a product image */}
+      <div
+        data-nosnippet
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full pointer-events-none bg-contain bg-center bg-no-repeat select-none"
+        style={{ zIndex: 10, backgroundImage: "url('/frame.png')" }}
       />
       {/* Product display image - z-[15] (on top of frame) with contained cursor zoom */}
       <div className="absolute top-[17.5%] bottom-[19.5%] left-[9%] right-[9%] overflow-hidden" style={{ zIndex: 15 }}>

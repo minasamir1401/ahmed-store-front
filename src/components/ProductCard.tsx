@@ -158,13 +158,12 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
           <div className="relative w-full h-full">
             {cardImage ? (
               <>
-                {/* Frame overlay - z-10 (behind product) */}
-                <Image
-                  src="/frame.png"
-                  alt="Frame"
-                  fill
-                  className="object-contain z-10 pointer-events-none"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
+                {/* Frame overlay - CSS background so search bots do not index the empty frame */}
+                <div
+                  data-nosnippet
+                  aria-hidden="true"
+                  className="absolute inset-0 w-full h-full z-10 pointer-events-none bg-contain bg-center bg-no-repeat select-none"
+                  style={{ backgroundImage: "url('/frame.png')" }}
                 />
                 {/* Product image - constrained inside frame inner box */}
                 <div className="absolute top-[17.5%] bottom-[19.5%] left-[9%] right-[9%] z-[15]">
@@ -179,14 +178,6 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
                     style={{ pointerEvents: 'none' }}
                   />
                 </div>
-                {/* Hidden merged image for right-click save (product + frame composited, z-20) */}
-                <img 
-                  src={`/api/og/product?url=${encodeURIComponent(cardImage)}`}
-                  alt={imgAlt}
-                  className="absolute inset-0 w-full h-full object-contain opacity-0 z-20"
-                  style={{ pointerEvents: 'auto' }}
-                  loading="lazy"
-                />
               </>
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 opacity-40">

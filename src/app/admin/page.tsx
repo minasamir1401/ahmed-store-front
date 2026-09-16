@@ -3,7 +3,7 @@
 import React from 'react'
 import {
   LayoutDashboard, Package, Tag, Award, FileText, Plus, Edit2, Trash2, Eye,
-  Loader2, Lock, User, LogIn, X, Image as ImageIcon, Upload, CheckCircle2, AlertCircle, Layers, Building2, Search, RotateCcw, Sparkles, Menu, ShoppingCart, Printer, Truck, Calendar, Clock, Smartphone, Stethoscope, Activity
+  Loader2, Lock, User, LogIn, X, Image as ImageIcon, Upload, CheckCircle2, AlertCircle, Layers, Building2, Search, RotateCcw, Sparkles, Menu, ShoppingCart, Printer, Truck, Calendar, Clock, Smartphone, Stethoscope, Activity, ArrowRight
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAdminDashboard } from './hooks/useAdminDashboard'
@@ -104,6 +104,12 @@ export default function AdminDashboard() {
     handleFileUpload,
     uploadAdminImage,
     handleOpenModal,
+    handleCloseModal,
+    handleTabChange,
+    handleOpenOrderDetails,
+    handleCloseOrderDetails,
+    handleOpenOrderWaybill,
+    handleCloseOrderWaybill,
     handleAIFill,
     handleAutoTranslate,
     handleSEOAI,
@@ -208,6 +214,7 @@ export default function AdminDashboard() {
     handleDelete,
     handleShipToAramex,
     handleOpenModal,
+    handleCloseModal,
     mainFileInputRef,
     galleryFileInputRef,
     brandLogoRef,
@@ -339,8 +346,7 @@ export default function AdminDashboard() {
               <button 
                 key={tab.id} 
                 onClick={() => {
-                  setActiveTab(tab.id)
-                  setIsModalOpen(false)
+                  handleTabChange(tab.id)
                   setIsSidebarOpen(false)
                 }} 
                 className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-black transition-all ${
@@ -544,6 +550,11 @@ export default function AdminDashboard() {
                                   <div className="text-xs md:text-sm font-black text-slate-800 truncate max-w-[200px] md:max-w-none">
                                     {activeTab === 'orders' ? `#${item.orderNumber}` : (item.title || item.name || 'بدون اسم')}
                                   </div>
+                                  {activeTab === 'products' && item.titleEn && (
+                                    <div className="text-[11px] text-slate-500 font-semibold truncate max-w-[240px] md:max-w-none text-left" dir="ltr">
+                                      {item.titleEn}
+                                    </div>
+                                  )}
                                   <div className="text-[10px] text-slate-400 font-bold mt-1.5 flex flex-wrap items-center gap-2">
                                     {activeTab === 'orders' ? (
                                       <>
@@ -561,9 +572,9 @@ export default function AdminDashboard() {
                                         {item.categoryId && <span className="text-emerald-600 font-black">#{categories.find(c => c.id === item.categoryId)?.name || 'غير مصنف'}</span>}
                                         {activeTab === 'products' && (
                                           item.desc && item.desc.length > 200 ? (
-                                            <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded font-black border border-emerald-100/50">SEO جاهز ✅</span>
+                                            <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded font-black border border-emerald-100/50">SEO مكتمل</span>
                                           ) : (
-                                            <span className="bg-slate-100 text-slate-400 px-2 py-0.5 rounded font-bold border border-slate-200/50">بدون SEO ⚠️</span>
+                                            <span className="bg-slate-100 text-slate-400 px-2 py-0.5 rounded font-bold border border-slate-200/50">يحتاج SEO</span>
                                           )
                                         )}
                                       </>
@@ -596,8 +607,8 @@ export default function AdminDashboard() {
                               <div className="flex gap-2 justify-center lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                                 {activeTab === 'orders' ? (
                                   <>
-                                    <button onClick={() => setSelectedOrderForDetails(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all cursor-pointer" title="عرض تفاصيل الطلب"><Eye size={16} /></button>
-                                    <button onClick={() => setSelectedOrderForWaybill(item)} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all cursor-pointer" title="طباعة بوليصة الشحن"><Printer size={16} /></button>
+                                    <button onClick={() => handleOpenOrderDetails(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all cursor-pointer" title="عرض تفاصيل الطلب"><Eye size={16} /></button>
+                                    <button onClick={() => handleOpenOrderWaybill(item)} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all cursor-pointer" title="طباعة بوليصة الشحن"><Printer size={16} /></button>
                                     {item.status === 'pending' && (
                                       <button onClick={() => handleShipToAramex(item.id)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all cursor-pointer" title="إرسال لشركة أرامكس"><Truck size={16} /></button>
                                     )}
@@ -626,8 +637,14 @@ export default function AdminDashboard() {
               {/* Form Header */}
               <div className="bg-slate-50 border-b border-slate-100 px-4 sm:px-6 py-4 sm:py-6 flex items-center justify-between sticky top-0 z-30">
                 <div className="flex items-center gap-2 sm:gap-4">
-                  <button onClick={() => setIsModalOpen(false)} className="p-1.5 sm:p-2 text-slate-400 hover:text-slate-600 hover:bg-white rounded-full transition-colors cursor-pointer">
-                    <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <button
+                    type="button"
+                    onClick={() => handleCloseModal()}
+                    className="flex items-center gap-1.5 px-3.5 py-2 text-slate-700 hover:text-slate-950 bg-white hover:bg-slate-100 border border-slate-200 rounded-2xl transition-all text-xs font-black shadow-sm cursor-pointer"
+                    title="الرجوع للقائمة"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                    <span>رجوع</span>
                   </button>
                   <div>
                     <h3 className="text-sm sm:text-base font-black text-slate-800 leading-none">إدارة {tabs.find(t => t.id === activeTab)?.label}</h3>
@@ -635,8 +652,18 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 <div className="flex gap-2 sm:gap-3">
-                  <button onClick={() => setIsModalOpen(false)} className="px-3 sm:px-6 py-2 sm:py-3 rounded-2xl font-black text-[10px] sm:text-xs text-slate-500 hover:bg-slate-100 transition-all cursor-pointer">إلغاء</button>
-                  <button onClick={handleSave} className="bg-emerald-600 text-white px-4 sm:px-8 py-2 sm:py-3 rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-emerald-600/10 hover:scale-[1.02] transition-all cursor-pointer">
+                  <button
+                    type="button"
+                    onClick={() => handleCloseModal()}
+                    className="px-3 sm:px-6 py-2 sm:py-3 rounded-2xl font-black text-[10px] sm:text-xs text-slate-500 hover:bg-slate-100 transition-all cursor-pointer"
+                  >
+                    إلغاء ورجوع
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    className="bg-emerald-600 text-white px-4 sm:px-8 py-2 sm:py-3 rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-emerald-600/10 hover:scale-[1.02] transition-all cursor-pointer"
+                  >
                     {loading ? <Loader2 className="animate-spin" size={14} /> : 'حفظ العنصر'}
                   </button>
                 </div>
@@ -680,7 +707,7 @@ export default function AdminDashboard() {
                                 const resData = await res.json();
                                 if (res.ok && resData.logoUrl) {
                                   setFormData({ ...formData, image: resData.logoUrl });
-                                  await showAlert(`تم العثور على لوجو الماركة بنجاح من النطاق: ${resData.domain} ✅`, 'تم العثور على اللوجو');
+                                  await showAlert(`تم العثور على لوجو الماركة بنجاح من النطاق: ${resData.domain}`, 'تم العثور على اللوجو');
                                 } else {
                                   await showAlert(resData.error || 'فشل في العثور على لوجو لهذه الماركة تلقائياً.', 'خطأ في البحث');
                                 }
@@ -743,7 +770,7 @@ export default function AdminDashboard() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setSelectedOrderForWaybill(null)}
+                  onClick={handleCloseOrderWaybill}
                   className="p-2 bg-white text-slate-400 rounded-full hover:bg-slate-100 transition-all border border-slate-100 cursor-pointer"
                 >
                   <X size={14} />
@@ -889,7 +916,8 @@ export default function AdminDashboard() {
                   <p className="text-[10px] text-slate-400 font-bold mt-1">{new Date(order.createdAt).toLocaleString('ar-EG')}</p>
                 </div>
                 <button 
-                  onClick={() => setSelectedOrderForDetails(null)} 
+                  type="button"
+                  onClick={handleCloseOrderDetails} 
                   className="p-2 bg-white text-slate-400 rounded-full hover:bg-slate-100 transition-all border border-slate-100 cursor-pointer"
                 >
                   <X size={16} />
@@ -920,8 +948,8 @@ export default function AdminDashboard() {
                               body: JSON.stringify({ status: st.id })
                             });
                             if (res.ok) {
-                              await showAlert(`تم تغيير الحالة بنجاح إلى: ${st.label} ✅`, 'تحديث الحالة')
-                              setSelectedOrderForDetails(null);
+                              await showAlert(`تم تغيير الحالة بنجاح إلى: ${st.label}`, 'تحديث الحالة')
+                              handleCloseOrderDetails();
                               fetchData();
                             } else {
                               await showAlert('فشل في تحديث الحالة', 'خطأ')
@@ -963,8 +991,8 @@ export default function AdminDashboard() {
                             body: JSON.stringify({ shippingRef: val })
                           });
                           if (res.ok) {
-                            await showAlert('تم حفظ رقم التتبع بنجاح ✅', 'حفظ التتبع')
-                            setSelectedOrderForDetails(null);
+                            await showAlert('تم حفظ رقم التتبع بنجاح', 'حفظ التتبع')
+                            handleCloseOrderDetails();
                             fetchData();
                           } else {
                             await showAlert('فشل حفظ رقم التتبع', 'خطأ')

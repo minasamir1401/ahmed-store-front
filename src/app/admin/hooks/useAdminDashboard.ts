@@ -7,6 +7,7 @@ import {
   DEFAULT_DOSAGE_CALCULATOR,
   parseAIJSON
 } from '../admin-dashboard-utils'
+import { parseImageList, serializeImageList } from '@/lib/product-images'
 
 type AIProvider = 'openrouter' | 'apifree'
 
@@ -21,7 +22,15 @@ export function useAdminDashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [activeTab, setActiveTab] = useState('products')
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search).get('tab')
+      if (p && ADMIN_TABS.some(t => t.id === p)) return p
+    }
+    return 'products'
+  })
+  const hasOpenedModalInSessionRef = useRef(false)
+  const initialUrlProcessedRef = useRef(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [data, setData] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>(DEFAULT_CATEGORIES)
@@ -442,7 +451,7 @@ export function useAdminDashboard() {
     return result
   }
 
-  const handleFileUpload = async (file: File, type: 'main' | 'brand' | 'gallery' | 'side1' | 'side2' | 'prod1' | 'prod2' | 'prod3' | 'prod4') => {
+  const handleFileUpload = async (file: File, type: 'main' | 'second' | 'brand' | 'gallery' | 'side1' | 'side2' | 'prod1' | 'prod2' | 'prod3' | 'prod4') => {
     if (!file) return
     if (type === 'brand') setBrandUploading(true)
     else setUploading(true)
@@ -459,13 +468,20 @@ export function useAdminDashboard() {
         imageWidth: result.width || prev.imageWidth || null,
         imageHeight: result.height || prev.imageHeight || null
       }))
+      else if (type === 'second') {
+        setFormData((prev: any) => {
+          const current = parseImageList(prev.images)
+          const updated = [result.url, ...current.slice(1)]
+          return { ...prev, images: serializeImageList(updated) }
+        })
+      }
       else if (type === 'side1') setFormData((prev: any) => ({ ...prev, side1Image: result.url }))
       else if (type === 'side2') setFormData((prev: any) => ({ ...prev, side2Image: result.url }))
       else if (type.startsWith('prod')) setFormData((prev: any) => ({ ...prev, [`${type}Image`]: result.url }))
       else if (type === 'gallery') {
         setFormData((prev: any) => {
-          const current = prev.images ? prev.images.split(',').filter(Boolean) : []
-          return { ...prev, images: [...current, result.url].join(',') }
+          const current = parseImageList(prev.images)
+          return { ...prev, images: serializeImageList([...current, result.url]) }
         })
       }
       addLog('تم رفع الصورة بنجاح')
@@ -482,7 +498,34 @@ export function useAdminDashboard() {
     }
   }
 
-  const handleOpenModal = (item: any = null) => {
+  const syncAdminUrl = (
+    tab: string,
+    editId: string | null = null,
+    isNew: boolean = false,
+    replace: boolean = false
+  ) => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams()
+    if (tab) params.set('tab', tab)
+    if (editId) {
+      params.set('edit', editId)
+    } else if (isNew) {
+      params.set('new', '1')
+    }
+    const searchStr = params.toString() ? `?${params.toString()}` : ''
+    const targetUrl = `${window.location.pathname}${searchStr}`
+    const currentUrl = `${window.location.pathname}${window.location.search}`
+    if (targetUrl !== currentUrl) {
+      const stateObj = { adminTab: tab, editId: editId || null, isNew: !!isNew }
+      if (replace) {
+        window.history.replaceState(stateObj, '', targetUrl)
+      } else {
+        window.history.pushState(stateObj, '', targetUrl)
+      }
+    }
+  }
+
+  const populateForm = (item: any = null, targetTab: string = activeTab) => {
     if (item) {
       const normalizedItem = normalizeProductTranslations(item)
       setEditingItem(item)
@@ -493,12 +536,33 @@ export function useAdminDashboard() {
       })
       setBrandSearch(item.brand?.name || '')
       try {
-        setSupplementFactsList(item.supplementFacts ? (typeof item.supplementFacts === 'string' ? JSON.parse(item.supplementFacts) : item.supplementFacts) : [])
+        let sf = item.supplementFacts ? (typeof item.supplementFacts === 'string' ? JSON.parse(item.supplementFacts) : item.supplementFacts) : []
+        if (Array.isArray(sf)) {
+          setSupplementFactsList(sf)
+        } else if (sf && Array.isArray(sf.rows)) {
+          setSupplementFactsList(sf.rows)
+        } else if (sf && typeof sf === 'object') {
+          const text = sf.ar || sf.en || ''
+          const lines = String(text).split('\n').map((l: string) => l.trim()).filter(Boolean)
+          const list = lines.map((line: string) => {
+            const parts = line.split(':')
+            return {
+              name: parts[0]?.trim() || line,
+              amount: parts[1]?.trim() || '',
+              dv: parts[2]?.trim() || ''
+            }
+          })
+          setSupplementFactsList(list)
+        } else {
+          setSupplementFactsList([])
+        }
       } catch {
         setSupplementFactsList([])
       }
       try {
-        setSizesPricesList(item.sizeOptions ? (typeof item.sizeOptions === 'string' ? JSON.parse(item.sizeOptions) : item.sizeOptions) : [])
+        const rawSizes = item.sizeOptions || item.sizesPrices
+        const sp = rawSizes ? (typeof rawSizes === 'string' ? JSON.parse(rawSizes) : rawSizes) : []
+        setSizesPricesList(Array.isArray(sp) ? sp : [])
       } catch {
         setSizesPricesList([])
       }
@@ -523,7 +587,8 @@ export function useAdminDashboard() {
         setDosageCalculatorObj(DEFAULT_DOSAGE_CALCULATOR)
       }
       try {
-        setFaqsList(item.faqs ? (typeof item.faqs === 'string' ? JSON.parse(item.faqs) : item.faqs) : [])
+        const faqs = item.faqs ? (typeof item.faqs === 'string' ? JSON.parse(item.faqs) : item.faqs) : []
+        setFaqsList(Array.isArray(faqs) ? faqs : [])
       } catch {
         setFaqsList([])
       }
@@ -537,7 +602,7 @@ export function useAdminDashboard() {
       setCertificationsObj({ glutenFree: true, nonGmo: true })
       setDosageCalculatorObj(DEFAULT_DOSAGE_CALCULATOR)
       setFaqsList([])
-      if (activeTab === 'products') {
+      if (targetTab === 'products') {
         setFormData({
           title: '', desc: '', features: '', price: '', oldPrice: '',
           image: '', images: '', sizes: '', brandName: '', brandImage: '',
@@ -547,15 +612,130 @@ export function useAdminDashboard() {
           overview: '', warnings: '', disclaimer: '', directions: '', ingredients: '', supplementFacts: '', dosageCalculator: '',
           titleEn: '', descEn: '', featuresEn: '', usageEn: '', ingredientsEn: '', warningsEn: '', disclaimerEn: '', seoKeywordsEn: '', seoDescEn: ''
         })
-      } else if (activeTab === 'offers') {
+      } else if (targetTab === 'offers') {
         setFormData({ title: '', discount: '', image: '', productId: '' })
-      } else if (activeTab === 'medical-tips') {
+      } else if (targetTab === 'medical-tips') {
         setFormData({ title: '', titleEn: '', content: '', contentEn: '', image: '' })
       } else {
         setFormData({ name: '', nameEn: '', title: '', image: '' })
       }
     }
+  }
+
+  const openItemById = async (targetTab: string, id: string, skipHistory: boolean = false) => {
+    const foundInMemory = data.find(i => String(i.id) === String(id)) || productsList.find(i => String(i.id) === String(id))
+    if (foundInMemory) {
+      populateForm(foundInMemory, targetTab)
+      setIsModalOpen(true)
+      if (!skipHistory) {
+        syncAdminUrl(targetTab, id, false, false)
+      }
+      return
+    }
+
+    setLoading(true)
+    try {
+      if (targetTab === 'products') {
+        const res = await fetch(`${BACKEND_API}/api/products/${id}?t=${Date.now()}`)
+        if (res.ok) {
+          const item = await res.json()
+          populateForm(item, targetTab)
+          setIsModalOpen(true)
+          if (!skipHistory) {
+            syncAdminUrl(targetTab, id, false, false)
+          }
+          return
+        }
+      } else {
+        const endpoint = ADMIN_TABS.find(t => t.id === targetTab)?.endpoint
+        if (endpoint) {
+          const res = await fetchWithAdminAuth(`${BACKEND_API}/api/${endpoint}?t=${Date.now()}`)
+          if (res.ok) {
+            const list = await res.json()
+            if (Array.isArray(list)) {
+              const match = list.find(i => String(i.id) === String(id))
+              if (match) {
+                populateForm(match, targetTab)
+                setIsModalOpen(true)
+                if (!skipHistory) {
+                  syncAdminUrl(targetTab, id, false, false)
+                }
+                return
+              }
+            }
+          }
+        }
+      }
+      addLog(`تعذر العثور على العنصر رقم ${id}`)
+      syncAdminUrl(targetTab, null, false, true)
+    } catch (err: any) {
+      addLog(`خطأ في جلب تفاصيل العنصر: ${err.message}`)
+      syncAdminUrl(targetTab, null, false, true)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleOpenModal = (item: any = null, skipHistory: boolean = false) => {
+    hasOpenedModalInSessionRef.current = !skipHistory
+    populateForm(item, activeTab)
     setIsModalOpen(true)
+    if (!skipHistory && typeof window !== 'undefined') {
+      syncAdminUrl(activeTab, item?.id || null, !item, false)
+    }
+  }
+
+  const handleCloseModal = (skipHistory: boolean | any = false) => {
+    const skip = typeof skipHistory === 'boolean' ? skipHistory : false
+    setIsModalOpen(false)
+    setEditingItem(null)
+    if (!skip && typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search)
+      if (searchParams.has('edit') || searchParams.has('new')) {
+        if (hasOpenedModalInSessionRef.current) {
+          hasOpenedModalInSessionRef.current = false
+          window.history.back()
+        } else {
+          syncAdminUrl(activeTab, null, false, false)
+        }
+      }
+    }
+  }
+
+  const handleTabChange = (tabId: string) => {
+    hasOpenedModalInSessionRef.current = false
+    setActiveTab(tabId)
+    setIsModalOpen(false)
+    setEditingItem(null)
+    syncAdminUrl(tabId, null, false, false)
+  }
+
+  const handleOpenOrderDetails = (order: any) => {
+    if (typeof window !== 'undefined' && !selectedOrderForDetails) {
+      window.history.pushState({ adminOrderModal: true }, '', window.location.href)
+    }
+    setSelectedOrderForDetails(order)
+  }
+
+  const handleCloseOrderDetails = () => {
+    setSelectedOrderForDetails(null)
+    if (typeof window !== 'undefined' && window.history.state?.adminOrderModal) {
+      window.history.back()
+    }
+  }
+
+  const handleOpenOrderWaybill = (order: any) => {
+    if (typeof window !== 'undefined' && !selectedOrderForWaybill) {
+      window.history.pushState({ adminWaybillModal: true }, '', window.location.href)
+    }
+    setSelectedOrderForWaybill(order)
+  }
+
+  const handleCloseOrderWaybill = () => {
+    setSelectedOrderForWaybill(null)
+    if (typeof window !== 'undefined' && window.history.state?.adminWaybillModal) {
+      window.history.back()
+    }
   }
 
   const handleAIFill = async (providerOverride?: AIProvider) => {
@@ -592,18 +772,27 @@ export function useAdminDashboard() {
 {
   "title": "اسم المنتج الاحترافي المزدوج (عربي وإنجليزي معا)",
   "titleEn": "اسم المنتج بالإنجليزية فقط",
-  "desc": "وصف مفيد وشامل للمنتج يوضح فوائده واستخداماته الرئيسية (بين 100 و150 كلمة).",
-  "features": "قائمة المميزات والفوائد، كل ميزة في سطر منفصل",
+  "desc": "وصف مفيد وشامل للمنتج يوضح فوائده واستخداماته الرئيسية (بين 100 و150 كلمة) بالعربية.",
+  "descEn": "Detailed and comprehensive product description in English highlighting benefits and uses.",
+  "features": "قائمة المميزات والفوائد بالعربية، كل ميزة في سطر منفصل",
+  "featuresEn": "List of key features and benefits in English, one per line",
   "brandImage": "",
   "productSpecs": "{\"authentic\": true, \"sku\": \"\", \"shippingWeight\": \"\"}",
   "keyInfo": "{\"servingSize\": \"جرعة يومية\", \"totalServings\": \"عدد الحصص\", \"bestBefore\": \"\", \"origin\": \"الولايات المتحدة الأمريكية\"}",
   "certifications": "{\"glutenFree\": true, \"dairyFree\": false, \"soyFree\": true, \"treeNutFree\": true, \"nonGmo\": true, \"organic\": false}",
-  "warnings": "محاذير الاستخدام ونصائح الجرعة",
-  "directions": "طريقة الاستخدام",
-  "ingredients": "المكونات الرئيسية",
-  "supplementFacts": "[{\"name\": \"المكون 1\", \"amount\": \"500mg\", \"dv\": \"100%\"}]",
+  "warnings": "محاذير الاستخدام بالعربية",
+  "warningsEn": "Warnings and precautions in English",
+  "directions": "طريقة الاستخدام بالعربية",
+  "usageEn": "Directions and suggested use in English",
+  "ingredients": "المكونات الرئيسية بالعربية",
+  "ingredientsEn": "Key ingredients in English",
+  "disclaimer": "إخلاء مسؤولية قانوني بالعربية",
+  "disclaimerEn": "Legal disclaimer in English",
+  "supplementFacts": "[{\"name\": \"المكون 1\", \"name_en\": \"Ingredient 1\", \"amount\": \"500mg\", \"dv\": \"100%\"}]",
   "seoKeywords": "قائمة مكثفة تتكون من 30 كلمة وعبارة مفتاحية مهمة مفصولة بفواصل عربية '،'.",
-  "seoDesc": "وصف ميتا قصير ومقنع للبحث (حوالي 150 حرفاً).",
+  "seoKeywordsEn": "List of 30 relevant English SEO keywords separated by commas.",
+  "seoDesc": "وصف ميتا قصير ومقنع للبحث بالعربية (حوالي 150 حرفاً).",
+  "seoDescEn": "Short compelling meta description in English (about 150 characters).",
   "faqs": "[{\"question_ar\": \"سؤال 1؟\", \"answer_ar\": \"إجابة 1\", \"question_en\": \"Question 1?\", \"answer_en\": \"Answer 1\"}]",
   "dosageCalculator": "{\"enabled\": true, \"genderTarget\": \"both\", \"title\": \"حاسبة الجرعة الموصى بها\", \"icon\": \"Activity\", \"optionsLabel\": \"الهدف:\", \"rules\": []}"
 }`
@@ -625,17 +814,33 @@ export function useAdminDashboard() {
           title: parsed.title || prev.title,
           titleEn: parsed.titleEn || prev.titleEn,
           desc: parsed.desc || prev.desc,
+          descEn: parsed.descEn || prev.descEn,
           features: parsed.features || prev.features,
+          featuresEn: parsed.featuresEn || prev.featuresEn,
           brandImage: parsed.brandImage || prev.brandImage,
           seoKeywords: parsed.seoKeywords || prev.seoKeywords,
+          seoKeywordsEn: parsed.seoKeywordsEn || prev.seoKeywordsEn,
           seoDesc: parsed.seoDesc || prev.seoDesc,
+          seoDescEn: parsed.seoDescEn || prev.seoDescEn,
           warnings: parsed.warnings || prev.warnings,
+          warningsEn: parsed.warningsEn || prev.warningsEn,
           directions: parsed.directions || prev.directions,
-          ingredients: parsed.ingredients || prev.ingredients
+          usageEn: parsed.usageEn || parsed.directionsEn || prev.usageEn,
+          ingredients: parsed.ingredients || prev.ingredients,
+          ingredientsEn: parsed.ingredientsEn || prev.ingredientsEn,
+          disclaimer: parsed.disclaimer || prev.disclaimer,
+          disclaimerEn: parsed.disclaimerEn || prev.disclaimerEn
         }))
 
         try {
-          setSupplementFactsList(parsed.supplementFacts ? (typeof parsed.supplementFacts === 'string' ? JSON.parse(parsed.supplementFacts) : parsed.supplementFacts) : [])
+          let sf = parsed.supplementFacts ? (typeof parsed.supplementFacts === 'string' ? JSON.parse(parsed.supplementFacts) : parsed.supplementFacts) : []
+          if (Array.isArray(sf)) {
+            setSupplementFactsList(sf)
+          } else if (sf && Array.isArray(sf.rows)) {
+            setSupplementFactsList(sf.rows)
+          } else {
+            setSupplementFactsList([])
+          }
         } catch {
           setSupplementFactsList([])
         }
@@ -692,8 +897,8 @@ export function useAdminDashboard() {
     // Extract metadata dynamically to populate the prompt placeholders
     const activeCategory = categories.find((c: any) => c.id === formData.categoryId)?.name || 'فيتامينات ومكملات غذائية';
     const concentration = formData.title.match(/\d+\s*(mg|mcg|iu|g|ملجم|جم|وحدة)/i)?.[0] || 'غير محدد في الاسم';
-    const quantity = keyInfoObj.totalServings || sizesPricesList.map((s: any) => s.size).join(', ') || 'غير محدد';
-    const ingredients = formData.ingredients || supplementFactsList.map((s: any) => s.name).join(', ') || 'غير محدد';
+    const quantity = keyInfoObj.totalServings || (Array.isArray(sizesPricesList) ? sizesPricesList : []).map((s: any) => s.size).join(', ') || 'غير محدد';
+    const ingredients = formData.ingredients || (Array.isArray(supplementFactsList) ? supplementFactsList : []).map((s: any) => s.name).join(', ') || 'غير محدد';
     const brand = formData.brandName || brandSearch || 'غير محدد';
 
     try {
@@ -813,14 +1018,14 @@ export function useAdminDashboard() {
           seoDesc: addAboveExisting(parsed.seoDesc, prev.seoDesc, '\n'),
           seoDescEn: addAboveExisting(parsed.seoDescEn, prev.seoDescEn, '\n'),
           seoKeywords: addAboveExisting(parsed.seoKeywords, prev.seoKeywords, '، '),
-          seoKeywordsEn: addAboveExisting(parsed.seoKeywords, prev.seoKeywordsEn, ', ')
+          seoKeywordsEn: addAboveExisting(parsed.seoKeywordsEn || parsed.seoKeywords, prev.seoKeywordsEn, ', ')
         }))
 
         if (parsed.faqs && Array.isArray(parsed.faqs)) {
           setFaqsList(parsed.faqs)
         }
 
-        addLog('تم توليد وتحديث بيانات الـ SEO والأسئلة الشائعة بنجاح! 🎉')
+        addLog('تم توليد وتحديث بيانات الـ SEO والأسئلة الشائعة بنجاح!')
       } else {
         throw new Error('Invalid SEO response structure')
       }
@@ -848,7 +1053,7 @@ export function useAdminDashboard() {
       })
       const resData = await res.json()
       if (res.ok) {
-        await showAlert('تم توليد وتحديث بيانات الـ SEO للمنتج بنجاح! ✅', 'تحديث ناجح')
+        await showAlert('تم توليد وتحديث بيانات الـ SEO للمنتج بنجاح!', 'تحديث ناجح')
         addLog(`تم تحديث الـ SEO للمنتج بنجاح.`)
         await fetchData() // Refresh product list data
       } else {
@@ -890,7 +1095,8 @@ export function useAdminDashboard() {
   }
 
   const translateSupplementFacts = async () => {
-    return Promise.all(supplementFactsList.map(async (item: any) => {
+    const list = Array.isArray(supplementFactsList) ? supplementFactsList : []
+    return Promise.all(list.map(async (item: any) => {
       let translated = { ...item }
       translated = await translateObjectField(item, translated, 'name')
       translated = await translateObjectField(item, translated, 'amount')
@@ -1081,7 +1287,7 @@ export function useAdminDashboard() {
       a.click()
       a.remove()
       window.URL.revokeObjectURL(url)
-      addLog('تم تحميل النسخة الاحتياطية بنجاح ✅')
+      addLog('تم تحميل النسخة الاحتياطية بنجاح')
     } catch (err: any) {
       await showAlert('حدث خطأ أثناء تحميل النسخة الاحتياطية: ' + err.message, 'خطأ')
       addLog('خطأ في تحميل النسخة الاحتياطية')
@@ -1109,7 +1315,7 @@ export function useAdminDashboard() {
 
       if (res.ok) {
         await showAlert('تم استعادة النسخة الاحتياطية بنجاح! تم استبدال كافة البيانات وتحديث الصور.', 'استعادة ناجحة')
-        addLog('تمت استعادة البيانات بنجاح ✅')
+        addLog('تمت استعادة البيانات بنجاح')
         fetchStats()
         fetchMeta()
       } else {
@@ -1186,7 +1392,7 @@ export function useAdminDashboard() {
       if (res.ok) {
         const data = await res.json()
         await showAlert(`تم تنظيف قاعدة البيانات بنجاح! تم تحديث عدد ${data.count || 0} سجل.`, 'تنظيف ناجح')
-        addLog(`تم تنظيف قاعدة البيانات بنجاح ✅ (تم تحديث ${data.count || 0} سجل)`)
+        addLog(`تم تنظيف قاعدة البيانات بنجاح (تم تحديث ${data.count || 0} سجل)`)
         fetchStats()
         fetchData()
       } else {
@@ -1249,7 +1455,7 @@ export function useAdminDashboard() {
         })
       })
       if (res.ok) {
-        await showAlert('تم حفظ إعدادات النظام SMTP وأرقام التواصل بنجاح! ✅', 'تحديث ناجح')
+        await showAlert('تم حفظ إعدادات النظام SMTP وأرقام التواصل بنجاح!', 'تحديث ناجح')
       } else {
         const err = await res.json()
         await showAlert('فشل حفظ إعدادات النظام: ' + (err.error || 'خطأ غير معروف'), 'خطأ')
@@ -1277,7 +1483,7 @@ export function useAdminDashboard() {
       })
       const json = await res.json()
       if (res.ok) {
-        await showAlert('تم إرسال البريد الإلكتروني التجريبي بنجاح! تفقد صندوق بريدك الوارد (والـ Spam). ✅', 'تم الإرسال بنجاح')
+        await showAlert('تم إرسال البريد الإلكتروني التجريبي بنجاح! تفقد صندوق بريدك الوارد (والـ Spam).', 'تم الإرسال بنجاح')
       } else {
         await showAlert('فشل إرسال البريد التجريبي: ' + (json.error || 'خطأ غير معروف'), 'خطأ')
       }
@@ -1300,7 +1506,7 @@ export function useAdminDashboard() {
         })
         if (res.ok) {
           addLog('تم تحديث بيانات الهيرو بنجاح!')
-          await showAlert('تم الحفظ بنجاح! ✅', 'حفظ الهيرو')
+          await showAlert('تم الحفظ بنجاح!', 'حفظ الهيرو')
           fetchData()
         } else {
           await showAlert('فشل حفظ بيانات الهيرو', 'خطأ')
@@ -1338,15 +1544,15 @@ export function useAdminDashboard() {
 
       if (activeTab === 'products') {
         payload.brandId = finalBrandId
-        payload.supplementFacts = supplementFactsList.length > 0 ? JSON.stringify(supplementFactsList) : ''
-        payload.sizeOptions = sizesPricesList.length > 0 ? JSON.stringify(sizesPricesList) : ''
+        payload.supplementFacts = Array.isArray(supplementFactsList) && supplementFactsList.length > 0 ? JSON.stringify(supplementFactsList) : ''
+        payload.sizeOptions = Array.isArray(sizesPricesList) && sizesPricesList.length > 0 ? JSON.stringify(sizesPricesList) : ''
         payload.specifications = Object.keys(productSpecsObj).length > 0 ? JSON.stringify(productSpecsObj) : ''
         payload.keyInfo = Object.keys(keyInfoObj).length > 0 ? JSON.stringify(keyInfoObj) : ''
         payload.certifications = Object.keys(certificationsObj).length > 0 ? JSON.stringify(certificationsObj) : ''
         payload.dosageCalculator = dosageCalculatorObj ? JSON.stringify(dosageCalculatorObj) : ''
-        payload.faqs = faqsList.length > 0 ? JSON.stringify(faqsList) : ''
+        payload.faqs = Array.isArray(faqsList) && faqsList.length > 0 ? JSON.stringify(faqsList) : ''
         payload.usage = payload.directions || payload.usage || ''
-        payload.usageEn = payload.usageEn || ''
+        payload.usageEn = payload.usageEn || formData.usageEn || formData.directionsEn || ''
         payload.imageAlt = payload.imageAlt || payload.title || ''
 
         if (!payload.image) {
@@ -1386,10 +1592,10 @@ export function useAdminDashboard() {
       })
 
       if (res.ok) {
-        setIsModalOpen(false)
+        handleCloseModal()
         await fetchData()
         if (activeTab === 'products') addLog('تم حفظ المنتج، والخادم الخلفي يتولى إشعار Google Indexing وتسجيل النتيجة')
-        await showAlert('تم الحفظ بنجاح! ✅', 'حفظ ناجح')
+        await showAlert('تم الحفظ بنجاح!', 'حفظ ناجح')
       } else {
         const errData = await res.json()
         await showAlert(`فشل الحفظ: ${errData.error || 'خطأ غير معروف'}`, 'خطأ في الحفظ')
@@ -1404,6 +1610,36 @@ export function useAdminDashboard() {
   const filteredBrands = (Array.isArray(brands) ? brands : []).filter(b => b.name.toLowerCase().includes(brandSearch.toLowerCase()))
 
   useEffect(() => {
+    const handlePopState = () => {
+      setSelectedOrderForDetails(null)
+      setSelectedOrderForWaybill(null)
+
+      if (typeof window === 'undefined') return
+      const searchParams = new URLSearchParams(window.location.search)
+      const tabParam = searchParams.get('tab')
+      const editId = searchParams.get('edit')
+      const isNew = searchParams.get('new') === '1'
+
+      const targetTab = tabParam && ADMIN_TABS.some(t => t.id === tabParam) ? tabParam : 'products'
+      if (targetTab !== activeTab) {
+        setActiveTab(targetTab)
+      }
+
+      if (editId) {
+        openItemById(targetTab, editId, true)
+      } else if (isNew) {
+        handleOpenModal(null, true)
+      } else {
+        setIsModalOpen(false)
+        setEditingItem(null)
+      }
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [activeTab, data, productsList])
+
+  useEffect(() => {
     const auth = localStorage.getItem('mithaly_admin_auth')
     const token = localStorage.getItem('mithaly_admin_token')
     if (auth === 'true' && token) {
@@ -1413,6 +1649,31 @@ export function useAdminDashboard() {
       })
     }
   }, [])
+
+  useEffect(() => {
+    if (!isLoggedIn) return
+    if (initialUrlProcessedRef.current) return
+    initialUrlProcessedRef.current = true
+
+    if (typeof window === 'undefined') return
+    const searchParams = new URLSearchParams(window.location.search)
+    const tabParam = searchParams.get('tab')
+    const editId = searchParams.get('edit')
+    const isNew = searchParams.get('new') === '1'
+
+    const effectiveTab = tabParam && ADMIN_TABS.some(t => t.id === tabParam) ? tabParam : activeTab
+    if (effectiveTab !== activeTab) {
+      setActiveTab(effectiveTab)
+    }
+
+    if (editId) {
+      openItemById(effectiveTab, editId, true)
+    } else if (isNew) {
+      handleOpenModal(null, true)
+    } else if (!searchParams.has('tab')) {
+      syncAdminUrl(effectiveTab, null, false, true)
+    }
+  }, [isLoggedIn])
 
   useEffect(() => {
     if (activeTab === 'whatsapp' && isLoggedIn) {
@@ -1517,6 +1778,12 @@ export function useAdminDashboard() {
     handleWhatsappLogout,
     handleFileUpload,
     handleOpenModal,
+    handleCloseModal,
+    handleTabChange,
+    handleOpenOrderDetails,
+    handleCloseOrderDetails,
+    handleOpenOrderWaybill,
+    handleCloseOrderWaybill,
     handleAIFill,
     handleAutoTranslate,
     handleSEOAI,

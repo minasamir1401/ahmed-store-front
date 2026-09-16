@@ -7,14 +7,8 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: 'api.the-vitahub.com' },
-      { protocol: 'https', hostname: 'images.unsplash.com' },
-      { protocol: 'https', hostname: 'placehold.co' },
-      { protocol: 'https', hostname: 'logo.clearbit.com' },
-      { protocol: 'https', hostname: 'www.google.com' },
-      { protocol: 'https', hostname: 't1.gstatic.com' },
-      { protocol: 'https', hostname: 'logos.hunter.io' },
-      { protocol: 'https', hostname: 'icons.duckduckgo.com' },
+      { protocol: 'https', hostname: '**' },
+      { protocol: 'http', hostname: '**' },
     ],
     localPatterns: [
       {

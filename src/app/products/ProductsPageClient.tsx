@@ -429,13 +429,87 @@ function ProductsContent() {
   const prevPriceValue = React.useRef<[number, number]>([0, 5000])
 
   // Pagination states
-  const [currentPage, setCurrentPage] = React.useState(1)
+  const pageParam = searchParams.get('page')
+  const [currentPage, setCurrentPage] = React.useState<number>(() => {
+    if (pageParam) {
+      const p = parseInt(pageParam, 10)
+      if (p > 0) return p
+    }
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('vitahub_last_products_page')
+      if (saved) {
+        const p = parseInt(saved, 10)
+        if (p > 0) return p
+      }
+    }
+    return 1
+  })
   const [totalProducts, setTotalProducts] = React.useState(0)
   const LIMIT = 24
+
+  // Ensure URL reflects restored page on initial load if present from session
+  React.useEffect(() => {
+    if (currentPage > 1 && !searchParams.get('page') && typeof window !== 'undefined') {
+      const url = new URL(window.location.href)
+      url.searchParams.set('page', String(currentPage))
+      window.history.replaceState(null, '', url.toString())
+    }
+  }, [])
+
+  // Keep state in sync with URL searchParams (e.g. browser back/forward)
+  React.useEffect(() => {
+    const p = searchParams.get('page')
+    const pageNum = p ? Math.max(1, parseInt(p, 10) || 1) : 1
+    if (pageNum !== currentPage) {
+      setCurrentPage(pageNum)
+    }
+  }, [searchParams])
 
   React.useEffect(() => {
     document.title = t('products_title')
   }, [language, t])
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage === currentPage) return
+
+    if (typeof window !== 'undefined') {
+      const currentUrl = new URL(window.location.href)
+      const currentKey = `vitahub_scroll_pos_${currentUrl.pathname}${currentUrl.search}`
+      sessionStorage.setItem(currentKey, String(window.scrollY))
+
+      const nextUrl = new URL(window.location.href)
+      if (newPage > 1) {
+        nextUrl.searchParams.set('page', String(newPage))
+        sessionStorage.setItem('vitahub_last_products_page', String(newPage))
+      } else {
+        nextUrl.searchParams.delete('page')
+        sessionStorage.removeItem('vitahub_last_products_page')
+      }
+      window.history.pushState(null, '', nextUrl.toString())
+    }
+
+    setCurrentPage(newPage)
+
+    if (typeof window !== 'undefined') {
+      const nextUrl = new URL(window.location.href)
+      const nextKey = `vitahub_scroll_pos_${nextUrl.pathname}${nextUrl.search}`
+      const savedPos = sessionStorage.getItem(nextKey)
+      const savedY = savedPos ? parseInt(savedPos, 10) : null
+
+      if (savedY !== null && savedY > 0) {
+        window.scrollTo({ top: savedY, behavior: 'smooth' })
+      } else {
+        const gridTop = document.getElementById('products-grid-top')
+        if (gridTop) {
+          const rect = gridTop.getBoundingClientRect()
+          const targetY = rect.top + window.pageYOffset - 90
+          window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' })
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+      }
+    }
+  }
 
   const fetchData = async (page = 1, cats = selectedCats, price = priceValue, sort = sortBy) => {
     setLoading(true)
@@ -497,10 +571,48 @@ function ProductsContent() {
     fetchData(currentPage, selectedCats, priceValue, sortBy)
   }, [currentPage, selectedCats, priceValue, sortBy, isPriceModified, searchQuery])
 
-  // Reset page to 1 on filter/search parameters change
+  const isInitialMount = React.useRef(true)
+  const prevFiltersRef = React.useRef({
+    cats: selectedCats,
+    price: priceValue,
+    sort: sortBy,
+    search: searchQuery,
+    isPriceModified
+  })
+
+  // Reset page to 1 ONLY when filters or search query actually change by user action
   React.useEffect(() => {
-    queueMicrotask(() => setCurrentPage(1))
-  }, [selectedCats, priceValue, sortBy, searchQuery])
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      return
+    }
+
+    const prev = prevFiltersRef.current
+    const catsChanged = JSON.stringify(prev.cats) !== JSON.stringify(selectedCats)
+    const sortChanged = prev.sort !== sortBy
+    const searchChanged = prev.search !== searchQuery
+    const priceChanged = isPriceModified && (prev.price[0] !== priceValue[0] || prev.price[1] !== priceValue[1] || prev.isPriceModified !== isPriceModified)
+
+    prevFiltersRef.current = {
+      cats: selectedCats,
+      price: priceValue,
+      sort: sortBy,
+      search: searchQuery,
+      isPriceModified
+    }
+
+    if (catsChanged || sortChanged || searchChanged || priceChanged) {
+      setCurrentPage(1)
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('vitahub_last_products_page')
+        const url = new URL(window.location.href)
+        if (url.searchParams.has('page')) {
+          url.searchParams.delete('page')
+          window.history.replaceState(null, '', url.toString())
+        }
+      }
+    }
+  }, [selectedCats, priceValue, sortBy, searchQuery, isPriceModified])
 
   // Toggle category
   const toggleCat = (id: string) => {
@@ -520,6 +632,15 @@ function ProductsContent() {
     setSortBy('default')
     setIsPriceModified(false)
     setPriceValue(priceRange)
+    setCurrentPage(1)
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('vitahub_last_products_page')
+      const url = new URL(window.location.href)
+      if (url.searchParams.has('page')) {
+        url.searchParams.delete('page')
+        window.history.replaceState(null, '', url.toString())
+      }
+    }
   }
 
   const hasFilters = selectedCats.length > 0 ||
@@ -622,6 +743,7 @@ function ProductsContent() {
 
           {/* Products Area */}
           <div className="flex-1 min-w-0">
+            <div id="products-grid-top" className="scroll-mt-24" />
             {error ? (
               <div className="text-center py-16 bg-red-50/50 rounded-[2rem] border border-red-100 max-w-md mx-auto px-6 relative z-20">
                 <div className="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-lg">!</div>
@@ -698,10 +820,7 @@ function ProductsContent() {
                   <div className="flex items-center justify-center gap-2 mt-12" dir={dir}>
                     <button
                       disabled={currentPage === 1}
-                      onClick={() => {
-                        setCurrentPage(prev => Math.max(prev - 1, 1))
-                        window.scrollTo({ top: 0, behavior: 'smooth' })
-                      }}
+                      onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
                       className="px-4 py-2 rounded-xl text-xs font-bold bg-white border border-[#e8f0ed] text-gray-600 hover:bg-[#f7fbf9] disabled:opacity-40 disabled:hover:bg-white transition-all cursor-pointer"
                     >
                       {language === 'ar' ? 'السابق' : 'Previous'}
@@ -713,10 +832,7 @@ function ProductsContent() {
                       return (
                         <button
                           key={pageNumber}
-                          onClick={() => {
-                            setCurrentPage(pageNumber)
-                            window.scrollTo({ top: 0, behavior: 'smooth' })
-                          }}
+                          onClick={() => handlePageChange(pageNumber)}
                           className={`w-9 h-9 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
                             isCurrent
                               ? 'bg-primary text-white shadow-md shadow-emerald-700/10'
@@ -730,10 +846,7 @@ function ProductsContent() {
 
                     <button
                       disabled={currentPage === totalPages}
-                      onClick={() => {
-                        setCurrentPage(prev => Math.min(prev + 1, totalPages))
-                        window.scrollTo({ top: 0, behavior: 'smooth' })
-                      }}
+                      onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
                       className="px-4 py-2 rounded-xl text-xs font-bold bg-white border border-[#e8f0ed] text-gray-600 hover:bg-[#f7fbf9] disabled:opacity-40 disabled:hover:bg-white transition-all cursor-pointer"
                     >
                       {language === 'ar' ? 'التالي' : 'Next'}

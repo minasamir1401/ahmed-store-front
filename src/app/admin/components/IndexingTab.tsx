@@ -62,7 +62,7 @@ export default function IndexingTab({ BACKEND_API, fetchWithAdminAuth, addLog }:
 
       const data = await res.json()
       if (res.ok && data.success) {
-        setMessage({ text: 'تم إرسال طلب الأرشفة الفورية بنجاح وجاري معالجته من قبل جوجل! ✅', type: 'success' })
+        setMessage({ text: 'تم إرسال طلب الأرشفة الفورية بنجاح وجاري معالجته من قبل جوجل!', type: 'success' })
         setUrlInput('')
         fetchLogs()
       } else {

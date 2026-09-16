@@ -141,13 +141,13 @@ export default function AdminSettingsTab(props: any) {
                         <Database size={22} />
                       </div>
                       <h3 className="text-lg font-black text-slate-800">النسخ الاحتياطي واستعادة البيانات</h3>
-                      <p className="text-[10px] text-slate-400 font-bold">قم بتحميل نسخة احتياطية كاملة للمتجر (المنتجات، الأقسام، الهيرو، الطلبات، والصور) أو استعادة نسخة سابقة</p>
+                      <p className="text-[10px] text-slate-400 font-bold">تحميل نسخة احتياطية شاملة 100% لكافة بيانات المتجر (المنتجات، الأقسام، البراندات، الطلبات، المقالات، النصائح، سجلات الفهرسة، الإعدادات، وكافة الصور المرفوعة) أو استعادة نسخة سابقة</p>
                     </div>
 
                     <div className="space-y-6">
                       <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100/50 space-y-2 text-right">
-                        <span className="text-[11px] font-black text-slate-700 block">خطوة 1: تحميل نسخة احتياطية</span>
-                        <p className="text-[9px] text-slate-400 leading-relaxed font-semibold">يقوم هذا الإجراء بتنزيل ملف مضغوط ZIP يحتوي على كافة بيانات المتجر وقاعدة البيانات بالإضافة إلى جميع الصور التي تم رفعها على السيرفر.</p>
+                        <span className="text-[11px] font-black text-slate-700 block">خطوة 1: تحميل نسخة احتياطية كاملة</span>
+                        <p className="text-[9px] text-slate-400 leading-relaxed font-semibold">يقوم هذا الإجراء بتنزيل ملف مضغوط ZIP شامل يحتوي على كافة جداول قاعدة البيانات الـ 13 (بما فيها سجلات الفهرسة، الإعدادات، وجلسات النظام) بالإضافة إلى جميع الصور المرفوعة على السيرفر بدون أي نقصان.</p>
                         <button 
                           type="button"
                           onClick={handleDownloadBackup}

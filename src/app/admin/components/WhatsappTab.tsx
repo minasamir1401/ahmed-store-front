@@ -43,10 +43,10 @@ export default function WhatsappTab(props: any) {
                   whatsappStatus.status === 'initializing' ? 'bg-blue-100 text-blue-700' :
                   'bg-red-100 text-red-700'
                 }`}>
-                  {whatsappStatus.status === 'connected' ? 'متصل وجاهز للعمل ✅' :
-                   whatsappStatus.status === 'qr' ? 'في انتظار مسح الرمز 📱' :
-                   whatsappStatus.status === 'initializing' ? 'جاري التهيئة والتشغيل... 🔄' :
-                   'غير متصل ❌'}
+                  {whatsappStatus.status === 'connected' ? 'متصل وجاهز للعمل' :
+                   whatsappStatus.status === 'qr' ? 'في انتظار مسح الرمز' :
+                   whatsappStatus.status === 'initializing' ? 'جاري التهيئة والتشغيل...' :
+                   'غير متصل'}
                 </span>
               </span>
             </div>

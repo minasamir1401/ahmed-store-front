@@ -71,3 +71,28 @@ export const safeBrandImage = (src?: string | null) => {
 
   return src
 }
+
+export const parseImageList = (raw: any): string[] => {
+  if (!raw) return []
+  if (Array.isArray(raw)) {
+    return raw.map((s: any) => String(s).trim().replace(/^[\["']+|[\]"']+$/g, '')).filter(Boolean)
+  }
+  const str = String(raw).trim()
+  if (!str) return []
+  if (str.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(str)
+      if (Array.isArray(parsed)) {
+        return parsed.map((s: any) => String(s).trim().replace(/^[\["']+|[\]"']+$/g, '')).filter(Boolean)
+      }
+    } catch {
+      // fallback to delimiter split
+    }
+  }
+  return str.split(',').map((s: string) => s.trim().replace(/^[\["']+|[\]"']+$/g, '')).filter(Boolean)
+}
+
+export const serializeImageList = (list: string[]): string => {
+  const cleaned = list.map((s: string) => String(s).trim().replace(/^[\["']+|[\]"']+$/g, '')).filter(Boolean)
+  return cleaned.length > 0 ? JSON.stringify(cleaned) : ''
+}

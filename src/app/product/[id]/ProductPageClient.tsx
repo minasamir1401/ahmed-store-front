@@ -44,6 +44,11 @@ const stagger: any = {
 function WooZoom({ src, alt }: { src: string; alt: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [zoomState, setZoomState] = useState({ isHovered: false, x: 50, y: 50 })
+  const [hasError, setHasError] = useState(false)
+
+  useEffect(() => {
+    setHasError(false)
+  }, [src])
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = containerRef.current?.getBoundingClientRect()
@@ -72,17 +77,29 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
         style={{ zIndex: 10, backgroundImage: "url('/frame.png')" }}
       />
       {/* Product display image - z-[15] (on top of frame) with contained cursor zoom */}
-      <div className="absolute top-[17.5%] bottom-[19.5%] left-[9%] right-[9%] overflow-hidden" style={{ zIndex: 15 }}>
-        <img
-          src={src}
-          alt={alt}
-          className="w-full h-full object-contain mix-blend-multiply select-none transition-transform duration-150 ease-out pointer-events-none"
-          draggable={false}
-          style={{
-            transform: zoomState.isHovered ? 'scale(1.8)' : 'scale(1)',
-            transformOrigin: `${zoomState.x}% ${zoomState.y}%`
-          }}
-        />
+      <div className="absolute top-[17.5%] bottom-[19.5%] left-[9%] right-[9%] overflow-hidden flex items-center justify-center" style={{ zIndex: 15 }}>
+        {src && !hasError ? (
+          <img
+            src={src}
+            alt={alt}
+            onError={() => setHasError(true)}
+            className="w-full h-full object-contain mix-blend-multiply select-none transition-transform duration-150 ease-out pointer-events-none"
+            draggable={false}
+            style={{
+              transform: zoomState.isHovered ? 'scale(1.8)' : 'scale(1)',
+              transformOrigin: `${zoomState.x}% ${zoomState.y}%`
+            }}
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-2 opacity-40">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2e7d5e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span className="text-xs font-bold text-primary/60">لا توجد صورة</span>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -273,7 +290,22 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
   const titleBi = parseBilingual(product.title)
   const titleEn = product.titleEn || titleBi.en || titleBi.ar
   const wishlistTitle = JSON.stringify({ ar: titleBi.ar, en: titleEn })
-  const additionalImages = product.images ? product.images.split(',').map((img: string) => img.trim()).filter((i: string) => i) : []
+  let additionalImages: string[] = []
+  if (product.images) {
+    const rawImgs = String(product.images).trim()
+    if (rawImgs.startsWith('[') && rawImgs.endsWith(']')) {
+      try {
+        const parsed = JSON.parse(rawImgs)
+        if (Array.isArray(parsed)) {
+          additionalImages = parsed.map((img: any) => String(img).trim()).filter(Boolean)
+        }
+      } catch {
+        additionalImages = rawImgs.split(',').map((img: string) => img.trim()).filter(Boolean)
+      }
+    } else {
+      additionalImages = rawImgs.split(',').map((img: string) => img.trim()).filter(Boolean)
+    }
+  }
   const imageVersion = productImageVersion(product)
   const allImages = [product.image, ...additionalImages].filter(Boolean).map((src: string) => withImageVersion(src, imageVersion))
   const mainImageAlt = productImageAlt(product, getLocalizedValue(language, product.title, product.titleEn, translate))
@@ -298,13 +330,26 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
   try {
     const raw = product.productSpecs ? JSON.parse(product.productSpecs) : (product.specifications ? JSON.parse(product.specifications) : null)
     if (Array.isArray(raw)) {
-      specifications = raw.map((item: any) => ({
-        label: getLocalizedValue(language, item.label, item.label_en, translate),
-        value: getLocalizedValue(language, item.value, item.value_en, translate),
-        bold: item.bold
-      }));
+      specifications = raw
+        .filter((item: any) => {
+          const rawLabel = String(item.label || '').trim();
+          const rawLabelEn = String(item.label_en || '').trim();
+          const rawVal = String(item.value || '').trim();
+
+          if (rawLabel.includes('المصدر') || rawLabelEn.toLowerCase().includes('source link')) return false;
+          if (rawLabel.includes('بحث الصور') || rawLabelEn.toLowerCase().includes('image search')) return false;
+          if (rawLabel.includes('وزن الشحن') || rawLabelEn.toLowerCase().includes('shipping weight')) return false;
+          if (rawVal.startsWith('http://') || rawVal.startsWith('https://')) return false;
+
+          return true;
+        })
+        .map((item: any) => ({
+          label: getLocalizedValue(language, item.label, item.label_en, translate),
+          value: getLocalizedValue(language, item.value, item.value_en, translate),
+          bold: item.bold
+        }));
     } else if (raw && typeof raw === 'object') {
-      const specKeys = ['sku', 'upc', 'authentic', 'shippingWeight', 'dimensions', 'firstAvailable', 'quantity', 'animalDerived'];
+      const specKeys = ['sku', 'upc', 'authentic', 'dimensions', 'firstAvailable', 'quantity', 'animalDerived'];
       specifications = specKeys
         .map(key => {
           let label = '';
@@ -321,9 +366,6 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
             label = language === 'en' ? '100% Authentic' : 'أصلي 100%';
             value = raw.authentic ? (language === 'en' ? 'Yes ✓' : 'نعم ✓') : (language === 'en' ? 'No ✗' : 'لا ✗');
             bold = true;
-          } else if (key === 'shippingWeight') {
-            label = language === 'en' ? 'Shipping Weight' : 'وزن الشحن';
-            value = language === 'en' ? (raw.shippingWeight_en || raw.shippingWeight) : (raw.shippingWeight_ar || raw.shippingWeight);
           } else if (key === 'dimensions') {
             label = language === 'en' ? 'Dimensions' : 'الأبعاد';
             value = language === 'en' ? (raw.dimensions_en || raw.dimensions) : (raw.dimensions_ar || raw.dimensions);
@@ -338,6 +380,17 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
         })
         .filter(item => item.value !== null && item.value !== undefined && item.value !== '' && item.value !== 'undefined');
     }
+
+    // Final safety filter
+    specifications = specifications.filter((s: any) => {
+      const l = String(s.label || '').toLowerCase();
+      const v = String(s.value || '').trim();
+      if (l.includes('المصدر') || l.includes('source')) return false;
+      if (l.includes('بحث الصور') || l.includes('image search')) return false;
+      if (l.includes('وزن الشحن') || l.includes('shipping weight')) return false;
+      if (v.startsWith('http://') || v.startsWith('https://')) return false;
+      return true;
+    });
   } catch { specifications = [] }
 
   try {
@@ -549,6 +602,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                             src={productImageThumb(img) || img}
                             alt={`${mainImageAlt} ${i + 1}`}
                             fill
+                            unoptimized={Boolean(img && /^https?:\/\//i.test(img))}
                             className="object-contain mix-blend-multiply"
                             sizes="(max-width: 768px) 25vw, 150px"
                           />
@@ -632,69 +686,6 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
               )}
 
               <SmartDosageCalculator product={product} language={language} />
-
-              {/* ── The VitaHub Golden Guarantees ── */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="bg-slate-50/70 rounded-2xl sm:rounded-[2.5rem] border border-slate-100/80 p-5 sm:p-8 space-y-6"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-6 bg-primary rounded-full inline-block" />
-                  <h3 className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-widest">{language === 'ar' ? 'ضمانات الجودة في The VitaHub' : 'Quality Guarantees at The VitaHub'}</h3>
-                </div>
-
-                <div className="space-y-4">
-                  {[
-                    {
-                      icon: ShieldCheck,
-                      title: language === 'ar' ? 'أصلية وموثقة 100%' : '100% Original & Certified',
-                      desc: language === 'ar' ? 'تأتي مكملاتنا مباشرة من المصانع الرسمية مع رمز تتبع التحقق من المصدر (Batch Number).' : 'Our supplements come directly from official factories with a batch number verification code.',
-                      color: 'text-emerald-600',
-                      bg: 'bg-emerald-50/50'
-                    },
-                    {
-                      icon: ShieldCheck, 
-                      title: language === 'ar' ? 'تخزين وحفظ مبرد متكامل' : 'Integrated Cold Storage & Preservation',
-                      desc: language === 'ar' ? 'مخازن مجهزة بالكامل بنظام تحكم ذكي للحرارة والرطوبة للحفاظ على فاعلية الفيتامينات الكاملة.' : 'Fully equipped warehouses with smart temperature and humidity control to preserve the complete effectiveness of vitamins.',
-                      color: 'text-sky-500',
-                      bg: 'bg-sky-50/30'
-                    },
-                    {
-                      icon: Truck,
-                      title: language === 'ar' ? 'شحن آمن وفحص قبل الدفع' : 'Secure Shipping & Pre-payment Inspection',
-                      desc: language === 'ar' ? 'توصيل لباب بيتك مع أحقية فحص المنتج والتأكد من الباتش والتوثيق بالكامل قبل دفع قرش واحد.' : 'Delivery to your doorstep with the right to inspect the product, batch, and documentation before paying a single penny.',
-                      color: 'text-blue-500',
-                      bg: 'bg-blue-50/30'
-                    },
-                    {
-                      icon: RotateCcw,
-                      title: language === 'ar' ? 'استرجاع واستبدال مرن وسهل' : 'Flexible & Easy Returns',
-                      desc: language === 'ar' ? 'لديك 14 يوماً كاملة لاستبدال أو إرجاع أي منتج غير مفتوح بسهولة دون أي تعقيدات.' : 'You have 14 full days to exchange or return any unopened product easily without complications.',
-                      color: 'text-amber-500',
-                      bg: 'bg-amber-50/30'
-                    }
-                  ].map((item, idx) => {
-                    const IconComp = item.icon;
-                    return (
-                      <div
-                        key={idx}
-                        className="flex gap-3 items-start p-3 sm:p-4 rounded-2xl bg-white border border-slate-100 hover:shadow-md hover:border-slate-200/50 hover:-translate-y-0.5 transition-all duration-300"
-                      >
-                        <div className={`${item.bg} ${item.color} p-2 sm:p-2.5 rounded-xl flex-shrink-0`}>
-                          <IconComp size={18} />
-                        </div>
-                        <div className="space-y-1">
-                          <h4 className="text-[11px] sm:text-xs font-black text-slate-800">{item.title}</h4>
-                          <p className="text-[10px] sm:text-xs font-bold text-slate-400 leading-relaxed">{item.desc}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </motion.div>
             </div>
 
             {/* ── Right: Info ── */}
@@ -936,6 +927,73 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                   </div>
                 </motion.div>
               )}
+
+              {/* ── The VitaHub Golden Guarantees ── */}
+              <motion.div
+                variants={fadeUp}
+                className="bg-slate-50/70 rounded-3xl border border-slate-100/80 p-5 sm:p-7 space-y-5 order-11 shadow-sm"
+              >
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-6 bg-primary rounded-full inline-block" />
+                    <h3 className="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-widest">
+                      {language === 'ar' ? 'ضمانات الجودة والخدمة في The VitaHub' : 'Quality & Service Guarantees at The VitaHub'}
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-black text-emerald-700 bg-emerald-100/70 px-2.5 py-0.5 rounded-full">
+                    {language === 'ar' ? 'موثق 100%' : '100% Certified'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    {
+                      icon: ShieldCheck,
+                      title: language === 'ar' ? 'أصلية وموثقة 100%' : '100% Original & Certified',
+                      desc: language === 'ar' ? 'تأتي مكملاتنا مباشرة من المصانع الرسمية مع رمز تتبع التحقق (Batch Number).' : 'Supplements sourced directly from official makers with batch verification.',
+                      color: 'text-emerald-600',
+                      bg: 'bg-emerald-50/70'
+                    },
+                    {
+                      icon: ShieldCheck, 
+                      title: language === 'ar' ? 'تخزين وحفظ مبرد متكامل' : 'Cold Storage & Preservation',
+                      desc: language === 'ar' ? 'مخازن مجهزة بنظام تحكم ذكي للحرارة والرطوبة للحفاظ على فاعلية الفيتامينات الكاملة.' : 'Smart temperature and humidity controlled storage preserving full vitamin potency.',
+                      color: 'text-sky-600',
+                      bg: 'bg-sky-50/70'
+                    },
+                    {
+                      icon: Truck,
+                      title: language === 'ar' ? 'شحن آمن وفحص قبل الدفع' : 'Secure Shipping & Inspection',
+                      desc: language === 'ar' ? 'توصيل لباب بيتك مع أحقية فحص المنتج والتأكد من الباتش بالكامل قبل الدفع.' : 'Doorstep delivery with inspection rights before paying a single pound.',
+                      color: 'text-blue-600',
+                      bg: 'bg-blue-50/70'
+                    },
+                    {
+                      icon: RotateCcw,
+                      title: language === 'ar' ? 'استرجاع واستبدال مرن' : 'Flexible Returns & Exchanges',
+                      desc: language === 'ar' ? 'لديك 14 يوماً كاملة لاستبدال أو إرجاع أي عبوة غير مفتوحة بسهولة.' : '14 days flexible return policy for any unopened product.',
+                      color: 'text-amber-600',
+                      bg: 'bg-amber-50/70'
+                    }
+                  ].map((item, idx) => {
+                    const IconComp = item.icon;
+                    return (
+                      <div
+                        key={idx}
+                        className="flex gap-3 items-start p-3 sm:p-3.5 rounded-2xl bg-white border border-slate-100/90 hover:shadow-md hover:border-slate-200/60 transition-all"
+                      >
+                        <div className={`${item.bg} ${item.color} p-2 rounded-xl flex-shrink-0 mt-0.5`}>
+                          <IconComp size={16} />
+                        </div>
+                        <div className="space-y-0.5 min-w-0">
+                          <h4 className="text-[11px] sm:text-xs font-black text-slate-800 leading-snug">{item.title}</h4>
+                          <p className="text-[10px] font-bold text-slate-400 leading-relaxed line-clamp-2">{item.desc}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
             </motion.div>
           </div>
 
@@ -1254,7 +1312,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
             className="fixed bottom-[68px] lg:bottom-6 left-1.5 right-1.5 max-[340px]:left-1 max-[340px]:right-1 xs:left-3 xs:right-3 sm:left-auto sm:right-6 sm:w-96 lg:right-8 z-50"
           >
             <div className="w-full bg-white rounded-[1.5rem] xs:rounded-[2rem] shadow-2xl border border-slate-100 p-1.5 max-[340px]:p-1 xs:p-4 flex items-center gap-1.5 max-[340px]:gap-1 xs:gap-4">
-              <Image src={productImageThumb(product.image) || product.image} alt={mainImageAlt} width={72} height={72} className="w-9 h-9 max-[340px]:w-8 max-[340px]:h-8 rounded-xl xs:rounded-2xl object-contain bg-[#f0f7f4] p-1 border border-slate-100 flex-shrink-0" sizes="72px" />
+              <Image unoptimized={Boolean(product.image && /^https?:\/\//i.test(product.image))} src={productImageThumb(product.image) || product.image} alt={mainImageAlt} width={72} height={72} className="w-9 h-9 max-[340px]:w-8 max-[340px]:h-8 rounded-xl xs:rounded-2xl object-contain bg-[#f0f7f4] p-1 border border-slate-100 flex-shrink-0" sizes="72px" />
               <div className="flex-1 min-w-0">
                 <p className="text-[9px] xs:text-xs font-bold text-gray-500 truncate">{getLocalizedValue(language, product.title, product.titleEn, translate)}</p>
                 <p className="text-xs max-[340px]:text-[11px] xs:text-lg font-black text-primary">{currentPrice} {t('currency')}</p>

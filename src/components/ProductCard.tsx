@@ -33,6 +33,7 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
   const [isAdded, setIsAdded] = React.useState(false)
   const [isHovered, setIsHovered] = React.useState(false)
   const [imgError, setImgError] = React.useState(false)
+  const [fallbackNative, setFallbackNative] = React.useState(false)
   const { addToCart } = useCart()
   const { toggleWishlist, isInWishlist } = useWishlist()
   const { t, translate, language } = useLanguage()
@@ -167,16 +168,26 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
                 />
                 {/* Product image - constrained inside frame inner box */}
                 <div className="absolute top-[17.5%] bottom-[19.5%] left-[9%] right-[9%] z-[15]">
-                  <Image
-                    src={cardImage}
-                    alt={imgAlt}
-                    fill
-                    className="object-contain"
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
-                    loading="lazy"
-                    onError={() => setImgError(true)}
-                    style={{ pointerEvents: 'none' }}
-                  />
+                  {fallbackNative ? (
+                    <img
+                      src={cardImage}
+                      alt={imgAlt}
+                      className="w-full h-full object-contain pointer-events-none"
+                      onError={() => setImgError(true)}
+                    />
+                  ) : (
+                    <Image
+                      src={cardImage}
+                      alt={imgAlt}
+                      fill
+                      unoptimized={Boolean(cardImage && /^https?:\/\//i.test(cardImage) && !cardImage.includes('the-vitahub.com') && !cardImage.includes('localhost'))}
+                      className="object-contain"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
+                      loading="lazy"
+                      onError={() => setFallbackNative(true)}
+                      style={{ pointerEvents: 'none' }}
+                    />
+                  )}
                 </div>
               </>
             ) : (

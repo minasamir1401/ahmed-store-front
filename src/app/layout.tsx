@@ -192,6 +192,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ModalProvider } from "@/context/ModalContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import ConsoleManager from "@/components/ConsoleManager";
+import ScrollRestoration from "@/components/ScrollRestoration";
 import { headers } from 'next/headers'
 import TrackingPixels from "@/components/TrackingPixels";
 
@@ -227,6 +228,7 @@ export default async function RootLayout({
         </a>
 
         <ConsoleManager />
+        <ScrollRestoration />
         <TrackingPixels />
         <LanguageProvider>
           <AuthProvider>

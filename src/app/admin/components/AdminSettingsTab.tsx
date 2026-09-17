@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, CheckCircle2, Upload, Plus, Edit2, Trash2, Eye, Search, Smartphone, Shield, LogIn, Lock as LockIcon, Database, DownloadCloud, Sparkles, Mail, Send, Truck, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Loader2, CheckCircle2, Upload, Plus, Edit2, Trash2, Eye, Search, Smartphone, Shield, LogIn, Lock as LockIcon, Database, DownloadCloud, Sparkles, Mail, Send, Truck, ArrowRight, ShieldCheck, Zap, Archive } from 'lucide-react';
 
 
 export default function AdminSettingsTab(props: any) {
@@ -7,13 +7,8 @@ export default function AdminSettingsTab(props: any) {
     formData, setFormData, handleSave, loading, uploading, handleFileUpload,
     items, adminEmail, setAdminEmail, adminName, setAdminName, adminPassword, setAdminPassword,
     adminSaveLoading, handleAdminSave, isLoggedIn, setIsLoggedIn, showLogin,
-    activeTab, tabs, backupLoading, restoreLoading, handleDownloadBackup, handleRestoreBackup,
+    activeTab, tabs, backupLoading, backupTypeLoading, restoreLoading, handleDownloadBackup, handleRestoreBackup,
     cleanLoading, handleCleanBase64Images,
-    smtpHost, setSmtpHost,
-    smtpPort, setSmtpPort,
-    smtpSecure, setSmtpSecure,
-    smtpUser, setSmtpUser,
-    smtpPass, setSmtpPass,
     fromEmail, setFromEmail,
     fromName, setFromName,
     whatsappNumber, setWhatsappNumber,
@@ -145,17 +140,57 @@ export default function AdminSettingsTab(props: any) {
                     </div>
 
                     <div className="space-y-6">
-                      <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100/50 space-y-2 text-right">
-                        <span className="text-[11px] font-black text-slate-700 block">خطوة 1: تحميل نسخة احتياطية كاملة</span>
-                        <p className="text-[9px] text-slate-400 leading-relaxed font-semibold">يقوم هذا الإجراء بتنزيل ملف مضغوط ZIP شامل يحتوي على كافة جداول قاعدة البيانات الـ 13 (بما فيها سجلات الفهرسة، الإعدادات، وجلسات النظام) بالإضافة إلى جميع الصور المرفوعة على السيرفر بدون أي نقصان.</p>
-                        <button 
-                          type="button"
-                          onClick={handleDownloadBackup}
-                          disabled={backupLoading || restoreLoading}
-                          className="mt-2 w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white py-3 rounded-xl font-black text-xs shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] transition-all cursor-pointer"
-                        >
-                          {backupLoading ? <Loader2 className="animate-spin" size={14} /> : <DownloadCloud size={14} />} تحميل نسخة احتياطية كاملة
-                        </button>
+                      <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100/50 space-y-3 text-right">
+                        <span className="text-[11px] font-black text-slate-700 block">خطوة 1: تحميل نسخة احتياطية</span>
+                        <p className="text-[9px] text-slate-400 leading-relaxed font-semibold">
+                          اختر نوع النسخة الاحتياطية المناسب لك. يمكنك تنزيل نسخة البيانات فقط بشكل فوري، أو تنزيل نسخة شاملة تحتوي على قاعدة البيانات وملفات الصور المرفوعة.
+                        </p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                          <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 space-y-3 flex flex-col justify-between shadow-2xs">
+                            <div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-[9px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-md">فورية</span>
+                                <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                                  <Zap size={14} className="text-emerald-600" /> نسخة البيانات فقط
+                                </span>
+                              </div>
+                              <p className="text-[9px] text-slate-500 mt-2 leading-relaxed font-medium">
+                                تشمل 100% من جداول قاعدة البيانات (المنتجات، الطلبات، الأقسام، البراندات، المقالات، الإعدادات). حجم الملف خفيف جدا والتحميل فوري في أقل من ثانية.
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleDownloadBackup('data')}
+                              disabled={backupLoading || restoreLoading}
+                              className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white py-2.5 rounded-xl font-black text-xs shadow-sm flex items-center justify-center gap-2 hover:scale-[1.01] transition-all cursor-pointer"
+                            >
+                              {backupTypeLoading === 'data' ? <Loader2 className="animate-spin" size={14} /> : <DownloadCloud size={14} />} تحميل نسخة البيانات (سريعة)
+                            </button>
+                          </div>
+
+                          <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 space-y-3 flex flex-col justify-between shadow-2xs">
+                            <div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-[9px] font-black text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">شاملة</span>
+                                <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                                  <Archive size={14} className="text-slate-600" /> نسخة كاملة مع الصور
+                                </span>
+                              </div>
+                              <p className="text-[9px] text-slate-500 mt-2 leading-relaxed font-medium">
+                                تشمل قاعدة البيانات بالكامل بالإضافة إلى جميع الصور والملفات المرفوعة على السيرفر، مجمعة في ملف ZIP واحد للحفظ الشامل.
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleDownloadBackup('full')}
+                              disabled={backupLoading || restoreLoading}
+                              className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white py-2.5 rounded-xl font-black text-xs shadow-sm flex items-center justify-center gap-2 hover:scale-[1.01] transition-all cursor-pointer"
+                            >
+                              {backupTypeLoading === 'full' ? <Loader2 className="animate-spin" size={14} /> : <DownloadCloud size={14} />} تحميل نسخة كاملة (+الصور)
+                            </button>
+                          </div>
+                        </div>
                       </div>
 
                       <div className="p-4 bg-red-50/40 rounded-2xl border border-red-100/30 space-y-2 text-right">

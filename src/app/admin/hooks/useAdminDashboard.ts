@@ -44,6 +44,7 @@ export function useAdminDashboard() {
   const [uploading, setUploading] = useState(false)
   const [brandUploading, setBrandUploading] = useState(false)
   const [backupLoading, setBackupLoading] = useState(false)
+  const [backupTypeLoading, setBackupTypeLoading] = useState<'data' | 'full' | null>(null)
   const [restoreLoading, setRestoreLoading] = useState(false)
   const [cleanLoading, setCleanLoading] = useState(false)
   const [excelImporting, setExcelImporting] = useState(false)
@@ -82,12 +83,8 @@ export function useAdminDashboard() {
   const [adminEmail, setAdminEmail] = useState('')
   const [adminName, setAdminName] = useState('')
   const [adminPassword, setAdminPassword] = useState('')
-  const [smtpHost, setSmtpHost] = useState('smtp.gmail.com')
-  const [smtpPort, setSmtpPort] = useState('587')
-  const [smtpSecure, setSmtpSecure] = useState('false')
-  const [smtpUser, setSmtpUser] = useState('')
-  const [smtpPass, setSmtpPass] = useState('')
-  const [fromEmail, setFromEmail] = useState('')
+  const [resendApiKey, setResendApiKey] = useState('')
+  const [fromEmail, setFromEmail] = useState('orders@the-vitahub.com')
   const [fromName, setFromName] = useState('The VitaHub')
   const [whatsappNumber, setWhatsappNumber] = useState('01201450111')
   const [receivingNumber, setReceivingNumber] = useState('01009596452')
@@ -318,11 +315,7 @@ export function useAdminDashboard() {
 
         if (settingsRes.ok) {
           const json = await settingsRes.json()
-          if (json.smtp_host !== undefined) setSmtpHost(json.smtp_host)
-          if (json.smtp_port !== undefined) setSmtpPort(json.smtp_port)
-          if (json.smtp_secure !== undefined) setSmtpSecure(json.smtp_secure)
-          if (json.smtp_user !== undefined) setSmtpUser(json.smtp_user)
-          if (json.smtp_pass !== undefined) setSmtpPass(json.smtp_pass)
+          if (json.resend_api_key !== undefined) setResendApiKey(json.resend_api_key)
           if (json.from_email !== undefined) setFromEmail(json.from_email)
           if (json.from_name !== undefined) setFromName(json.from_name)
           if (json.whatsapp_number !== undefined) setWhatsappNumber(json.whatsapp_number)
@@ -1266,12 +1259,13 @@ export function useAdminDashboard() {
     }
   }
 
-  const handleDownloadBackup = async () => {
+  const handleDownloadBackup = async (type: 'data' | 'full' = 'full') => {
     setBackupLoading(true)
-    addLog('جاري تجهيز النسخة الاحتياطية للتحميل...')
+    setBackupTypeLoading(type)
+    addLog(type === 'data' ? 'جاري تجهيز نسخة البيانات السريعة...' : 'جاري تجهيز النسخة الاحتياطية الشاملة...')
     try {
       const token = localStorage.getItem('mithaly_admin_token')
-      const res = await fetch(`${BACKEND_API}/api/admin/backup`, {
+      const res = await fetch(`${BACKEND_API}/api/admin/backup?type=${type}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -1282,7 +1276,8 @@ export function useAdminDashboard() {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `mithaly-backup-${new Date().toISOString().slice(0, 10)}.zip`
+      const prefix = type === 'data' ? 'mithaly-data-backup' : 'mithaly-full-backup'
+      a.download = `${prefix}-${new Date().toISOString().slice(0, 10)}.zip`
       document.body.appendChild(a)
       a.click()
       a.remove()
@@ -1293,6 +1288,7 @@ export function useAdminDashboard() {
       addLog('خطأ في تحميل النسخة الاحتياطية')
     } finally {
       setBackupLoading(false)
+      setBackupTypeLoading(null)
     }
   }
 
@@ -1441,13 +1437,9 @@ export function useAdminDashboard() {
       const res = await fetchWithAdminAuth(`${BACKEND_API}/api/admin/settings`, {
         method: 'POST',
         body: JSON.stringify({
-          smtp_host: smtpHost,
-          smtp_port: smtpPort,
-          smtp_secure: smtpSecure,
-          smtp_user: smtpUser,
-          smtp_pass: smtpPass,
-          from_email: fromEmail,
-          from_name: fromName,
+          resend_api_key: resendApiKey,
+          from_email: fromEmail || 'orders@the-vitahub.com',
+          from_name: fromName || 'The VitaHub',
           whatsapp_number: whatsappNumber,
           receiving_number: receivingNumber,
           shipping_rates: shippingRates,
@@ -1455,7 +1447,7 @@ export function useAdminDashboard() {
         })
       })
       if (res.ok) {
-        await showAlert('تم حفظ إعدادات النظام SMTP وأرقام التواصل بنجاح!', 'تحديث ناجح')
+        await showAlert('تم حفظ إعدادات Resend وأرقام التواصل بنجاح!', 'تحديث ناجح')
       } else {
         const err = await res.json()
         await showAlert('فشل حفظ إعدادات النظام: ' + (err.error || 'خطأ غير معروف'), 'خطأ')
@@ -1794,6 +1786,7 @@ export function useAdminDashboard() {
     rowSeoLoading,
     handleProductRowSEO,
     backupLoading,
+    backupTypeLoading,
     restoreLoading,
     handleDownloadBackup,
     handleRestoreBackup,
@@ -1801,16 +1794,8 @@ export function useAdminDashboard() {
     handleCleanBase64Images,
     aiProvider,
     handleAiProviderChange,
-    smtpHost,
-    setSmtpHost,
-    smtpPort,
-    setSmtpPort,
-    smtpSecure,
-    setSmtpSecure,
-    smtpUser,
-    setSmtpUser,
-    smtpPass,
-    setSmtpPass,
+    resendApiKey,
+    setResendApiKey,
     fromEmail,
     setFromEmail,
     fromName,

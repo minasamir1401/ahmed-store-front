@@ -2,14 +2,10 @@ import React from 'react';
 import { Loader2, CheckCircle2, Smartphone, Mail, Send, Eye, EyeOff } from 'lucide-react';
 
 export default function WhatsappTab(props: any) {
-  const [showSmtpPass, setShowSmtpPass] = React.useState(false);
+  const [showResendKey, setShowResendKey] = React.useState(false);
   const { 
     whatsappStatus, handleWhatsappLogout, wsLoading,
-    smtpHost, setSmtpHost,
-    smtpPort, setSmtpPort,
-    smtpSecure, setSmtpSecure,
-    smtpUser, setSmtpUser,
-    smtpPass, setSmtpPass,
+    resendApiKey, setResendApiKey,
     fromEmail, setFromEmail,
     fromName, setFromName,
     whatsappNumber, setWhatsappNumber,
@@ -97,7 +93,7 @@ export default function WhatsappTab(props: any) {
                     <li>وجه كاميرا الهاتف نحو الرمز الموضح بجانبك لمسحه.</li>
                   </ol>
                   <p className="text-[10px] text-amber-600 font-bold bg-amber-50 p-2.5 rounded-xl border border-amber-200/50">
-                    💡 ملاحظة: بعد المسح بنجاح، ستتحول الشاشة تلقائياً للحالة &quot;متصل&quot; خلال ثوانٍ.
+                    ملاحظة: بعد المسح بنجاح، ستتحول الشاشة تلقائياً للحالة &quot;متصل&quot; خلال ثوانٍ.
                   </p>
                 </div>
               </div>
@@ -182,7 +178,7 @@ export default function WhatsappTab(props: any) {
           </div>
         </form>
 
-        {/* SMTP Server Settings */}
+        {/* Resend Email Gateway Settings */}
         <form onSubmit={handleSaveGeneralSettings} className="bg-white border border-slate-100 rounded-[2.5rem] p-6 md:p-10 space-y-6 shadow-sm max-w-xl mx-auto relative overflow-hidden mt-8">
           <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600" />
           
@@ -190,89 +186,48 @@ export default function WhatsappTab(props: any) {
             <div className="bg-[#10b9811a] w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-emerald-600">
               <Mail size={22} />
             </div>
-            <h3 className="text-lg font-black text-slate-800">إعدادات البريد الإلكتروني SMTP</h3>
-            <p className="text-[10px] text-slate-400 font-bold">ربط حساب Gmail أو خادم SMTP خارجي لإرسال فواتير وتأكيدات الطلبات للعملاء تلقائياً</p>
+            <h3 className="text-lg font-black text-slate-800">إعدادات منصة Resend للبريد الإلكتروني</h3>
+            <p className="text-[10px] text-slate-400 font-bold">المنظومة السحابية الرسمية لإرسال الفواتير وتأكيدات الطلبات والإشعارات للعملاء</p>
           </div>
 
           <div className="space-y-4 text-right">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">خادم SMTP (Host)</label>
-                <input 
-                  type="text" 
-                  value={smtpHost || ''} 
-                  onChange={e => setSmtpHost(e.target.value)} 
-                  className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
-                  placeholder="smtp.gmail.com" 
-                  required 
-                  disabled={settingsSaveLoading}
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">المنفذ (Port)</label>
-                <input 
-                  type="text" 
-                  value={smtpPort || ''} 
-                  onChange={e => setSmtpPort(e.target.value)} 
-                  className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
-                  placeholder="587 أو 465" 
-                  required 
-                  disabled={settingsSaveLoading}
-                />
-              </div>
-            </div>
-
             <div className="space-y-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">نوع التشفير / الاتصال الآمن</label>
-              <select 
-                value={smtpSecure || 'false'}
-                onChange={e => setSmtpSecure(e.target.value)}
-                className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right"
-                disabled={settingsSaveLoading}
-              >
-                <option value="false">TLS (منفذ 587 - موصى به للـ Gmail)</option>
-                <option value="true">SSL (منفذ 465)</option>
-              </select>
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">البريد الإلكتروني / الحساب (User)</label>
-              <input 
-                type="email" 
-                value={smtpUser || ''} 
-                onChange={e => setSmtpUser(e.target.value)} 
-                className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right text-left" 
-                placeholder="example@gmail.com" 
-                required 
-                disabled={settingsSaveLoading}
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">كلمة المرور / App Password (Gmail)</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">مفتاح API الخاص بـ Resend (API Key)</label>
               <div className="relative flex items-center">
                 <input 
-                  type={showSmtpPass ? "text" : "password"} 
-                  value={smtpPass || ''} 
-                  onChange={e => setSmtpPass(e.target.value)} 
-                  className="w-full bg-slate-50 rounded-2xl py-3.5 pr-4 pl-12 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
-                  placeholder="كلمة مرور التطبيق المكونة من 16 حرفاً" 
-                  required={!smtpPass}
+                  type={showResendKey ? "text" : "password"} 
+                  value={resendApiKey || ''} 
+                  onChange={e => setResendApiKey(e.target.value)} 
+                  className="w-full bg-slate-50 rounded-2xl py-3.5 pr-4 pl-12 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right dir-ltr" 
+                  placeholder="re_xxxxxxxxxxxxxxxxxxxxxxxxx" 
+                  required
                   disabled={settingsSaveLoading}
                 />
                 <button
                   type="button"
-                  onClick={() => setShowSmtpPass(!showSmtpPass)}
+                  onClick={() => setShowResendKey(!showResendKey)}
                   className="absolute left-4 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
                 >
-                  {showSmtpPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showResendKey ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">اسم المرسل الظاهر للعميل</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">بريد المرسل المعتمد (Sender Email)</label>
+                <input 
+                  type="email" 
+                  value={fromEmail || ''} 
+                  onChange={e => setFromEmail(e.target.value)} 
+                  className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right dir-ltr" 
+                  placeholder="orders@the-vitahub.com" 
+                  required
+                  disabled={settingsSaveLoading}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">اسم المتجر أو المرسل (Sender Name)</label>
                 <input 
                   type="text" 
                   value={fromName || ''} 
@@ -283,23 +238,16 @@ export default function WhatsappTab(props: any) {
                   disabled={settingsSaveLoading}
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">بريد المرسل (اختياري)</label>
-                <input 
-                  type="text" 
-                  value={fromEmail || ''} 
-                  onChange={e => setFromEmail(e.target.value)} 
-                  className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
-                  placeholder="اتركه فارغاً لاستخدام البريد نفسه" 
-                  disabled={settingsSaveLoading}
-                />
-              </div>
+            </div>
+
+            <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 text-[11px] text-slate-500 font-medium leading-relaxed">
+              يتم إرسال كافة رسائل البريد الإلكتروني (فواتير الطلبات، رموز الاستعادة، التنبيهات) مباشرة عبر البنية التحتية السحابية لمنصة Resend لضمان أعلى معدل وصول وتفادي مجلد الرسائل غير المرغوب فيها (Spam).
             </div>
           </div>
 
           <div className="flex justify-end pt-4 border-t border-slate-50">
             <button type="submit" disabled={settingsSaveLoading} className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white py-4 rounded-2xl font-black text-xs shadow-lg shadow-emerald-600/10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer">
-              {settingsSaveLoading ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />} حفظ إعدادات SMTP
+              {settingsSaveLoading ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />} حفظ إعدادات Resend
             </button>
           </div>
         </form>
@@ -312,8 +260,8 @@ export default function WhatsappTab(props: any) {
             <div className="bg-blue-50 w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-blue-600">
               <Send size={22} />
             </div>
-            <h3 className="text-lg font-black text-slate-800">تجربة إرسال بريد إلكتروني</h3>
-            <p className="text-[10px] text-slate-400 font-bold">اختبار صحة إعدادات SMTP ومدى نجاح الاتصال بإرسال رسالة تجريبية لبريدك الشخصي</p>
+            <h3 className="text-lg font-black text-slate-800">تجربة إرسال بريد إلكتروني عبر Resend</h3>
+            <p className="text-[10px] text-slate-400 font-bold">إرسال رسالة فحص تجريبية للتأكد من صحة الربط مع منصة Resend السحابية</p>
           </div>
 
           <div className="space-y-4 text-right">
@@ -323,8 +271,8 @@ export default function WhatsappTab(props: any) {
                 type="email" 
                 value={testRecipient || ''} 
                 onChange={e => setTestRecipient(e.target.value)} 
-                className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right" 
-                placeholder="your-email@example.com" 
+                className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right dir-ltr" 
+                placeholder="mina15g4y@gmail.com" 
                 required 
                 disabled={testEmailLoading}
               />

@@ -89,6 +89,10 @@ export function useAdminDashboard() {
   const [whatsappNumber, setWhatsappNumber] = useState('01201450111')
   const [receivingNumber, setReceivingNumber] = useState('01009596452')
   const [adminNotificationEmail, setAdminNotificationEmail] = useState('the.vitaminshub@gmail.com')
+  const [smtpHost, setSmtpHost] = useState('')
+  const [smtpPort, setSmtpPort] = useState('465')
+  const [smtpUser, setSmtpUser] = useState('')
+  const [smtpPass, setSmtpPass] = useState('')
   const [shippingRates, setShippingRates] = useState('{}')
   const [returnPolicy, setReturnPolicy] = useState('')
 
@@ -339,6 +343,10 @@ export function useAdminDashboard() {
           if (json.whatsapp_number !== undefined) setWhatsappNumber(json.whatsapp_number)
           if (json.receiving_number !== undefined) setReceivingNumber(json.receiving_number)
           if (json.admin_notification_email !== undefined) setAdminNotificationEmail(json.admin_notification_email)
+          if (json.smtp_host !== undefined) setSmtpHost(json.smtp_host === 'smtp.resend.com' ? '' : json.smtp_host)
+          if (json.smtp_port !== undefined) setSmtpPort(json.smtp_port)
+          if (json.smtp_user !== undefined) setSmtpUser(json.smtp_user === 'resend' ? '' : json.smtp_user)
+          if (json.smtp_pass !== undefined) setSmtpPass(json.smtp_pass)
           if (json.shipping_rates !== undefined) setShippingRates(json.shipping_rates)
           if (json.return_policy !== undefined) setReturnPolicy(json.return_policy)
         }
@@ -1464,6 +1472,10 @@ export function useAdminDashboard() {
           whatsapp_number: whatsappNumber,
           receiving_number: receivingNumber,
           admin_notification_email: adminNotificationEmail || 'the.vitaminshub@gmail.com',
+          smtp_host: smtpHost,
+          smtp_port: smtpPort,
+          smtp_user: smtpUser,
+          smtp_pass: smtpPass,
           shipping_rates: shippingRates,
           return_policy: returnPolicy
         })
@@ -1840,6 +1852,14 @@ export function useAdminDashboard() {
     setReceivingNumber,
     adminNotificationEmail,
     setAdminNotificationEmail,
+    smtpHost,
+    setSmtpHost,
+    smtpPort,
+    setSmtpPort,
+    smtpUser,
+    setSmtpUser,
+    smtpPass,
+    setSmtpPass,
     testRecipient,
     setTestRecipient,
     testEmailLoading,

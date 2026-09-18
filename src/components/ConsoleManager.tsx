@@ -35,16 +35,16 @@ export default function ConsoleManager() {
       if (password === 'mina') {
         localStorage.setItem('debug_pwd', 'mina');
         checkAndApply();
-        originalLog('✅ Logs enabled!');
+        originalLog('Logs enabled.');
       } else {
-        originalWarn('❌ Wrong password');
+        originalWarn('Wrong password');
       }
     };
 
     (window as any).hideLogs = () => {
       localStorage.removeItem('debug_pwd');
       checkAndApply();
-      originalLog('🚫 Logs disabled.');
+      originalLog('Logs disabled.');
     };
   }, []);
 

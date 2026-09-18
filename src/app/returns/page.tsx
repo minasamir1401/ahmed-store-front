@@ -52,7 +52,7 @@ export default function ReturnsPage() {
             ) : (
               <div className="text-center py-12 space-y-4">
                 <Info size={48} className="mx-auto text-slate-300" />
-                <h3 className="text-xl font-bold text-slate-600">سياسة الإرجاع قيد التحديث</h3>
+                <h2 className="text-xl font-bold text-slate-600">سياسة الإرجاع قيد التحديث</h2>
                 <p className="text-slate-400">نعمل حالياً على صياغة سياسة الاستبدال والاسترجاع، يرجى العودة لاحقاً.</p>
               </div>
             )}

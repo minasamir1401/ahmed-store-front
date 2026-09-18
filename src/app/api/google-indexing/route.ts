@@ -80,8 +80,9 @@ export async function POST(request: NextRequest) {
     }
 
     const results = []
+    const authHeader = request.headers.get('authorization') || undefined
     for (const url of urlsToNotify) {
-      const res = await publishGoogleIndexingNotification(url, type)
+      const res = await publishGoogleIndexingNotification(url, type, authHeader)
       results.push({ url, result: res })
     }
 

@@ -273,7 +273,10 @@ export default function ArticleDetailClient({ post, params }: { post: any, param
               <div className={`flex flex-wrap items-center justify-between gap-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <div className="flex items-center gap-3">
                   <ShareButton title={translate(formattedPost.title)} />
-                  <button className="flex items-center gap-2 text-gray-300 hover:text-rose-400 transition-all">
+                  <button 
+                    aria-label={language === 'ar' ? 'إعجاب بالمقال' : 'Like article'}
+                    className="flex items-center gap-2 text-gray-300 hover:text-rose-400 transition-all cursor-pointer"
+                  >
                     <Heart size={22} />
                   </button>
                 </div>

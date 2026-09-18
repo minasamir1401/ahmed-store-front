@@ -36,7 +36,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ pat
   let lastError: any
 
   for (const baseUrl of backendBaseUrls) {
-    const encodedPath = params.path.map((segment) => encodeURIComponent(segment)).join('/')
+    const encodedPath = params.path.map((segment) => {
+      let decoded = segment
+      try {
+        decoded = decodeURIComponent(segment)
+      } catch {
+        decoded = segment
+      }
+      return encodeURIComponent(decoded)
+    }).join('/')
     const targetUrl = `${baseUrl}/uploads/${encodedPath}${query}`
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
@@ -51,9 +59,6 @@ export async function GET(request: NextRequest, context: { params: Promise<{ pat
       clearTimeout(timeout)
 
       if (response.status === 404) {
-        // If 404, we might want to try other base URLs or just return 404
-        // For static files, if one backend doesn't have it, others likely won't either
-        // unless they are using different storage. Let's continue to be safe.
         continue
       }
 
@@ -77,10 +82,9 @@ export async function GET(request: NextRequest, context: { params: Promise<{ pat
     }
   }
 
-  // If we reach here, it's either 404 or all backends failed
   if (lastError) {
-    return NextResponse.json({ error: `Uploads proxy failed: ${lastError.message}` }, { status: 502 })
+    return new NextResponse(null, { status: 502 })
   }
   
-  return NextResponse.json({ error: 'Not Found' }, { status: 404 })
+  return new NextResponse(null, { status: 404 })
 }

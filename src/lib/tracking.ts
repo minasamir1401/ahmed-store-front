@@ -34,7 +34,7 @@ const logDebug = (platform: string, event: string, data?: any) => {
     // but here we just write to native print or write if we want to show it.
     // Since ConsoleManager overrides console.log, let's write to console.log anyway, or use alert/store.
     // Actually, window.console.info is standard. Let's just print to console.
-    (console as any)._log ? (console as any)._log(`📊 [Tracking - ${platform}] ${event}`, data) : console.log(`📊 [Tracking - ${platform}] ${event}`, data);
+    (console as any)._log ? (console as any)._log(`[Tracking - ${platform}] ${event}`, data) : console.log(`[Tracking - ${platform}] ${event}`, data);
   }
 };
 
@@ -74,7 +74,9 @@ const sendEventToBackend = async (eventName: string, metadata?: any, eventId?: s
     const url = window.location.href;
     const fbp = getCookie('_fbp') || null;
     const fbc = getFbc() || null;
-    const token = localStorage.getItem('vitamins_hub_auth_token');
+    const token = typeof window !== 'undefined'
+      ? (sessionStorage.getItem('vitamins_hub_auth_token') || localStorage.getItem('vitamins_hub_auth_token'))
+      : null;
     const headers: any = {
       'Content-Type': 'application/json'
     };

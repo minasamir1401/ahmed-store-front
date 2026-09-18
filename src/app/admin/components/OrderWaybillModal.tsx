@@ -12,7 +12,7 @@ export default function OrderWaybillModal({ order, onClose }: any) {
             <h3 className="text-base font-black text-slate-800">بوليصة شحن الطلب #{order.orderNumber}</h3>
             <p className="text-[10px] text-slate-400 font-bold mt-1">{new Date(order.createdAt).toLocaleString('ar-EG')}</p>
           </div>
-          <button onClick={onClose} className="p-2 bg-white text-slate-400 rounded-full hover:bg-slate-100 transition-all border border-slate-100 cursor-pointer">
+          <button onClick={onClose} aria-label="إغلاق النافذة المنبثقة" className="p-2 bg-white text-slate-400 rounded-full hover:bg-slate-100 transition-all border border-slate-100 cursor-pointer">
             <X size={14} />
           </button>
         </div>

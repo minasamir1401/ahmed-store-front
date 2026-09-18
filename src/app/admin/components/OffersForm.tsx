@@ -80,7 +80,7 @@ export default function OffersForm(props: any) {
                value={formData.discount || ''} 
                onChange={e => setFormData({...formData, discount: e.target.value})} 
                className="w-full bg-white focus:bg-amber-50/30 border-2 border-slate-100 focus:border-amber-500/50 rounded-2xl py-4 px-5 font-black text-sm outline-none transition-all text-slate-700 shadow-sm" 
-               placeholder="مثال: خصم 30% 🔥 أو وفر 150 جنيه" 
+               placeholder="مثال: خصم 30% أو وفر 150 جنيه" 
                required 
              />
            </div>

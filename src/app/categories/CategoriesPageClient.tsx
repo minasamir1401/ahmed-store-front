@@ -116,7 +116,7 @@ export default function CategoriesPageClient({ initialCategories = [] }: Categor
                     )}
                     
                     <div className="text-center space-y-2 mt-auto">
-                      <h3 className="text-sm sm:text-xl font-black text-gray-800 group-hover:text-primary transition-colors">{language === 'en' ? (cat.nameEn || translate(cat.name)) : cat.name}</h3>
+                      <h2 className="text-sm sm:text-xl font-black text-gray-800 group-hover:text-primary transition-colors">{language === 'en' ? (cat.nameEn || translate(cat.name)) : cat.name}</h2>
                       <div className="inline-block bg-gray-50 px-4 py-1.5 rounded-full text-[10px] font-black text-gray-400 group-hover:bg-primary/10 group-hover:text-primary transition-all">
                         {language === 'ar' ? `${cat.count} منتج متوفر` : `${cat.count} products available`}
                       </div>

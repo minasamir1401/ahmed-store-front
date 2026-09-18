@@ -100,7 +100,9 @@ export default function HeroTab(props: any) {
     const uploadData = new FormData();
     uploadData.append('image', file);
     
-    const token = localStorage.getItem('mithaly_admin_token') || '';
+    const token = typeof window !== 'undefined'
+      ? (sessionStorage.getItem('mithaly_admin_token') || localStorage.getItem('mithaly_admin_token') || '')
+      : '';
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
     const url = type ? `${backendUrl}/api/upload?type=${type}` : `${backendUrl}/api/upload`;
     

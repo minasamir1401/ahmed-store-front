@@ -561,7 +561,7 @@ export default function CheckoutPage() {
                             <span className="text-base xs:text-xl font-black text-amber-900 tracking-wider">{receivingNumber}</span>
                             <button onClick={async () => {
                               navigator.clipboard.writeText(receivingNumber)
-                              await showAlert(language === 'ar' ? 'تم نسخ الرقم بنجاح ✅' : 'Number copied successfully ✅', language === 'ar' ? 'نسخ الرقم' : 'Copy Number')
+                              await showAlert(language === 'ar' ? 'تم نسخ الرقم بنجاح' : 'Number copied successfully', language === 'ar' ? 'نسخ الرقم' : 'Copy Number')
                             }} className="h-11 px-6 bg-amber-100 rounded-xl font-bold text-amber-800 hover:bg-amber-200 transition-colors flex-shrink-0 text-xs flex items-center justify-center cursor-pointer">{t('edit') === 'تعديل' ? 'نسخ' : 'Copy'}</button>
                           </div>
                           {paymentMethod === 'instapay' ? (

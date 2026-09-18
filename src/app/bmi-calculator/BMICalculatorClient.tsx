@@ -117,10 +117,10 @@ export default function BMICalculatorClient() {
               <div className="bg-white rounded-[3rem] shadow-xl p-8 border border-[#e8f0ed] relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-[100%] -mr-16 -mt-16" />
                 
-                <h3 className={`text-xl font-black text-gray-800 mb-8 flex items-center gap-3 ${isRtl ? 'text-right' : 'text-left'}`}>
+                <h2 className={`text-xl font-black text-gray-800 mb-8 flex items-center gap-3 ${isRtl ? 'text-right' : 'text-left'}`}>
                   <Calculator className="text-primary" size={24} />
                   {language === 'ar' ? 'بياناتك الصحية' : 'Your Health Details'}
-                </h3>
+                </h2>
 
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
@@ -183,6 +183,7 @@ export default function BMICalculatorClient() {
                     </button>
                     <button 
                       onClick={reset}
+                      aria-label={language === 'ar' ? 'إعادة تعيين الحقول' : 'Reset fields'}
                       className="w-16 h-16 bg-gray-100 text-gray-400 rounded-2xl flex items-center justify-center hover:bg-gray-200 transition-all cursor-pointer"
                     >
                       <RefreshCw size={20} />
@@ -246,7 +247,7 @@ export default function BMICalculatorClient() {
                           </div>
                        </div>
                        
-                       <h3 className={`text-xl font-black text-gray-800 mb-6 mt-8 lg:mt-0 ${isRtl ? 'text-right' : 'text-left'}`}>{t('bmi_tips_heading')}</h3>
+                       <h2 className={`text-xl font-black text-gray-800 mb-6 mt-8 lg:mt-0 ${isRtl ? 'text-right' : 'text-left'}`}>{t('bmi_tips_heading')}</h2>
                        
                        {isLoadingAI ? (
                           <div className="space-y-4 py-8">

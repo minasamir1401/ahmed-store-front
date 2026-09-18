@@ -87,7 +87,7 @@ export default function SmartDosageCalculator({ product, language }: { product: 
   let healthTip = '';
 
   if (isMagnesium) {
-    calculatorTitle = language === 'ar' ? '💡 حاسبة جرعة المغنيسيوم الذكية' : '💡 Smart Magnesium Dosage Calculator';
+    calculatorTitle = language === 'ar' ? 'حاسبة جرعة المغنيسيوم الذكية' : 'Smart Magnesium Dosage Calculator';
     let targetMg = 300;
     if (magnesiumGender === 'male') {
       targetMg = magnesiumGoal === 'muscle' ? 420 : 400;
@@ -115,7 +115,7 @@ export default function SmartDosageCalculator({ product, language }: { product: 
         : 'You can divide the dose throughout the day (e.g., morning/evening) with meals for optimal absorption and support for energy and health.';
     }
   } else if (isVitaminD) {
-    calculatorTitle = language === 'ar' ? '☀️ حاسبة جرعة فيتامين د3 الذكية' : '☀️ Smart Vitamin D3 Dosage Calculator';
+    calculatorTitle = language === 'ar' ? 'حاسبة جرعة فيتامين د3 الذكية' : 'Smart Vitamin D3 Dosage Calculator';
     let targetIU = 600;
     if (vitDAge === 'over70') {
       targetIU = vitDSun === 'none' ? 1000 : 800;
@@ -150,7 +150,7 @@ export default function SmartDosageCalculator({ product, language }: { product: 
         : 'Despite sun exposure, the supplement helps maintain optimal levels. Take it in the morning with breakfast to avoid its potential slight impact on sleep quality.';
     }
   } else if (isOmega3) {
-    calculatorTitle = language === 'ar' ? '🐟 حاسبة جرعة أوميجا 3 الذكية' : '🐟 Smart Omega 3 Dosage Calculator';
+    calculatorTitle = language === 'ar' ? 'حاسبة جرعة أوميجا 3 الذكية' : 'Smart Omega 3 Dosage Calculator';
     let targetMg = 1000;
     if (omegaGoal === 'joint') {
       targetMg = 2000;
@@ -176,7 +176,7 @@ export default function SmartDosageCalculator({ product, language }: { product: 
         : 'Daily maintenance dose is excellent for focus, brain health, and skin freshness. Take it regularly with fats for excellent absorption.';
     }
   } else {
-    calculatorTitle = language === 'ar' ? '💧 حاسبة الترطيب والصحة اليومية' : '💧 Daily Hydration & Health Calculator';
+    calculatorTitle = language === 'ar' ? 'حاسبة الترطيب والصحة اليومية' : 'Daily Hydration & Health Calculator';
     let targetWater = 2.5;
     if (generalWeight === 'light') {
       targetWater = generalActivity === 'high' ? 3.0 : 2.2;

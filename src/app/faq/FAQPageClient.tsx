@@ -57,12 +57,12 @@ export default function FAQPageClient() {
                 key={index} 
                 className="p-6 md:p-8 rounded-[2rem] bg-[#f0f7f4] border border-[#e8f0ed] transition-all hover:bg-white hover:shadow-lg hover:shadow-primary/5 group"
               >
-                <h3 className={`font-black text-lg md:text-xl text-gray-800 mb-3 group-hover:text-primary transition-colors flex items-start gap-3 ${isRtl ? 'justify-start' : 'flex-row-reverse justify-end'}`}>
+                <h2 className={`font-black text-lg md:text-xl text-gray-800 mb-3 group-hover:text-primary transition-colors flex items-start gap-3 ${isRtl ? 'justify-start' : 'flex-row-reverse justify-end'}`}>
                   <span className="w-6 h-6 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs shrink-0 mt-1">
                     {language === 'ar' ? 'س' : 'Q'}
                   </span>
                   <span className={isRtl ? 'text-right' : 'text-left'}>{faq.q}</span>
-                </h3>
+                </h2>
                 <p className={`text-gray-600 font-medium leading-relaxed text-sm pr-9 ${isRtl ? 'border-r text-right pr-9' : 'border-l text-left pl-9 pr-0'} border-slate-200`}>
                   {faq.a}
                 </p>

@@ -207,9 +207,9 @@ export default function BrandsPageClient({ initialBrands = [] }: BrandsPageClien
 
                       {/* Brand Info */}
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm md:text-base font-black text-gray-800 group-hover:text-primary transition-colors truncate">
+                        <h2 className="text-sm md:text-base font-black text-gray-800 group-hover:text-primary transition-colors truncate">
                           {displayName}
-                        </h3>
+                        </h2>
                         <div className="flex items-center gap-1.5 mt-1.5">
                           <Package size={12} className="text-gray-400 shrink-0" />
                           <span className="text-xs font-bold text-gray-400">
@@ -236,11 +236,11 @@ export default function BrandsPageClient({ initialBrands = [] }: BrandsPageClien
               <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-gray-300">
                 <Package size={36} />
               </div>
-              <h3 className="text-lg font-black text-gray-400">
+              <h2 className="text-lg font-black text-gray-400">
                 {searchQuery 
                   ? (language === 'ar' ? 'لم نجد نتائج مطابقة' : 'No matching results')
                   : (language === 'ar' ? 'لا توجد ماركات حالياً' : 'No brands available')}
-              </h3>
+              </h2>
               <p className="text-sm text-gray-500 mt-2">
                 {searchQuery
                   ? (language === 'ar' ? 'جرب البحث بكلمة مختلفة' : 'Try searching with a different keyword')

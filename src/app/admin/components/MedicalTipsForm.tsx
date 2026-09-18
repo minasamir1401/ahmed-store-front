@@ -20,7 +20,9 @@ export default function MedicalTipsForm(props: any) {
     addLog('جاري ترجمة النصيحة الطبية...');
     
     try {
-      const token = localStorage.getItem('mithaly_admin_token');
+      const token = typeof window !== 'undefined'
+        ? (sessionStorage.getItem('mithaly_admin_token') || localStorage.getItem('mithaly_admin_token'))
+        : null;
       const headers = {
         'Content-Type': 'application/json',
         ...(token ? { 'Authorization': `Bearer ${token}` } : {})

@@ -74,14 +74,16 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
         data-nosnippet
         aria-hidden="true"
         className="absolute inset-0 w-full h-full pointer-events-none bg-contain bg-center bg-no-repeat select-none"
-        style={{ zIndex: 10, backgroundImage: "url('/frame.png')" }}
+        style={{ zIndex: 10, backgroundImage: "url('/frame.webp')" }}
       />
       {/* Product display image - z-[15] (on top of frame) with contained cursor zoom */}
       <div className="absolute top-[17.5%] bottom-[19.5%] left-[9%] right-[9%] overflow-hidden flex items-center justify-center" style={{ zIndex: 15 }}>
         {src && !hasError ? (
           <img
-            src={src}
+            src={src.replace(/^http:\/\//i, 'https://')}
             alt={alt}
+            width={500}
+            height={500}
             onError={() => setHasError(true)}
             className="w-full h-full object-contain mix-blend-multiply select-none transition-transform duration-150 ease-out pointer-events-none"
             draggable={false}
@@ -364,7 +366,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
             value = raw.upc;
           } else if (key === 'authentic') {
             label = language === 'en' ? '100% Authentic' : 'أصلي 100%';
-            value = raw.authentic ? (language === 'en' ? 'Yes ✓' : 'نعم ✓') : (language === 'en' ? 'No ✗' : 'لا ✗');
+            value = raw.authentic ? (language === 'en' ? 'Yes' : 'نعم') : (language === 'en' ? 'No' : 'لا');
             bold = true;
           } else if (key === 'dimensions') {
             label = language === 'en' ? 'Dimensions' : 'الأبعاد';
@@ -851,7 +853,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                   <AnimatePresence mode="wait">
                     {isAdded ? (
                       <motion.span key="added" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex items-center gap-3 max-[340px]:gap-1.5">
-                        <Check className="w-5 h-5 max-[340px]:w-4 max-[340px]:h-4 sm:w-6 sm:h-6" /> {language === 'ar' ? 'تم الإضافة ✨' : 'Added ✨'}
+                        <Check className="w-5 h-5 max-[340px]:w-4 max-[340px]:h-4 sm:w-6 sm:h-6" /> {language === 'ar' ? 'تمت الإضافة' : 'Added'}
                       </motion.span>
                     ) : (
                       <motion.span key="add" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex items-center gap-3 max-[340px]:gap-1.5">

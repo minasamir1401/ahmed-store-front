@@ -207,14 +207,14 @@ export default function HomeClient({
                             ? 'right-4 xs:right-8 md:right-16 text-right' 
                             : 'left-4 xs:left-8 md:left-16 text-left'
                         }`}>
-                          <motion.h2 
+                          <motion.h1 
                             initial={{ opacity: 0, x: dir === 'rtl' ? 40 : -40 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.2, duration: 0.5 }}
                             className="text-lg xs:text-2xl sm:text-3xl md:text-5xl font-black text-slate-800 mb-1.5 sm:mb-3 leading-tight"
                           >
                             {translate(slides[currentSlide].title)}
-                          </motion.h2>
+                          </motion.h1>
                           <motion.p 
                             initial={{ opacity: 0, x: dir === 'rtl' ? 30 : -30 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -275,14 +275,14 @@ export default function HomeClient({
                         ? 'right-4 xs:right-8 md:right-16 text-right' 
                         : 'left-4 xs:left-8 md:left-16 text-left'
                     }`}>
-                      <motion.h2 
+                      <motion.h1 
                         initial={{ opacity: 0, x: dir === 'rtl' ? 40 : -40 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3, duration: 0.6 }}
                         className="text-lg xs:text-2xl sm:text-3xl md:text-5xl font-black text-slate-800 mb-1.5 sm:mb-3 leading-tight"
                       >
                         {translate(hero.title)}
-                      </motion.h2>
+                      </motion.h1>
                       <motion.p 
                         initial={{ opacity: 0, x: dir === 'rtl' ? 30 : -30 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -337,6 +337,7 @@ export default function HomeClient({
                         <Image 
                           src={translate(hero.side1Image)} 
                           fill 
+                          priority
                           className="object-cover opacity-100 group-hover:scale-105 transition-transform duration-500" 
                           sizes="(max-width: 1024px) 50vw, 33vw" 
                           alt="Categories Banner" 
@@ -842,7 +843,7 @@ function CategoryProductRow({ category, products, language, t, translate, dir }:
           className="flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar scroll-smooth py-4 px-2 -mx-2"
           style={{ scrollbarWidth: 'none' }}
         >
-          {products.map((p) => (
+          {products.slice(0, 8).map((p) => (
             <div key={p.id} className="w-[180px] xs:w-[220px] sm:w-[240px] flex-shrink-0">
               <ProductCard {...p} />
             </div>

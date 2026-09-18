@@ -88,6 +88,7 @@ export function useAdminDashboard() {
   const [fromName, setFromName] = useState('The VitaHub')
   const [whatsappNumber, setWhatsappNumber] = useState('01201450111')
   const [receivingNumber, setReceivingNumber] = useState('01009596452')
+  const [adminNotificationEmail, setAdminNotificationEmail] = useState('the.vitaminshub@gmail.com')
   const [shippingRates, setShippingRates] = useState('{}')
   const [returnPolicy, setReturnPolicy] = useState('')
 
@@ -105,9 +106,26 @@ export function useAdminDashboard() {
 
   const addLog = (msg: string) => setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev].slice(0, 4))
 
+  const getStoredAdminToken = () => {
+    if (typeof window === 'undefined') return null
+    return sessionStorage.getItem('mithaly_admin_token') || localStorage.getItem('mithaly_admin_token')
+  }
+
   const clearAdminSession = () => {
+    const currentToken = adminToken || getStoredAdminToken()
+    if (currentToken) {
+      fetch(`${BACKEND_API}/api/auth/admin-logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${currentToken}`
+        }
+      }).catch(() => {})
+    }
     setIsLoggedIn(false)
     setAdminToken(null)
+    sessionStorage.removeItem('mithaly_admin_auth')
+    sessionStorage.removeItem('mithaly_admin_token')
     localStorage.removeItem('mithaly_admin_auth')
     localStorage.removeItem('mithaly_admin_token')
   }
@@ -187,7 +205,7 @@ export function useAdminDashboard() {
   }
 
   const getAuthHeaders = (contentType: string | null = 'application/json') => {
-    const token = localStorage.getItem('mithaly_admin_token')
+    const token = adminToken || getStoredAdminToken()
     const headers: any = {}
     if (contentType) headers['Content-Type'] = contentType
     if (token) headers['Authorization'] = `Bearer ${token}`
@@ -195,7 +213,7 @@ export function useAdminDashboard() {
   }
 
   const fetchWithAdminAuth = async (url: string, init: RequestInit = {}, contentType: string | null = 'application/json') => {
-    const token = localStorage.getItem('mithaly_admin_token')
+    const token = adminToken || getStoredAdminToken()
     if (!token) {
       clearAdminSession()
       throw new Error('يجب تسجيل الدخول كمسؤول أولاً')
@@ -320,6 +338,7 @@ export function useAdminDashboard() {
           if (json.from_name !== undefined) setFromName(json.from_name)
           if (json.whatsapp_number !== undefined) setWhatsappNumber(json.whatsapp_number)
           if (json.receiving_number !== undefined) setReceivingNumber(json.receiving_number)
+          if (json.admin_notification_email !== undefined) setAdminNotificationEmail(json.admin_notification_email)
           if (json.shipping_rates !== undefined) setShippingRates(json.shipping_rates)
           if (json.return_policy !== undefined) setReturnPolicy(json.return_policy)
         }
@@ -366,8 +385,10 @@ export function useAdminDashboard() {
       if (res.ok && result.token) {
         setIsLoggedIn(true)
         setAdminToken(result.token)
-        localStorage.setItem('mithaly_admin_auth', 'true')
-        localStorage.setItem('mithaly_admin_token', result.token)
+        sessionStorage.setItem('mithaly_admin_auth', 'true')
+        sessionStorage.setItem('mithaly_admin_token', result.token)
+        localStorage.removeItem('mithaly_admin_auth')
+        localStorage.removeItem('mithaly_admin_token')
         addLog('تم تسجيل الدخول كمسؤول بنجاح')
       } else {
         await showAlert(result.error || 'بيانات الدخول خاطئة', 'خطأ في تسجيل الدخول')
@@ -1264,7 +1285,7 @@ export function useAdminDashboard() {
     setBackupTypeLoading(type)
     addLog(type === 'data' ? 'جاري تجهيز نسخة البيانات السريعة...' : 'جاري تجهيز النسخة الاحتياطية الشاملة...')
     try {
-      const token = localStorage.getItem('mithaly_admin_token')
+      const token = adminToken || getStoredAdminToken()
       const res = await fetch(`${BACKEND_API}/api/admin/backup?type=${type}`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -1442,6 +1463,7 @@ export function useAdminDashboard() {
           from_name: fromName || 'The VitaHub',
           whatsapp_number: whatsappNumber,
           receiving_number: receivingNumber,
+          admin_notification_email: adminNotificationEmail || 'the.vitaminshub@gmail.com',
           shipping_rates: shippingRates,
           return_policy: returnPolicy
         })
@@ -1632,8 +1654,20 @@ export function useAdminDashboard() {
   }, [activeTab, data, productsList])
 
   useEffect(() => {
-    const auth = localStorage.getItem('mithaly_admin_auth')
-    const token = localStorage.getItem('mithaly_admin_token')
+    let auth = sessionStorage.getItem('mithaly_admin_auth')
+    let token = sessionStorage.getItem('mithaly_admin_token')
+
+    if (!token) {
+      auth = localStorage.getItem('mithaly_admin_auth')
+      token = localStorage.getItem('mithaly_admin_token')
+      if (token) {
+        sessionStorage.setItem('mithaly_admin_auth', auth || 'true')
+        sessionStorage.setItem('mithaly_admin_token', token)
+        localStorage.removeItem('mithaly_admin_auth')
+        localStorage.removeItem('mithaly_admin_token')
+      }
+    }
+
     if (auth === 'true' && token) {
       queueMicrotask(() => {
         setIsLoggedIn(true)
@@ -1804,6 +1838,8 @@ export function useAdminDashboard() {
     setWhatsappNumber,
     receivingNumber,
     setReceivingNumber,
+    adminNotificationEmail,
+    setAdminNotificationEmail,
     testRecipient,
     setTestRecipient,
     testEmailLoading,

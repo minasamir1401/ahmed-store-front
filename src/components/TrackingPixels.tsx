@@ -13,10 +13,26 @@ function TrackingPixelsContent() {
   const googleId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID
   const tiktokId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID
   const snapchatId = process.env.NEXT_PUBLIC_SNAPCHAT_PIXEL_ID
+  const [hasConsent, setHasConsent] = React.useState(false)
+
+  useEffect(() => {
+    const checkConsent = () => {
+      try {
+        const consent = localStorage.getItem('vitahub_cookie_consent')
+        setHasConsent(consent === 'accepted')
+      } catch {
+        setHasConsent(false)
+      }
+    }
+
+    checkConsent()
+    window.addEventListener('cookie_consent_updated', checkConsent)
+    return () => window.removeEventListener('cookie_consent_updated', checkConsent)
+  }, [])
 
   // Track page view and search on route/path changes
   useEffect(() => {
-    if (!pathname) return
+    if (!pathname || !hasConsent) return
     const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '')
     trackPageView(url)
 
@@ -24,7 +40,9 @@ function TrackingPixelsContent() {
     if (searchQuery && searchQuery.trim()) {
       trackSearch(searchQuery.trim())
     }
-  }, [pathname, searchParams])
+  }, [pathname, searchParams, hasConsent])
+
+  if (!hasConsent) return null
 
   return (
     <>

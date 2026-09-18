@@ -94,7 +94,7 @@ export default function PixelsTab({ BACKEND_API, fetchWithAdminAuth }: PixelsTab
       case 'AddToCart': return 'إضافة للسلة'
       case 'AddToWishlist': return 'إضافة للمفضلة'
       case 'InitiateCheckout': return 'بدء الدفع'
-      case 'Purchase': return 'شراء ناجح 💰'
+      case 'Purchase': return 'شراء ناجح'
       default: return name
     }
   }

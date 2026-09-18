@@ -91,7 +91,7 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
   const discountPercent = oldPrice && price ? Math.round(((oldPrice - price) / oldPrice) * 100) : null
   const imgAlt = productImageAlt({ imageAlt, title, titleEn }, displayTitle)
   const rawImage = productMainImage(image)
-  const cardImage = (!imgError && rawImage) ? rawImage : null
+  const cardImage = (!imgError && rawImage) ? rawImage.replace(/^http:\/\//i, 'https://') : null
 
   return (
     <motion.div
@@ -164,7 +164,7 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
                   data-nosnippet
                   aria-hidden="true"
                   className="absolute inset-0 w-full h-full z-10 pointer-events-none bg-contain bg-center bg-no-repeat select-none"
-                  style={{ backgroundImage: "url('/frame.png')" }}
+                  style={{ backgroundImage: "url('/frame.webp')" }}
                 />
                 {/* Product image - constrained inside frame inner box */}
                 <div className="absolute top-[17.5%] bottom-[19.5%] left-[9%] right-[9%] z-[15]">
@@ -172,6 +172,9 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
                     <img
                       src={cardImage}
                       alt={imgAlt}
+                      width={200}
+                      height={250}
+                      loading="lazy"
                       className="w-full h-full object-contain pointer-events-none"
                       onError={() => setImgError(true)}
                     />
@@ -180,7 +183,6 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
                       src={cardImage}
                       alt={imgAlt}
                       fill
-                      unoptimized={Boolean(cardImage && /^https?:\/\//i.test(cardImage) && !cardImage.includes('the-vitahub.com') && !cardImage.includes('localhost'))}
                       className="object-contain"
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
                       loading="lazy"
@@ -248,7 +250,8 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
         <motion.button
           onClick={handleAdd}
           whileTap={{ scale: 0.95 }}
-          className="w-full flex items-center justify-center gap-1.5 h-11 rounded-xl text-xs font-bold transition-all overflow-hidden relative"
+          aria-label={`${t('add_to_cart')}: ${displayTitle}`}
+          className="w-full flex items-center justify-center gap-1.5 h-11 rounded-xl text-xs font-bold transition-all overflow-hidden relative cursor-pointer"
           style={{ background: '#f0f7f4', color: '#2e7d5e', border: '1px solid #cde8df' }}
           onMouseEnter={e => {
             (e.currentTarget as HTMLButtonElement).style.background = '#2e7d5e'

@@ -62,6 +62,8 @@ export async function generateMetadata({ searchParams }: PageParams): Promise<Me
     alternates: {
       canonical: `${siteUrl}/`,
       languages: {
+        'ar': `${siteUrl}/`,
+        'en': `${siteUrl}/?lang=en`,
         'ar-EG': `${siteUrl}/`,
         'en-EG': `${siteUrl}/?lang=en`,
         'x-default': `${siteUrl}/`,

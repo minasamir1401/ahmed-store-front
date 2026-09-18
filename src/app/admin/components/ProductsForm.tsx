@@ -235,7 +235,9 @@ export default function ProductsForm(props: any) {
                           const res = await fetch(BACKEND_API + '/api/upload', {
                             method: 'POST',
                             body: uploadData,
-                            headers: localStorage.getItem('mithaly_admin_token') ? { 'Authorization': `Bearer ${localStorage.getItem('mithaly_admin_token')}` } : {}
+                            headers: (typeof window !== 'undefined' && (sessionStorage.getItem('mithaly_admin_token') || localStorage.getItem('mithaly_admin_token')))
+                              ? { 'Authorization': `Bearer ${sessionStorage.getItem('mithaly_admin_token') || localStorage.getItem('mithaly_admin_token')}` }
+                              : {}
                           });
                           const result = await res.json();
                           if (res.ok && result.url) {

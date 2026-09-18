@@ -33,6 +33,8 @@ export const publicPageMetadata = ({
     alternates: {
       canonical: canonicalUrl,
       languages: {
+        'ar': canonicalUrl,
+        'en': `${canonicalUrl}?lang=en`,
         'ar-EG': canonicalUrl,
         'en-EG': `${canonicalUrl}?lang=en`,
         'x-default': canonicalUrl
@@ -74,15 +76,20 @@ export const publicPageMetadata = ({
   }
 }
 
-export const privatePageMetadata = (title: string): Metadata => ({
-  title,
-  robots: {
-    index: false,
-    follow: false,
-    googleBot: {
+export const privatePageMetadata = (title: string, path: string = ''): Metadata => {
+  const siteUrl = 'https://the-vitahub.com'
+  return {
+    title,
+    metadataBase: new URL(siteUrl),
+    ...(path ? { alternates: { canonical: `${siteUrl}${path}` } } : {}),
+    robots: {
       index: false,
       follow: false,
-      noimageindex: true,
+      googleBot: {
+        index: false,
+        follow: false,
+        noimageindex: true,
+      },
     },
-  },
-})
+  }
+}

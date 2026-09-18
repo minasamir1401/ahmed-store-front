@@ -84,7 +84,32 @@ export async function generateMetadata({ searchParams }: PageParams): Promise<Me
 export default async function OffersPage() {
   const { offers, products } = await getOffersData()
 
+  const lightweightOffersProducts = Array.isArray(products)
+    ? products
+        .filter((p: any) => {
+          const discountPercent = p.oldPrice && p.price ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0
+          return (p.oldPrice && p.oldPrice > p.price) || (p.discountType && p.discountValue) || discountPercent > 0
+        })
+        .map((p: any) => ({
+          id: p.id,
+          title: p.title,
+          titleEn: p.titleEn || null,
+          price: p.price,
+          oldPrice: p.oldPrice || null,
+          image: p.image,
+          imageAlt: p.imageAlt || null,
+          imageWidth: p.imageWidth || null,
+          imageHeight: p.imageHeight || null,
+          tag: p.tag || null,
+          discountType: p.discountType || null,
+          discountValue: p.discountValue || null,
+          categoryId: p.categoryId,
+          brandId: p.brandId || null,
+          createdAt: p.createdAt
+        }))
+    : []
+
   return (
-    <OffersPageClient initialOffers={offers} initialProducts={products} />
+    <OffersPageClient initialOffers={offers} initialProducts={lightweightOffersProducts} />
   )
 }

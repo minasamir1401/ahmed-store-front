@@ -362,7 +362,7 @@ export default function OffersPageClient({
               <div className="flex flex-wrap gap-2 no-scrollbar overflow-x-auto py-1">
                 {[
                   { id: 'all', label: language === 'ar' ? 'كل العروض' : 'All Offers' },
-                  { id: 'high-discount', label: language === 'ar' ? 'خصومات 25% فما فوق 🔥' : 'Discounts 25% & Above 🔥' },
+                  { id: 'high-discount', label: language === 'ar' ? 'خصومات 25% فما فوق' : 'Discounts 25% & Above' },
                   { id: 'under-500', label: language === 'ar' ? 'أقل من 500 ج.م' : 'Under 500 EGP' },
                   { id: 'best-sellers', label: language === 'ar' ? 'الأكثر طلباً' : 'Best Sellers' }
                 ].map(tab => {

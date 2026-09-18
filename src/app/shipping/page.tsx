@@ -65,7 +65,7 @@ export default function ShippingPage() {
             ) : (
               <div className="text-center py-12 space-y-4">
                 <Info size={48} className="mx-auto text-slate-300" />
-                <h3 className="text-xl font-bold text-slate-600">لا توجد أسعار شحن مضافة حالياً</h3>
+                <h2 className="text-xl font-bold text-slate-600">لا توجد أسعار شحن مضافة حالياً</h2>
                 <p className="text-slate-400">يرجى مراجعة الموقع لاحقاً للتعرف على أحدث تحديثات الأسعار.</p>
               </div>
             )}

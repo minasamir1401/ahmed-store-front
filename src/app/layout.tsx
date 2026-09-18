@@ -1,8 +1,24 @@
 import type { Metadata, Viewport } from "next";
+import { Cairo, Outfit } from "next/font/google";
 import "./globals.css";
 import FloatingActions from "@/components/FloatingActions";
 import BottomNav from "@/components/BottomNav";
+import CookieConsent from "@/components/CookieConsent";
 import { getServerSiteUrl } from "@/lib/seo";
+
+const cairo = Cairo({
+  subsets: ["arabic", "latin"],
+  weight: ["300", "400", "600", "700", "900"],
+  display: "swap",
+  variable: "--font-cairo",
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["400", "600", "800", "900"],
+  display: "swap",
+  variable: "--font-outfit",
+});
 
 // ─── Metadata ──────────────────────────────────────────────────────────────
 export async function generateMetadata(): Promise<Metadata> {
@@ -10,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: {
-      default: "The VitaHub | ذا فيتا هوب | متجر المكملات الغذائية والفيتامينات الأصلي في مصر",
+      default: "The VitaHub | متجر المكملات والفيتامينات الأصلي بمصر",
       template: "%s | The VitaHub"
     },
     description: "تسوق أفضل المكملات الغذائية، الفيتامينات، البروتينات، حوارق الدهون، ومنتجات الرشاقة الأصلية 100% في مصر مع The VitaHub (ذا فيتا هوب). توصيل سريع ودعم طبي متخصص.",
@@ -210,12 +226,9 @@ export default async function RootLayout({
     <html
       lang={lang}
       dir={dir}
-      className="h-full antialiased"
+      className={`h-full antialiased ${cairo.variable} ${outfit.variable}`}
     >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet" />
         <JsonLdSchema />
       </head>
       <body className="min-h-full flex flex-col font-cairo overflow-x-hidden">
@@ -238,6 +251,7 @@ export default async function RootLayout({
                   {children}
                   <FloatingActions />
                   <BottomNav />
+                  <CookieConsent />
                 </WishlistProvider>
               </CartProvider>
             </ModalProvider>

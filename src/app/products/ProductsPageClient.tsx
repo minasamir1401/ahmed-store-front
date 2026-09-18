@@ -782,9 +782,9 @@ function ProductsContent() {
                   <PackageSearch size={72} />
                 </motion.div>
                 <div className="text-center">
-                  <h3 className="text-xl font-black text-gray-800 mb-2">
+                  <h2 className="text-xl font-black text-gray-800 mb-2">
                     {language === 'ar' ? 'لا توجد منتجات' : 'No products found'}
-                  </h3>
+                  </h2>
                   <p className="text-gray-400 font-bold text-sm">
                     {language === 'ar' ? 'حاول تعديل الفلاتر المختارة' : 'Try modifying the selected filters'}
                   </p>

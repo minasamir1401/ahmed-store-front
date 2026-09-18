@@ -210,13 +210,13 @@ function LoginContent() {
                 <Sparkles size={14} className="animate-spin-slow" />
                 <span>{language === 'ar' ? 'عالم الصحة والتميز الرياضي' : 'World of Health & Athletic Excellence'}</span>
               </div>
-              <h2 className="text-4xl xl:text-5xl font-black leading-tight text-slate-900">
+              <h1 className="text-4xl xl:text-5xl font-black leading-tight text-slate-900">
                 {language === 'ar' ? (
                   <>شريكك الأقوى في رحلتك نحو <span className="bg-gradient-to-r from-emerald-600 to-emerald-400 bg-clip-text text-transparent">الرشاقة والصحة</span></>
                 ) : (
                   <>Your Strongest Partner for <span className="bg-gradient-to-r from-emerald-600 to-emerald-400 bg-clip-text text-transparent">Health & Fitness</span></>
                 )}
-              </h2>
+              </h1>
               <p className="text-slate-500 font-medium text-base leading-relaxed">
                 {language === 'ar' 
                   ? 'انضم إلى أكثر من 50,000 عميل يثقون في مكملاتنا الغذائية الأصلية 100%. سجل دخولك الآن لمتابعة طلباتك، وإدارة سلتك، والحصول على عروض مخصصة لأهدافك.'
@@ -365,9 +365,10 @@ function LoginContent() {
                     >
                       {/* Name input */}
                       <div className="space-y-2">
-                        <label className={`block text-[11px] font-black text-slate-500 uppercase tracking-wide ${isRtl ? 'text-right' : 'text-left'}`}>{t('register_name')}</label>
+                        <label htmlFor="login-name" className={`block text-[11px] font-black text-slate-500 uppercase tracking-wide ${isRtl ? 'text-right' : 'text-left'}`}>{t('register_name')}</label>
                         <div className="relative group">
                           <input
+                            id="login-name"
                             name="name"
                             type="text"
                             required
@@ -384,9 +385,10 @@ function LoginContent() {
 
                   {/* Phone input - ALWAYS SHOWN */}
                   <motion.div key="phone-field" className="space-y-2" layout>
-                    <label className={`block text-[11px] font-black text-slate-500 uppercase tracking-wide ${isRtl ? 'text-right' : 'text-left'}`}>{t('track_phone_label')}</label>
+                    <label htmlFor="login-phone" className={`block text-[11px] font-black text-slate-500 uppercase tracking-wide ${isRtl ? 'text-right' : 'text-left'}`}>{t('track_phone_label')}</label>
                     <div className="relative group">
                       <input
+                        id="login-phone"
                         name="phone"
                         type="tel"
                         required
@@ -410,9 +412,10 @@ function LoginContent() {
                       className="space-y-2"
                       layout
                     >
-                      <label className={`block text-[11px] font-black text-slate-500 uppercase tracking-wide ${isRtl ? 'text-right' : 'text-left'}`}>{t('login_email')}</label>
+                      <label htmlFor="login-email" className={`block text-[11px] font-black text-slate-500 uppercase tracking-wide ${isRtl ? 'text-right' : 'text-left'}`}>{t('login_email')}</label>
                       <div className="relative group">
                         <input
+                          id="login-email"
                           name="email"
                           type="email"
                           required
@@ -429,7 +432,7 @@ function LoginContent() {
                   {/* Password Input */}
                   <motion.div key="password-field" className="space-y-2" layout>
                     <div className={`flex items-center justify-between ${isRtl ? '' : 'flex-row-reverse'}`}>
-                      <label className="block text-[11px] font-black text-slate-500 uppercase tracking-wide">{t('login_password')}</label>
+                      <label htmlFor="login-password" className="block text-[11px] font-black text-slate-500 uppercase tracking-wide">{t('login_password')}</label>
                       {isLogin && (
                         <Link href="/forgot" className="text-[10px] font-black text-primary hover:underline transition-all">
                           {language === 'ar' ? 'نسيت كلمة السر؟' : 'Forgot Password?'}
@@ -438,6 +441,7 @@ function LoginContent() {
                     </div>
                     <div className="relative group">
                       <input
+                        id="login-password"
                         name="password"
                         type={showPassword ? 'text' : 'password'}
                         required
@@ -449,6 +453,7 @@ function LoginContent() {
                       <Lock className={`absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors ${isRtl ? 'left-4' : 'right-4'}`} size={16} />
                       <button
                         type="button"
+                        aria-label={showPassword ? (language === 'ar' ? 'إخفاء كلمة المرور' : 'Hide password') : (language === 'ar' ? 'إظهار كلمة المرور' : 'Show password')}
                         onClick={() => setShowPassword(!showPassword)}
                         className={`absolute top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors ${isRtl ? 'right-4' : 'left-4'}`}
                       >

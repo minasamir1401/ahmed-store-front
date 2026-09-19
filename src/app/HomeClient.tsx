@@ -12,6 +12,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import SkeletonCard from '@/components/ui/SkeletonCard'
 import { newestProducts } from '@/lib/product-display'
 import { getProductUrlParam } from '@/lib/slug'
+import SafeImage from '@/components/SafeImage'
 
 const MotionImage = motion(Image)
 
@@ -395,8 +396,67 @@ export default function HomeClient({
 
             </div>
 
-            {/* Featured Products/Categories (4 cards) */}
-            {hero && (hero.prod1Id || hero.prod2Id || hero.prod3Id || hero.prod4Id || hero.prod1Image || hero.prod2Image || hero.prod3Image || hero.prod4Image) && (
+            {/* Featured Products/Categories Section */}
+            {categories && categories.length > 0 ? (
+              <div className="mt-8 border-t border-slate-100/50 pt-8">
+                <div className="flex items-center justify-between gap-3 mb-6">
+                  <div className="flex items-center gap-3 flex-1">
+                    <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">{t('featured_products_categories')}</span>
+                    <div className="h-px flex-1 bg-slate-100" />
+                  </div>
+                  <Link 
+                    href="/categories" 
+                    className="text-xs font-bold text-slate-500 hover:text-emerald-600 transition-colors flex items-center gap-1 shrink-0 px-2.5 py-1 rounded-lg hover:bg-emerald-50"
+                  >
+                    <span>{language === 'ar' ? 'عرض جميع الأقسام' : 'View All Categories'}</span>
+                    <ChevronLeft size={14} className={language === 'en' ? 'rotate-180' : ''} />
+                  </Link>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                  {categories.slice(0, 8).map((cat: any, idx: number) => {
+                    const title = language === 'en' ? (cat.nameEn || translate(cat.name)) : cat.name;
+                    const href = `/products?category=${cat.id}`;
+                    const defaultCatImg = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&q=80';
+                    const img = cat.image || defaultCatImg;
+
+                    return (
+                      <motion.div
+                        key={cat.id || idx}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.05 * idx, duration: 0.4 }}
+                        whileHover={{ y: -6, scale: 1.02 }}
+                        className="relative rounded-3xl overflow-hidden aspect-[4/3] group shadow-sm hover:shadow-xl hover:shadow-emerald-950/10 border border-slate-100 transition-all cursor-pointer bg-slate-900"
+                      >
+                        <Link href={href} className="relative flex flex-col items-center justify-end w-full h-full p-4 gap-2 sm:gap-3 group overflow-hidden">
+                          <div className="absolute inset-0 w-full h-full">
+                            <SafeImage 
+                              src={img}
+                              fill
+                              className="object-cover group-hover:scale-110 transition-transform duration-700"
+                              sizes="(max-width: 768px) 50vw, 25vw"
+                              alt={title}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent opacity-85 group-hover:opacity-95 transition-opacity duration-300" />
+                          </div>
+
+                          <div className="text-center relative z-10 mt-auto flex flex-col items-center w-full px-2">
+                            <span className="block text-white text-xs sm:text-sm md:text-base font-black tracking-wide line-clamp-1 mb-1 drop-shadow-md">
+                              {title}
+                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-white bg-emerald-600/90 backdrop-blur-sm border border-white/20 shadow-sm transition-all duration-300 group-hover:bg-emerald-500">
+                                {language === 'ar' ? `${cat.count ?? 0} منتج` : `${cat.count ?? 0} Products`}
+                              </span>
+                            </div>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : hero && (hero.prod1Id || hero.prod2Id || hero.prod3Id || hero.prod4Id || hero.prod1Image || hero.prod2Image || hero.prod3Image || hero.prod4Image) ? (
               <div className="mt-8 border-t border-slate-100/50 pt-8">
                 <div className="flex items-center gap-3 mb-6">
                   <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">{t('featured_products_categories')}</span>
@@ -443,20 +503,17 @@ export default function HomeClient({
                         className="relative rounded-3xl overflow-hidden aspect-[4/3] group shadow-sm hover:shadow-md border border-slate-100 transition-all cursor-pointer bg-slate-50"
                       >
                         <Link href={href} className="relative flex flex-col items-center justify-end w-full h-full p-4 gap-2 sm:gap-3 group overflow-hidden">
-                          {/* Image filling the card */}
                           <div className="absolute inset-0 w-full h-full">
-                            <Image 
+                            <SafeImage 
                               src={item.img || defaultImg}
                               fill
                               className="object-cover group-hover:scale-110 transition-transform duration-700"
                               sizes="(max-width: 768px) 50vw, 25vw"
                               alt={title}
                             />
-                            {/* Dark gradient overlay so text is readable */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
                           </div>
 
-                          {/* Text overlaid on top */}
                           <div className="text-center relative z-10 mt-auto flex flex-col items-center">
                             {item.id && (
                               <span className="block text-white text-[11px] sm:text-sm font-black tracking-wide line-clamp-1 mb-1.5 drop-shadow-md">
@@ -473,7 +530,7 @@ export default function HomeClient({
                   })}
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
         </section>
 

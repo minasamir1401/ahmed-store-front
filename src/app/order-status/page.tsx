@@ -59,42 +59,86 @@ export default function TrackOrderPage() {
     }
   }
 
-  // Automatically load the latest order if the user is logged in
+  // Automatically load orders or restore from local storage for guests
   useEffect(() => {
     if (token) {
       queueMicrotask(() => fetchLatestOrder())
+    } else {
+      try {
+        const saved = localStorage.getItem('vitahub_local_orders') || localStorage.getItem('vitamins_hub_orders')
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setUserOrders(parsed)
+            const latest = parsed[0]
+            if (latest.orderNumber) setOrderNumber(latest.orderNumber)
+            const phone = latest.customerPhone || latest.checkoutData?.customerPhone || ''
+            if (phone) setTrackPhone(phone.split('-')[0].trim())
+          }
+        }
+      } catch (e) {
+        console.error('Error loading guest orders from local storage:', e)
+      }
     }
   }, [token])
 
-  const handleTrack = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!orderNumber.trim() || !trackPhone.trim()) return
+  // Check URL parameters on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const num = params.get('number') || params.get('order') || params.get('orderNumber')
+    const phone = params.get('phone')
+    if (num && phone) {
+      setOrderNumber(num)
+      setTrackPhone(phone)
+      queueMicrotask(() => executeTrack(num, phone))
+    }
+  }, [])
+
+  const executeTrack = async (rawNumber: string, rawPhone: string) => {
+    if (!rawNumber.trim() || !rawPhone.trim()) return
 
     setLoading(true)
     setError('')
     setOrder(null)
 
-    // Clean order number format
-    let cleanNumber = orderNumber.trim().toUpperCase()
-    if (cleanNumber.startsWith('#')) {
-      cleanNumber = cleanNumber.substring(1)
-    }
+    // Clean order number: remove colons, hashes, spaces, and punctuation
+    let cleanNumber = rawNumber.trim().toUpperCase()
+    cleanNumber = cleanNumber.replace(/[^A-Z0-9-]/g, '')
     if (!cleanNumber.startsWith('ORD-') && /^\d+$/.test(cleanNumber)) {
       cleanNumber = `ORD-${cleanNumber}`
     }
 
+    const cleanPhone = rawPhone.trim()
+
     try {
-      const res = await fetch(`/api/orders/track/${cleanNumber}?phone=${encodeURIComponent(trackPhone.trim())}`)
+      // First attempt using /api/orders/lookup to avoid ad blocker triggers
+      let res = await fetch(`/api/orders/lookup/${cleanNumber}?phone=${encodeURIComponent(cleanPhone)}`)
+      if (!res.ok && res.status !== 403) {
+        // Fallback to /api/orders/track
+        res = await fetch(`/api/orders/track/${cleanNumber}?phone=${encodeURIComponent(cleanPhone)}`)
+      }
+
       const data = await res.json()
       
       if (res.ok) {
         setOrder(data)
-        setUserOrders([]) // Clear user orders so we display only the searched one
+        setUserOrders([]) // Show the searched order
+        // Update local saved order if present
+        try {
+          const saved = localStorage.getItem('vitahub_local_orders') || localStorage.getItem('vitamins_hub_orders')
+          const parsed = saved ? JSON.parse(saved) : []
+          if (Array.isArray(parsed)) {
+            const updated = parsed.map((o: any) => o.orderNumber === data.orderNumber ? { ...o, ...data } : o)
+            localStorage.setItem('vitahub_local_orders', JSON.stringify(updated))
+            localStorage.setItem('vitamins_hub_orders', JSON.stringify(updated))
+          }
+        } catch (e) {}
       } else {
-        setError(language === 'ar' 
-          ? 'لم يتم العثور على هذا الطلب، يرجى التحقق من الرقم والمحاولة مرة أخرى.' 
-          : 'Order not found, please check the order number and try again.'
-        )
+        setError(data?.error || (language === 'ar' 
+          ? 'لم يتم العثور على هذا الطلب، يرجى التحقق من الرقم ورقم الهاتف والمحاولة مرة أخرى.' 
+          : 'Order not found, please check the order number and phone and try again.'
+        ))
       }
     } catch (err) {
       console.error(err)
@@ -105,6 +149,11 @@ export default function TrackOrderPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleTrack = async (e: React.FormEvent) => {
+    e.preventDefault()
+    executeTrack(orderNumber, trackPhone)
   }
 
   const handleCancelOrder = async (orderId: string) => {
@@ -259,11 +308,24 @@ export default function TrackOrderPage() {
 
         {/* Tracking Results Area */}
         <div className="container mx-auto px-4 max-w-4xl mt-12">
-          {token && userOrders.length === 0 && order && (
+          {userOrders.length === 0 && order && (
             <div className="text-center mb-8">
               <button
                 type="button"
-                onClick={fetchLatestOrder}
+                onClick={() => {
+                  if (token) {
+                    fetchLatestOrder()
+                  } else {
+                    try {
+                      const saved = localStorage.getItem('vitahub_local_orders') || localStorage.getItem('vitamins_hub_orders')
+                      const parsed = saved ? JSON.parse(saved) : []
+                      setUserOrders(Array.isArray(parsed) ? parsed : [])
+                      setOrder(null)
+                    } catch (e) {
+                      console.error(e)
+                    }
+                  }
+                }}
                 className="inline-flex items-center gap-2 bg-white hover:bg-slate-100 text-slate-700 px-6 py-3 rounded-2xl font-black text-xs transition-all border border-slate-200/80 shadow-sm hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               >
                 <ArrowLeft size={14} className={language === 'en' ? 'text-primary' : 'rotate-180 text-primary'} />

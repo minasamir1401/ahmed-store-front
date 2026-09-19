@@ -59,19 +59,39 @@ export default function CheckoutPage() {
     notes: ''
   })
 
-  // Load saved data
+  const isLoadedRef = React.useRef(false)
+
+  // Load saved customer profile on mount
   React.useEffect(() => {
-    const saved = localStorage.getItem('vitamins_hub_checkout_data')
-    if (saved) {
-      try {
-        queueMicrotask(() => setFormData(JSON.parse(saved)))
-      } catch (e) { console.error(e) }
+    try {
+      const saved = localStorage.getItem('vitahub_customer_profile') || localStorage.getItem('vitamins_hub_checkout_data')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (parsed && typeof parsed === 'object') {
+          setFormData(prev => ({
+            ...prev,
+            ...parsed
+          }))
+        }
+      }
+    } catch (e) {
+      console.error('Error restoring saved checkout profile:', e)
+    } finally {
+      isLoadedRef.current = true
     }
   }, [])
 
-  // Save data on change
+  // Save data on change once loaded
   React.useEffect(() => {
-    localStorage.setItem('vitamins_hub_checkout_data', JSON.stringify(formData))
+    if (!isLoadedRef.current) return
+    if (formData.name || formData.phone || formData.address) {
+      try {
+        localStorage.setItem('vitahub_customer_profile', JSON.stringify(formData))
+        localStorage.setItem('vitamins_hub_checkout_data', JSON.stringify(formData))
+      } catch (e) {
+        console.error(e)
+      }
+    }
   }, [formData])
 
   // Pre-populate with user info if logged in
@@ -192,10 +212,17 @@ export default function CheckoutPage() {
           checkoutData: orderPayload,
           isGuestOrder: !user
         }
-        const savedOrders = localStorage.getItem('vitamins_hub_orders')
-        const parsedOrders = savedOrders ? JSON.parse(savedOrders) : []
-        const localOrders = Array.isArray(parsedOrders) ? parsedOrders : []
-        localStorage.setItem('vitamins_hub_orders', JSON.stringify([storedOrder, ...localOrders].slice(0, 20)))
+        const savedOrders = localStorage.getItem('vitahub_local_orders') || localStorage.getItem('vitamins_hub_orders')
+        let localOrders: any[] = []
+        try {
+          const parsed = savedOrders ? JSON.parse(savedOrders) : []
+          localOrders = Array.isArray(parsed) ? parsed : []
+        } catch (e) {
+          console.error(e)
+        }
+        const updatedOrders = [storedOrder, ...localOrders.filter((o: any) => o.orderNumber !== orderData.orderNumber)].slice(0, 20)
+        localStorage.setItem('vitahub_local_orders', JSON.stringify(updatedOrders))
+        localStorage.setItem('vitamins_hub_orders', JSON.stringify(updatedOrders))
         
         // Track Purchase event on Facebook, Google, TikTok, Snapchat
         trackPurchase({
@@ -277,8 +304,14 @@ export default function CheckoutPage() {
               </p>
             </div>
             <div className="flex flex-col gap-3">
+              <Link href={`/order-status?number=${encodeURIComponent(placedOrder?.orderNumber || '')}&phone=${encodeURIComponent(formData.phone || '')}`}>
+                <button className="w-full bg-primary text-white h-14 rounded-2xl font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 cursor-pointer flex items-center justify-center gap-2">
+                  <Truck size={20} />
+                  <span>{language === 'ar' ? 'تتبع طلبك وتفاصيله الآن' : 'Track Your Order & Details Now'}</span>
+                </button>
+              </Link>
               <Link href="/">
-                <button className="w-full bg-primary text-white h-14 rounded-2xl font-bold hover:bg-primary/90 transition-all shadow-lg cursor-pointer">
+                <button className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 h-12 rounded-2xl font-bold transition-all cursor-pointer">
                   {t('cart_back_shopping')}
                 </button>
               </Link>

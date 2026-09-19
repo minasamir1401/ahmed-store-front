@@ -66,6 +66,39 @@ export default function HomeClient({
     return () => clearInterval(interval);
   }, [slides]);
 
+  // Categories Carousel state and autoplay
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+  const [isCatPaused, setIsCatPaused] = useState(false);
+
+  const scrollCategories = (direction: 'next' | 'prev') => {
+    if (!categoryScrollRef.current) return;
+    const el = categoryScrollRef.current;
+    const scrollStep = 220;
+    const isRtl = language === 'ar';
+    const delta = direction === 'next' ? (isRtl ? -scrollStep : scrollStep) : (isRtl ? scrollStep : -scrollStep);
+    el.scrollBy({ left: delta, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    if (!categories || categories.length <= 3 || isCatPaused) return;
+    const timer = setInterval(() => {
+      if (!categoryScrollRef.current) return;
+      const el = categoryScrollRef.current;
+      const isRtl = language === 'ar';
+      const scrollStep = 200;
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      const currentPos = Math.abs(el.scrollLeft);
+
+      if (currentPos >= maxScroll - 20) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        const delta = isRtl ? -scrollStep : scrollStep;
+        el.scrollBy({ left: delta, behavior: 'smooth' });
+      }
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [categories, isCatPaused, language]);
+
   const loadData = () => {
     setLoading(true)
     setError(null)
@@ -396,24 +429,61 @@ export default function HomeClient({
 
             </div>
 
-            {/* Featured Products/Categories Section */}
+            {/* Featured Products/Categories Carousel Section */}
             {categories && categories.length > 0 ? (
-              <div className="mt-8 border-t border-slate-100/50 pt-8">
-                <div className="flex items-center justify-between gap-3 mb-6">
-                  <div className="flex items-center gap-3 flex-1">
-                    <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">{t('featured_products_categories')}</span>
-                    <div className="h-px flex-1 bg-slate-100" />
+              <div className="mt-8 border-t border-slate-100/50 pt-6">
+                <div className="flex items-center justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs sm:text-sm font-black text-emerald-600 uppercase tracking-widest">{t('featured_products_categories')}</span>
+                    <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full hidden sm:inline-block">
+                      {categories.length}
+                    </span>
+                    <div className="h-px w-8 sm:w-16 bg-slate-200" />
                   </div>
-                  <Link 
-                    href="/categories" 
-                    className="text-xs font-bold text-slate-500 hover:text-emerald-600 transition-colors flex items-center gap-1 shrink-0 px-2.5 py-1 rounded-lg hover:bg-emerald-50"
-                  >
-                    <span>{language === 'ar' ? 'عرض جميع الأقسام' : 'View All Categories'}</span>
-                    <ChevronLeft size={14} className={language === 'en' ? 'rotate-180' : ''} />
-                  </Link>
+
+                  <div className="flex items-center gap-2">
+                    {/* Navigation Buttons */}
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => scrollCategories('prev')}
+                        aria-label="Previous"
+                        className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-600 text-slate-600 flex items-center justify-center transition-all shadow-sm active:scale-95 cursor-pointer"
+                      >
+                        {dir === 'rtl' ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => scrollCategories('next')}
+                        aria-label="Next"
+                        className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-600 text-slate-600 flex items-center justify-center transition-all shadow-sm active:scale-95 cursor-pointer"
+                      >
+                        {dir === 'rtl' ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                      </button>
+                    </div>
+
+                    <div className="h-4 w-px bg-slate-200 mx-1" />
+
+                    <Link 
+                      href="/categories" 
+                      className="text-xs font-bold text-slate-500 hover:text-emerald-600 transition-colors flex items-center gap-1 shrink-0 px-2.5 py-1 rounded-lg hover:bg-emerald-50"
+                    >
+                      <span>{language === 'ar' ? 'عرض الكل' : 'View All'}</span>
+                      <ChevronLeft size={14} className={language === 'en' ? 'rotate-180' : ''} />
+                    </Link>
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-                  {categories.slice(0, 8).map((cat: any, idx: number) => {
+
+                {/* Categories Slider */}
+                <div
+                  ref={categoryScrollRef}
+                  onMouseEnter={() => setIsCatPaused(true)}
+                  onMouseLeave={() => setIsCatPaused(false)}
+                  onTouchStart={() => setIsCatPaused(true)}
+                  onTouchEnd={() => setIsCatPaused(false)}
+                  className="flex items-center gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory py-2 px-0.5"
+                >
+                  {categories.map((cat: any, idx: number) => {
                     const title = language === 'en' ? (cat.nameEn || translate(cat.name)) : cat.name;
                     const href = `/products?category=${cat.id}`;
                     const defaultCatImg = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&q=80';
@@ -422,30 +492,28 @@ export default function HomeClient({
                     return (
                       <motion.div
                         key={cat.id || idx}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.05 * idx, duration: 0.4 }}
-                        whileHover={{ y: -6, scale: 1.02 }}
-                        className="relative rounded-3xl overflow-hidden aspect-[4/3] group shadow-sm hover:shadow-xl hover:shadow-emerald-950/10 border border-slate-100 transition-all cursor-pointer bg-slate-900"
+                        whileHover={{ y: -4, scale: 1.03 }}
+                        transition={{ duration: 0.2 }}
+                        className="w-[130px] xs:w-[145px] sm:w-[165px] md:w-[180px] shrink-0 snap-start relative rounded-2xl overflow-hidden aspect-[4/3] group shadow-sm hover:shadow-xl hover:shadow-emerald-950/15 border border-slate-100 transition-all cursor-pointer bg-slate-900 select-none"
                       >
-                        <Link href={href} className="relative flex flex-col items-center justify-end w-full h-full p-4 gap-2 sm:gap-3 group overflow-hidden">
+                        <Link href={href} className="relative flex flex-col items-center justify-end w-full h-full p-2.5 sm:p-3 group overflow-hidden">
                           <div className="absolute inset-0 w-full h-full">
                             <SafeImage 
                               src={img}
                               fill
                               className="object-cover group-hover:scale-110 transition-transform duration-700"
-                              sizes="(max-width: 768px) 50vw, 25vw"
+                              sizes="(max-width: 640px) 140px, 180px"
                               alt={title}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent opacity-85 group-hover:opacity-95 transition-opacity duration-300" />
                           </div>
 
-                          <div className="text-center relative z-10 mt-auto flex flex-col items-center w-full px-2">
-                            <span className="block text-white text-xs sm:text-sm md:text-base font-black tracking-wide line-clamp-1 mb-1 drop-shadow-md">
+                          <div className="text-center relative z-10 mt-auto flex flex-col items-center w-full px-1">
+                            <span className="block text-white text-[11px] sm:text-xs md:text-sm font-black tracking-wide line-clamp-1 mb-1 drop-shadow-md">
                               {title}
                             </span>
-                            <div className="flex items-center gap-1.5">
-                              <span className="inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-white bg-emerald-600/90 backdrop-blur-sm border border-white/20 shadow-sm transition-all duration-300 group-hover:bg-emerald-500">
+                            <div className="flex items-center gap-1">
+                              <span className="inline-block px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-black uppercase text-white bg-emerald-600/90 backdrop-blur-sm border border-white/20 shadow-sm transition-all duration-300 group-hover:bg-emerald-500">
                                 {language === 'ar' ? `${cat.count ?? 0} منتج` : `${cat.count ?? 0} Products`}
                               </span>
                             </div>

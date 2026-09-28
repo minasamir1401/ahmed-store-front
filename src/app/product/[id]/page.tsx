@@ -181,6 +181,17 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
         }
       ]
     },
+    other: {
+      'product:price:amount': String(product.price),
+      'product:price:currency': 'EGP',
+      'product:availability': 'in stock',
+      'product:condition': 'new',
+      'product:brand': product.brand?.name ? `The VitaHub - ${product.brand.name}` : 'The VitaHub',
+      'product:retailer_item_id': product.id,
+      'product:item_group_id': product.id,
+      'og:price:amount': String(product.price),
+      'og:price:currency': 'EGP',
+    },
     twitter: {
       card: 'summary_large_image',
       title,
@@ -246,7 +257,7 @@ export default async function ProductPage({ params, searchParams }: PageParams) 
       ...(gtinValue ? { "gtin": gtinValue } : {}),
       "brand": {
         "@type": "Brand",
-        "name": product.brand?.name || 'The VitaHub'
+        "name": product.brand?.name ? `The VitaHub - ${product.brand.name}` : 'The VitaHub'
       },
       "aggregateRating": {
         "@type": "AggregateRating",

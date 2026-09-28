@@ -23,8 +23,11 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
           '/returns',
           '/api/images/',
           '/api/products',
+          '/api/catalog/',
           '/api/medical-tips',
           '/api/og/',
+          '/facebook-feed.xml',
+          '/facebook-feed.csv',
           '/uploads/',
           '/_next/image'
         ],

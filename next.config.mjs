@@ -102,6 +102,18 @@ const nextConfig = {
         source: '/uploads/:path*',
         destination: `${BACKEND_URL}/uploads/:path*`,
       },
+      {
+        source: '/facebook-feed.xml',
+        destination: `${BACKEND_URL}/api/catalog/facebook-feed.xml`,
+      },
+      {
+        source: '/facebook-feed.csv',
+        destination: `${BACKEND_URL}/api/catalog/facebook-feed.csv`,
+      },
+      {
+        source: '/catalog-feed.xml',
+        destination: `${BACKEND_URL}/api/catalog/facebook-feed.xml`,
+      },
     ];
   },
 };

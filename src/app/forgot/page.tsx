@@ -325,6 +325,7 @@ export default function ForgotPasswordPage() {
                           placeholder="••••••••"
                           value={formData.newPassword}
                           onChange={handleInputChange}
+                          autoComplete="new-password"
                           className={`w-full h-12 bg-white/40 border border-slate-200/60 rounded-2xl focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10 transition-all outline-none text-xs sm:text-sm font-semibold group-hover:border-slate-300 ${isRtl ? 'px-11 pr-11 text-right' : 'px-11 pl-11 text-left'}`}
                         />
                         <Lock className={`absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors ${isRtl ? 'left-4' : 'right-4'}`} size={16} />
@@ -349,6 +350,7 @@ export default function ForgotPasswordPage() {
                           placeholder="••••••••"
                           value={formData.confirmPassword}
                           onChange={handleInputChange}
+                          autoComplete="new-password"
                           className={`w-full h-12 bg-white/40 border border-slate-200/60 rounded-2xl focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10 transition-all outline-none text-xs sm:text-sm font-semibold group-hover:border-slate-300 ${isRtl ? 'px-11 pr-11 text-right' : 'px-11 pl-11 text-left'}`}
                         />
                         <Lock className={`absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors ${isRtl ? 'left-4' : 'right-4'}`} size={16} />

@@ -17,14 +17,14 @@ export default function AdminLoginForm({ username, setUsername, password, setPas
             <label className="text-[10px] font-black text-slate-400 uppercase mr-1">اسم المستخدم</label>
             <div className="relative">
               <User size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input type="text" value={username} onChange={e => setUsername(e.target.value)} className="w-full bg-slate-50 rounded-2xl py-3.5 pr-12 pl-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700" placeholder="admin" required />
+              <input type="text" value={username} onChange={e => setUsername(e.target.value)} autoComplete="username" className="w-full bg-slate-50 rounded-2xl py-3.5 pr-12 pl-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700" placeholder="admin" required />
             </div>
           </div>
           <div className="space-y-1">
             <label className="text-[10px] font-black text-slate-400 uppercase mr-1">كلمة المرور</label>
             <div className="relative">
               <Lock size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-slate-50 rounded-2xl py-3.5 pr-12 pl-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700" placeholder="••••••••" required />
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" className="w-full bg-slate-50 rounded-2xl py-3.5 pr-12 pl-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700" placeholder="••••••••" required />
             </div>
           </div>
         </div>

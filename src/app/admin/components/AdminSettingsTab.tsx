@@ -45,6 +45,7 @@ export default function AdminSettingsTab(props: any) {
                           placeholder="admin أو admin@mithaly.com" 
                           required 
                           disabled={adminSaveLoading}
+                          autoComplete="username"
                         />
                       </div>
 
@@ -58,6 +59,7 @@ export default function AdminSettingsTab(props: any) {
                           placeholder="المدير العام" 
                           required 
                           disabled={adminSaveLoading}
+                          autoComplete="name"
                         />
                       </div>
 
@@ -70,6 +72,7 @@ export default function AdminSettingsTab(props: any) {
                           className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700" 
                           placeholder="••••••••" 
                           disabled={adminSaveLoading}
+                          autoComplete="new-password"
                         />
                       </div>
                     </div>

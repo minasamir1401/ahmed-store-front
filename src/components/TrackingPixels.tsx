@@ -32,7 +32,7 @@ function TrackingPixelsContent() {
 
   // Track page view and search on route/path changes
   useEffect(() => {
-    if (!pathname || !hasConsent) return
+    if (!pathname || pathname.startsWith('/admin') || !hasConsent) return
     const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '')
     trackPageView(url)
 
@@ -42,7 +42,7 @@ function TrackingPixelsContent() {
     }
   }, [pathname, searchParams, hasConsent])
 
-  if (!hasConsent) return null
+  if (!hasConsent || pathname?.startsWith('/admin')) return null
 
   return (
     <>

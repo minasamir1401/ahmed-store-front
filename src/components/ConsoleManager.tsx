@@ -30,6 +30,23 @@ export default function ConsoleManager() {
     // Apply initially
     checkAndApply();
 
+    // Intercept browser extension port disconnects and unhandled third-party rejections
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      const reason = event?.reason;
+      const message = reason?.message || (typeof reason === 'string' ? reason : '');
+      const isExtensionError =
+        message.includes('message channel closed before a response was received') ||
+        message.includes('listener indicated an asynchronous response') ||
+        message.includes('Extension context invalidated') ||
+        message.includes('Receiving end does not exist');
+
+      if (isExtensionError || (reason && typeof reason === 'object' && !('stack' in reason) && !('message' in reason))) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
     // Expose global methods
     (window as any).showLogs = (password: string) => {
       if (password === 'mina') {
@@ -45,6 +62,10 @@ export default function ConsoleManager() {
       localStorage.removeItem('debug_pwd');
       checkAndApply();
       originalLog('Logs disabled.');
+    };
+
+    return () => {
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
     };
   }, []);
 

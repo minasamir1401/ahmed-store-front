@@ -1448,7 +1448,7 @@ export function useAdminDashboard() {
         await showAlert('تم تحديث بيانات المسؤول بنجاح! يرجى استخدام البيانات الجديدة لتسجيل الدخول مستقبلاً.', 'تحديث ناجح')
         setAdminPassword('')
       } else {
-        const err = await res.json()
+        const err = await res.json().catch(() => ({}))
         await showAlert('فشل حفظ البيانات: ' + (err.error || 'خطأ غير معروف'), 'خطأ')
       }
     } catch (err: any) {
@@ -1482,7 +1482,7 @@ export function useAdminDashboard() {
       if (res.ok) {
         await showAlert('تم حفظ إعدادات Resend وأرقام التواصل بنجاح!', 'تحديث ناجح')
       } else {
-        const err = await res.json()
+        const err = await res.json().catch(() => ({}))
         await showAlert('فشل حفظ إعدادات النظام: ' + (err.error || 'خطأ غير معروف'), 'خطأ')
       }
     } catch (err: any) {
@@ -1714,8 +1714,12 @@ export function useAdminDashboard() {
 
   useEffect(() => {
     if (activeTab === 'whatsapp' && isLoggedIn) {
-      queueMicrotask(() => fetchWhatsappStatus())
-      const interval = setInterval(fetchWhatsappStatus, 3000)
+      queueMicrotask(() => {
+        fetchWhatsappStatus().catch(() => {})
+      })
+      const interval = setInterval(() => {
+        fetchWhatsappStatus().catch(() => {})
+      }, 3000)
       return () => clearInterval(interval)
     }
   }, [activeTab, isLoggedIn])
@@ -1723,8 +1727,8 @@ export function useAdminDashboard() {
   useEffect(() => {
     if (isLoggedIn) {
       queueMicrotask(() => {
-        fetchData()
-        fetchMeta()
+        fetchData().catch(() => {})
+        fetchMeta().catch(() => {})
       })
     }
   }, [activeTab, isLoggedIn])

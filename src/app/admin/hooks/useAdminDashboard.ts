@@ -1294,30 +1294,29 @@ export function useAdminDashboard() {
     addLog(type === 'data' ? 'جاري تجهيز نسخة البيانات السريعة...' : 'جاري تجهيز النسخة الاحتياطية الشاملة...')
     try {
       const token = adminToken || getStoredAdminToken()
-      const res = await fetch(`${BACKEND_API}/api/admin/backup?type=${type}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      if (!res.ok) throw new Error('فشل توليد النسخة الاحتياطية من السيرفر')
+      if (!token) throw new Error('يرجى تسجيل الدخول مجدداً')
 
-      const blob = await res.blob()
-      const url = window.URL.createObjectURL(blob)
+      const downloadUrl = `${BACKEND_API}/api/admin/backup?type=${type}&token=${encodeURIComponent(token)}`
+      
       const a = document.createElement('a')
-      a.href = url
-      const prefix = type === 'data' ? 'mithaly-data-backup' : 'mithaly-full-backup'
-      a.download = `${prefix}-${new Date().toISOString().slice(0, 10)}.zip`
+      a.href = downloadUrl
+      a.setAttribute('download', '')
+      a.style.display = 'none'
       document.body.appendChild(a)
       a.click()
-      a.remove()
-      window.URL.revokeObjectURL(url)
-      addLog('تم تحميل النسخة الاحتياطية بنجاح')
+      setTimeout(() => {
+        a.remove()
+      }, 1500)
+      
+      addLog('بدأ تحميل النسخة الاحتياطية بنجاح')
     } catch (err: any) {
       await showAlert('حدث خطأ أثناء تحميل النسخة الاحتياطية: ' + err.message, 'خطأ')
       addLog('خطأ في تحميل النسخة الاحتياطية')
     } finally {
-      setBackupLoading(false)
-      setBackupTypeLoading(null)
+      setTimeout(() => {
+        setBackupLoading(false)
+        setBackupTypeLoading(null)
+      }, 1500)
     }
   }
 

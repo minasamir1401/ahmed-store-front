@@ -13,15 +13,17 @@ function TrackingPixelsContent() {
   const googleId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID
   const tiktokId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID
   const snapchatId = process.env.NEXT_PUBLIC_SNAPCHAT_PIXEL_ID
-  const [hasConsent, setHasConsent] = React.useState(false)
+  // By default, marketing pixels are active so Meta Advantage+ and Catalog events run reliably.
+  // Pixels are only suppressed if the user explicitly opted out with 'essential' only.
+  const [isOptedOut, setIsOptedOut] = React.useState(false)
 
   useEffect(() => {
     const checkConsent = () => {
       try {
         const consent = localStorage.getItem('vitahub_cookie_consent')
-        setHasConsent(consent === 'accepted')
+        setIsOptedOut(consent === 'essential')
       } catch {
-        setHasConsent(false)
+        setIsOptedOut(false)
       }
     }
 
@@ -32,7 +34,7 @@ function TrackingPixelsContent() {
 
   // Track page view and search on route/path changes
   useEffect(() => {
-    if (!pathname || pathname.startsWith('/admin') || !hasConsent) return
+    if (!pathname || pathname.startsWith('/admin') || isOptedOut) return
     const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '')
     trackPageView(url)
 
@@ -40,9 +42,9 @@ function TrackingPixelsContent() {
     if (searchQuery && searchQuery.trim()) {
       trackSearch(searchQuery.trim())
     }
-  }, [pathname, searchParams, hasConsent])
+  }, [pathname, searchParams, isOptedOut])
 
-  if (!hasConsent || pathname?.startsWith('/admin')) return null
+  if (isOptedOut || pathname?.startsWith('/admin')) return null
 
   return (
     <>

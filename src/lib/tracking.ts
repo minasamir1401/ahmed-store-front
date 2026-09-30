@@ -63,6 +63,28 @@ const getFbc = (): string | null => {
   return fbc || null;
 };
 
+// Safe Meta Pixel dispatcher with fallback queuing
+export const safeFbq = (action: string, eventName: string, params?: any, options?: any) => {
+  if (typeof window === 'undefined') return;
+  const w = window as any;
+  if (typeof w.fbq === 'function') {
+    w.fbq(action, eventName, params, options);
+  } else {
+    w._fbqQueue = w._fbqQueue || [];
+    w._fbqQueue.push([action, eventName, params, options]);
+    const interval = setInterval(() => {
+      if (typeof w.fbq === 'function') {
+        clearInterval(interval);
+        while (w._fbqQueue && w._fbqQueue.length > 0) {
+          const item = w._fbqQueue.shift();
+          w.fbq(...item);
+        }
+      }
+    }, 200);
+    setTimeout(() => clearInterval(interval), 6000);
+  }
+};
+
 // Helper to generate unique eventId for non-Purchase events
 const generateEventId = (): string => {
   return 'evt_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
@@ -113,10 +135,8 @@ export const trackPageView = (url: string) => {
   sendEventToBackend('PageView', { path: url }, eventId);
 
   // Meta (Facebook)
-  if (typeof (window as any).fbq === 'function') {
-    (window as any).fbq('track', 'PageView', {}, { eventID: eventId });
-    logDebug('Meta', 'PageView', { url, eventId });
-  }
+  safeFbq('track', 'PageView', {}, { eventID: eventId });
+  logDebug('Meta', 'PageView', { url, eventId });
 
   // Google Analytics
   const gaId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
@@ -153,16 +173,20 @@ export const trackViewContent = (product: TrackedProduct) => {
   const currency = 'EGP';
 
   // Meta (Facebook)
-  if (typeof (window as any).fbq === 'function') {
-    (window as any).fbq('track', 'ViewContent', {
-      content_name: product.title,
-      content_ids: [product.id],
-      content_type: 'product',
-      value,
-      currency,
-    }, { eventID: eventId });
-    logDebug('Meta', 'ViewContent', { id: product.id, title: product.title, value, eventId });
-  }
+  const productId = String(product.id);
+  safeFbq('track', 'ViewContent', {
+    content_name: product.title,
+    content_ids: [productId],
+    content_type: 'product',
+    contents: [{
+      id: productId,
+      quantity: 1,
+      item_price: value,
+    }],
+    value,
+    currency,
+  }, { eventID: eventId });
+  logDebug('Meta', 'ViewContent', { id: productId, title: product.title, value, eventId });
 
   // Google Analytics
   if (typeof (window as any).gtag === 'function') {
@@ -268,16 +292,20 @@ export const trackAddToCart = (product: TrackedProduct) => {
   const currency = 'EGP';
 
   // Meta (Facebook)
-  if (typeof (window as any).fbq === 'function') {
-    (window as any).fbq('track', 'AddToCart', {
-      content_name: product.title,
-      content_ids: [product.id],
-      content_type: 'product',
-      value: totalValue,
-      currency,
-    }, { eventID: eventId });
-    logDebug('Meta', 'AddToCart', { id: product.id, title: product.title, value: totalValue, quantity, eventId });
-  }
+  const productId = String(product.id);
+  safeFbq('track', 'AddToCart', {
+    content_name: product.title,
+    content_ids: [productId],
+    content_type: 'product',
+    contents: [{
+      id: productId,
+      quantity,
+      item_price: value,
+    }],
+    value: totalValue,
+    currency,
+  }, { eventID: eventId });
+  logDebug('Meta', 'AddToCart', { id: productId, title: product.title, value: totalValue, quantity, eventId });
 
   // Google Analytics
   if (typeof (window as any).gtag === 'function') {
@@ -402,18 +430,23 @@ export const trackInitiateCheckout = (cart: TrackedProduct[], total: number) => 
 
   const value = Number(total) || 0;
   const currency = 'EGP';
-  const itemIds = cart.map(i => i.id);
+  const itemIds = cart.map(i => String(i.id));
 
   // Meta (Facebook)
-  if (typeof (window as any).fbq === 'function') {
-    (window as any).fbq('track', 'InitiateCheckout', {
-      content_ids: itemIds,
-      content_type: 'product',
-      value,
-      currency,
-    }, { eventID: eventId });
-    logDebug('Meta', 'InitiateCheckout', { itemIds, value, eventId });
-  }
+  const contents = cart.map(i => ({
+    id: String(i.id),
+    quantity: Number(i.quantity) || 1,
+    item_price: Number(i.price) || 0,
+  }));
+  safeFbq('track', 'InitiateCheckout', {
+    content_ids: itemIds,
+    content_type: 'product',
+    contents,
+    value,
+    currency,
+    num_items: cart.reduce((acc, i) => acc + (Number(i.quantity) || 1), 0),
+  }, { eventID: eventId });
+  logDebug('Meta', 'InitiateCheckout', { itemIds, value, eventId });
 
   // Google Analytics
   if (typeof (window as any).gtag === 'function') {
@@ -471,18 +504,23 @@ export const trackPurchase = (order: TrackedOrder) => {
 
   const value = Number(order.total) || 0;
   const currency = 'EGP';
-  const itemIds = order.items.map(i => i.productId);
+  const itemIds = order.items.map(i => String(i.productId));
 
   // Meta (Facebook)
-  if (typeof (window as any).fbq === 'function') {
-    (window as any).fbq('track', 'Purchase', {
-      content_ids: itemIds,
-      content_type: 'product',
-      value,
-      currency,
-    }, { eventID: eventId });
-    logDebug('Meta', 'Purchase', { transactionId: order.orderNumber, itemIds, value, eventId });
-  }
+  const contents = order.items.map(i => ({
+    id: String(i.productId),
+    quantity: Number(i.quantity) || 1,
+    item_price: Number(i.price) || 0,
+  }));
+  safeFbq('track', 'Purchase', {
+    content_ids: itemIds,
+    content_type: 'product',
+    contents,
+    value,
+    currency,
+    num_items: order.items.reduce((acc, i) => acc + (Number(i.quantity) || 1), 0),
+  }, { eventID: eventId });
+  logDebug('Meta', 'Purchase', { transactionId: order.orderNumber, itemIds, value, eventId });
 
   // Google Analytics
   if (typeof (window as any).gtag === 'function') {

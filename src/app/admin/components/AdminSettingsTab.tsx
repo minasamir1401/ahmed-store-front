@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, CheckCircle2, Upload, Plus, Edit2, Trash2, Eye, Search, Smartphone, Shield, LogIn, Lock as LockIcon, Database, DownloadCloud, Sparkles, Mail, Send, Truck, ArrowRight, ShieldCheck, Zap, Archive } from 'lucide-react';
+import { Loader2, CheckCircle2, Upload, Plus, Edit2, Trash2, Eye, Search, Smartphone, Shield, LogIn, Lock as LockIcon, Database, DownloadCloud, Sparkles, Mail, Send, Truck, ArrowRight, ShieldCheck, Zap, Archive, Share2, Copy, Check, ExternalLink } from 'lucide-react';
 
 
 export default function AdminSettingsTab(props: any) {
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const handleCopy = (text: string, fieldName: string) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedField(fieldName);
+      setTimeout(() => setCopiedField(null), 2000);
+    }
+  };
   const { 
     formData, setFormData, handleSave, loading, uploading, handleFileUpload,
     items, adminEmail, setAdminEmail, adminName, setAdminName, adminPassword, setAdminPassword,
@@ -144,6 +153,105 @@ export default function AdminSettingsTab(props: any) {
                       </button>
                     </div>
                   </form>
+
+                  {/* Meta Pixel & Catalog Feed Section */}
+                  <div className="bg-white border border-slate-100 rounded-[2.5rem] p-6 md:p-10 space-y-6 shadow-sm max-w-xl mx-auto relative overflow-hidden mt-8">
+                    <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600" />
+                    
+                    <div className="text-center space-y-2 mb-6">
+                      <div className="bg-blue-50 w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-blue-600">
+                        <Share2 size={22} />
+                      </div>
+                      <h3 className="text-lg font-black text-slate-800">بيانات الربط مع Meta و Facebook Catalog</h3>
+                      <p className="text-[10px] text-slate-400 font-bold">معرف البيكسل وروابط تغذية الكتالوج الرسمية للمتجر لضمان مطابقة 100%</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* Pixel / Dataset ID */}
+                      <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] font-black text-slate-500 uppercase">معرف مجموعة البيانات (Dataset / Pixel ID)</label>
+                          <span className="text-[9px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">نشط في الموقع</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="text" 
+                            readOnly 
+                            value="2785073648526058" 
+                            className="flex-1 bg-white rounded-xl py-2.5 px-3 font-mono font-bold text-xs text-slate-800 border border-slate-200 outline-none text-left dir-ltr" 
+                          />
+                          <button 
+                            type="button" 
+                            onClick={() => handleCopy('2785073648526058', 'pixel')} 
+                            className="bg-slate-200 hover:bg-slate-300 text-slate-700 p-2.5 rounded-xl transition-all flex items-center justify-center cursor-pointer shrink-0"
+                            title="نسخ المعرف"
+                          >
+                            {copiedField === 'pixel' ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* XML Feed URL */}
+                      <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] font-black text-slate-500 uppercase">رابط فيد الكتالوج (XML Feed) - الأساسي لـ Meta</label>
+                          <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">موصى به لـ Meta</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="text" 
+                            readOnly 
+                            value="https://the-vitahub.com/facebook-feed.xml" 
+                            className="flex-1 bg-white rounded-xl py-2.5 px-3 font-mono text-[11px] font-bold text-slate-800 border border-slate-200 outline-none text-left dir-ltr" 
+                          />
+                          <button 
+                            type="button" 
+                            onClick={() => handleCopy('https://the-vitahub.com/facebook-feed.xml', 'xml')} 
+                            className="bg-slate-200 hover:bg-slate-300 text-slate-700 p-2.5 rounded-xl transition-all flex items-center justify-center cursor-pointer shrink-0"
+                            title="نسخ الرابط"
+                          >
+                            {copiedField === 'xml' ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
+                          </button>
+                          <a 
+                            href="https://the-vitahub.com/facebook-feed.xml" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="bg-blue-50 hover:bg-blue-100 text-blue-600 p-2.5 rounded-xl transition-all flex items-center justify-center shrink-0"
+                            title="فتح الرابط"
+                          >
+                            <ExternalLink size={16} />
+                          </a>
+                        </div>
+                        <p className="text-[9px] text-slate-400 font-semibold leading-relaxed">
+                          هذا الرابط يقوم بتوليد الصور تلقائياً بصيغة JPEG متوافقة بنسبة 100% مع متطلبات Meta Commerce Manager، ويعمل مع التحديث التلقائي اليومي.
+                        </p>
+                      </div>
+
+                      {/* CSV Feed URL */}
+                      <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] font-black text-slate-500 uppercase">رابط فيد الكتالوج البديل (CSV Feed)</label>
+                          <span className="text-[9px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">صيغة CSV</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="text" 
+                            readOnly 
+                            value="https://the-vitahub.com/facebook-feed.csv" 
+                            className="flex-1 bg-white rounded-xl py-2.5 px-3 font-mono text-[11px] font-bold text-slate-800 border border-slate-200 outline-none text-left dir-ltr" 
+                          />
+                          <button 
+                            type="button" 
+                            onClick={() => handleCopy('https://the-vitahub.com/facebook-feed.csv', 'csv')} 
+                            className="bg-slate-200 hover:bg-slate-300 text-slate-700 p-2.5 rounded-xl transition-all flex items-center justify-center cursor-pointer shrink-0"
+                            title="نسخ الرابط"
+                          >
+                            {copiedField === 'csv' ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Backup & Restore Section */}
                   <div className="bg-white border border-slate-100 rounded-[2.5rem] p-6 md:p-10 space-y-6 shadow-sm max-w-xl mx-auto relative overflow-hidden mt-8">

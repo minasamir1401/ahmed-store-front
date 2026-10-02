@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Search, ShoppingCart, User, Menu, X, Heart, Globe } from 'lucide-react'
+import { Search, ShoppingCart, User, Menu, X, Heart, Globe, ArrowUpLeft } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useCart } from '@/context/CartContext'
@@ -11,6 +11,126 @@ import { useWishlist } from '@/context/WishlistContext'
 import { useAuth } from '@/context/AuthContext'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
+
+function SearchAutocomplete({ 
+  isMobile, 
+  searchQuery, 
+  setSearchQuery, 
+  handleSearch, 
+  t, 
+  language,
+  router
+}: any) {
+  const [suggestions, setSuggestions] = React.useState<any[]>([]);
+  const [showDropdown, setShowDropdown] = React.useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  React.useEffect(() => {
+    if (!searchQuery.trim() || searchQuery.trim().length < 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      fetch(`/api/products?q=${encodeURIComponent(searchQuery.trim())}&limit=6`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.items) {
+            setSuggestions(data.items);
+          } else if (Array.isArray(data)) {
+            setSuggestions(data.slice(0, 6));
+          }
+        })
+        .catch(err => console.error(err));
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const HighlightMatch = ({ text }: { text: string }) => {
+    if (!searchQuery) return <span>{text}</span>;
+    const escapedQuery = searchQuery.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedQuery})`, 'gi');
+    const parts = text.split(regex);
+    return (
+      <span className="truncate">
+        {parts.map((part, i) =>
+          regex.test(part) ? <span key={i} className="font-normal">{part}</span> : <strong key={i} className="font-bold">{part}</strong>
+        )}
+      </span>
+    );
+  };
+
+  return (
+    <div className={cn("relative", isMobile ? "w-full" : "hidden md:flex flex-1 max-w-xs xl:max-w-md")} ref={containerRef}>
+      <form onSubmit={(e) => {
+        setShowDropdown(false);
+        handleSearch(e);
+      }} className="relative w-full">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setShowDropdown(true);
+          }}
+          onFocus={() => setShowDropdown(true)}
+          placeholder={t('search_placeholder')}
+          aria-label={language === 'ar' ? "ابحث عن المكملات والفيتامينات" : "Search for supplements and vitamins"}
+          className={cn(
+            "w-full bg-accent border-none px-5 focus:ring-2 focus:ring-primary/20 transition-all text-sm",
+            isMobile ? "h-10 rounded-lg pr-10" : "h-11 rounded-full pr-12"
+          )}
+        />
+        <button type="submit" aria-label="Search" className={cn("absolute top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors cursor-pointer", isMobile ? "right-3" : "right-4")}>
+          <Search size={isMobile ? 16 : 18} />
+        </button>
+      </form>
+
+      {/* Dropdown */}
+      {showDropdown && suggestions.length > 0 && searchQuery.trim().length >= 2 && (
+        <div className="absolute top-full mt-2 w-full bg-white rounded-xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+          <ul className="max-h-[350px] overflow-y-auto py-1">
+            {suggestions.map((item) => {
+              const title = language === 'ar' ? (item.title || item.titleEn) : (item.titleEn || item.title);
+              return (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery(title);
+                      setShowDropdown(false);
+                      router.push(`/products?search=${encodeURIComponent(title)}`);
+                    }}
+                    className="w-full text-start px-4 py-3 flex items-center justify-between hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
+                  >
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                      <div className="text-[14px] text-slate-700 truncate" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                        <HighlightMatch text={title} />
+                      </div>
+                    </div>
+                    <ArrowUpLeft className="w-4 h-4 text-slate-400 flex-shrink-0 ml-2" />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function HeaderContent() {
   const { user } = useAuth()
@@ -127,19 +247,15 @@ function HeaderContent() {
               </div>
 
               {/* Search Bar (Desktop) */}
-              <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xs xl:max-w-md relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t('search_placeholder')}
-                  aria-label={language === 'ar' ? "ابحث عن المكملات والفيتامينات" : "Search for supplements and vitamins"}
-                  className="w-full h-11 bg-accent border-none rounded-full px-5 pr-12 focus:ring-2 focus:ring-primary/20 transition-all text-sm"
-                />
-                <button type="submit" aria-label="Search" className="absolute right-4 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors cursor-pointer">
-                  <Search size={18} />
-                </button>
-              </form>
+              <SearchAutocomplete
+                isMobile={false}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                handleSearch={handleSearch}
+                t={t}
+                language={language}
+                router={router}
+              />
 
               {/* Left Side: Actions */}
               <div className="flex items-center gap-1.5 xs:gap-2 md:gap-4 flex-shrink-0">
@@ -198,20 +314,16 @@ function HeaderContent() {
             </div>
 
             {/* Mobile Search */}
-            <div className="md:hidden pb-3">
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t('search_placeholder')}
-                  aria-label={language === 'ar' ? "ابحث عن المنتجات" : "Search products"}
-                  className="w-full h-10 bg-accent border-none rounded-lg px-4 pr-10 text-sm"
-                />
-                <button type="submit" aria-label="Search" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors cursor-pointer">
-                  <Search size={16} />
-                </button>
-              </form>
+            <div className="md:hidden pb-3 relative z-[60]">
+              <SearchAutocomplete
+                isMobile={true}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                handleSearch={handleSearch}
+                t={t}
+                language={language}
+                router={router}
+              />
             </div>
           </div>
         </div>

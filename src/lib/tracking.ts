@@ -126,7 +126,7 @@ const sendEventToBackend = async (eventName: string, metadata?: any, eventId?: s
 /**
  * Sends a PageView event to all configured pixels
  */
-export const trackPageView = (url: string) => {
+export const trackPageView = (url: string, skipFbq: boolean = false) => {
   if (typeof window === 'undefined') return;
 
   const eventId = generateEventId();
@@ -135,8 +135,10 @@ export const trackPageView = (url: string) => {
   sendEventToBackend('PageView', { path: url }, eventId);
 
   // Meta (Facebook)
-  safeFbq('track', 'PageView', {}, { eventID: eventId });
-  logDebug('Meta', 'PageView', { url, eventId });
+  if (!skipFbq) {
+    safeFbq('track', 'PageView', {}, { eventID: eventId });
+    logDebug('Meta', 'PageView', { url, eventId });
+  }
 
   // Google Analytics
   const gaId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, Suspense } from 'react'
+import React, { useEffect, Suspense, useRef } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import Script from 'next/script'
 import { trackPageView, trackSearch } from '@/lib/tracking'
@@ -9,13 +9,13 @@ function TrackingPixelsContent() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const facebookId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || "2785073648526058"
   const googleId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID
   const tiktokId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID
   const snapchatId = process.env.NEXT_PUBLIC_SNAPCHAT_PIXEL_ID
   // By default, marketing pixels are active so Meta Advantage+ and Catalog events run reliably.
   // Pixels are only suppressed if the user explicitly opted out with 'essential' only.
   const [isOptedOut, setIsOptedOut] = React.useState(false)
+  const isFirstRender = useRef(true)
 
   useEffect(() => {
     const checkConsent = () => {
@@ -35,50 +35,29 @@ function TrackingPixelsContent() {
   // Track page view and search on route/path changes
   useEffect(() => {
     if (!pathname || pathname.startsWith('/admin') || isOptedOut) return
-    const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '')
-    trackPageView(url)
 
     const searchQuery = searchParams?.get('search') || searchParams?.get('q')
     if (searchQuery && searchQuery.trim()) {
       trackSearch(searchQuery.trim())
     }
+
+    // On initial page load, Meta PageView has already fired from the <head> script.
+    // Skip duplicate Meta PageView on first mount, but still log to backend and other analytics.
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '')
+      trackPageView(url, true)
+      return
+    }
+
+    const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '')
+    trackPageView(url, false)
   }, [pathname, searchParams, isOptedOut])
 
   if (isOptedOut || pathname?.startsWith('/admin')) return null
 
   return (
     <>
-      {/* ─── Facebook / Instagram Pixel ─── */}
-      {facebookId && (
-        <>
-          <Script
-            id="facebook-pixel"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                !function(f,b,e,v,n,t,s)
-                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                n.queue=[];t=b.createElement(e);t.async=!0;
-                t.src=v;s=b.getElementsByTagName(e)[0];
-                s.parentNode.insertBefore(t,s)}(window, document,'script',
-                'https://connect.facebook.net/en_US/fbevents.js');
-                fbq('init', '${facebookId}');
-              `,
-            }}
-          />
-          <noscript>
-            <img
-              height="1"
-              width="1"
-              style={{ display: 'none' }}
-              src={`https://www.facebook.com/tr?id=${facebookId}&ev=PageView&noscript=1`}
-              alt="Facebook Tracking Pixel Fallback"
-            />
-          </noscript>
-        </>
-      )}
 
       {/* ─── Google Analytics (GA4) ─── */}
       {googleId && (

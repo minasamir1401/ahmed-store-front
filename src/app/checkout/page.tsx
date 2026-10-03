@@ -225,18 +225,8 @@ export default function CheckoutPage() {
         localStorage.setItem('vitamins_hub_orders', JSON.stringify(updatedOrders))
         
         // Track Purchase event on Facebook, Google, TikTok, Snapchat
-        trackPurchase({
-          id: orderData.id || '',
-          orderNumber: orderData.orderNumber || 'ORD-XXXX',
-          total: total,
-          shippingFee: shippingFee + codFee,
-          items: cart.map(item => ({
-            productId: String(item.id),
-            title: translate(item.title),
-            price: item.price,
-            quantity: item.quantity
-          }))
-        });
+        // The server validates product IDs, quantities and prices before saving.
+        trackPurchase(orderData);
 
         setPlacedOrder(orderData)
         setStep(3)

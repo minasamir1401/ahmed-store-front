@@ -51,7 +51,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' data: https://fonts.gstatic.com",
               "img-src 'self' data: blob: https: http:",
-              "connect-src 'self' https://the-vitahub.com https://api.the-vitahub.com http://localhost:5000 https://www.google-analytics.com https://analytics.google.com https://connect.facebook.net https://analytics.tiktok.com https://tr.snapchat.com https://accounts.google.com",
+              "connect-src 'self' https://the-vitahub.com https://api.the-vitahub.com http://localhost:5000 https://www.google-analytics.com https://analytics.google.com https://connect.facebook.net https://www.facebook.com https://analytics.tiktok.com https://tr.snapchat.com https://accounts.google.com",
               "frame-src 'self' https://accounts.google.com https://www.facebook.com",
               "upgrade-insecure-requests",
             ].join('; ')

@@ -81,6 +81,11 @@ export const safeFbq = (action: string, eventName: string, params?: any, options
   };
 
   if (typeof w.fbq === 'function') {
+    // Recover older events even if the fallback polling period already expired.
+    while (w._fbqQueue && w._fbqQueue.length > 0) {
+      const item = w._fbqQueue.shift();
+      if (item) dispatch(item[0], item[1], item[2], item[3]);
+    }
     dispatch(action, eventName, params, options);
   } else {
     w._fbqQueue = w._fbqQueue || [];
@@ -146,7 +151,7 @@ export const trackPageView = (url: string, skipFbq: boolean = false) => {
 
   const eventId = generateEventId();
 
-  // Send to backend database and CAPI
+  // Store internal analytics; this endpoint does not forward events to Meta CAPI.
   sendEventToBackend('PageView', { path: url }, eventId);
 
   // Meta (Facebook)
@@ -183,7 +188,7 @@ export const trackViewContent = (product: TrackedProduct) => {
 
   const eventId = generateEventId();
 
-  // Send to backend database and CAPI
+  // Store internal analytics; Meta delivery happens through fbq below.
   sendEventToBackend('ViewContent', product, eventId);
 
   const value = Number(product.price) || 0;
@@ -256,7 +261,7 @@ export const trackSearch = (searchQuery: string) => {
   const query = searchQuery.trim();
   const eventId = generateEventId();
 
-  // Send to backend database and CAPI
+  // Store internal analytics; Meta delivery happens through fbq below.
   sendEventToBackend('Search', { search_string: query }, eventId);
 
   // Meta (Facebook)
@@ -298,7 +303,7 @@ export const trackAddToCart = (product: TrackedProduct) => {
 
   const eventId = generateEventId();
 
-  // Send to backend database and CAPI
+  // Store internal analytics; Meta delivery happens through fbq below.
   sendEventToBackend('AddToCart', product, eventId);
 
   const value = Number(product.price) || 0;
@@ -372,7 +377,7 @@ export const trackAddToWishlist = (product: TrackedProduct) => {
 
   const eventId = generateEventId();
 
-  // Send to backend database and CAPI
+  // Store internal analytics; Meta delivery happens through fbq below.
   sendEventToBackend('AddToWishlist', product, eventId);
 
   const value = Number(product.price) || 0;
@@ -444,7 +449,7 @@ export const trackInitiateCheckout = (cart: TrackedProduct[], total: number) => 
 
   const eventId = generateEventId();
 
-  // Send to backend database and CAPI
+  // Store internal analytics; Meta delivery happens through fbq below.
   sendEventToBackend('InitiateCheckout', { cart, total }, eventId);
 
   const value = Number(total) || 0;
@@ -515,7 +520,7 @@ export const trackInitiateCheckout = (cart: TrackedProduct[], total: number) => 
 export const trackPurchase = (order: TrackedOrder) => {
   if (typeof window === 'undefined' || !order) return;
 
-  // Use orderNumber or order id as eventId for exact deduplication against server-side CAPI event
+  // Use the saved order identifier as a stable event ID (also usable by a future CAPI integration).
   const eventId = order.orderNumber || order.id || ('ORD_' + Date.now());
 
   // Send to backend database for analytics

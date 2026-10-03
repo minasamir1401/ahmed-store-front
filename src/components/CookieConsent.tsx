@@ -41,20 +41,20 @@ export default function CookieConsent() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 40 }}
           transition={{ duration: 0.35, ease: 'easeOut' }}
-          className="fixed bottom-4 inset-x-4 sm:bottom-6 sm:inset-x-auto sm:right-6 sm:max-w-md z-50 pointer-events-auto"
+          className="fixed bottom-[76px] inset-x-3 sm:bottom-8 sm:inset-x-auto sm:right-6 sm:max-w-sm z-[95] pointer-events-auto"
           dir={dir}
         >
-          <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-emerald-100 p-5 shadow-2xl shadow-slate-900/10 text-slate-800 space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-100">
-                <Cookie size={20} />
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-emerald-100 p-3.5 sm:p-4 shadow-xl shadow-slate-900/10 text-slate-800 space-y-2.5">
+            <div className="flex items-start gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-100 mt-0.5">
+                <Cookie size={16} />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-0.5 min-w-0 flex-1">
                 <h3 className="text-xs font-black text-slate-900 flex items-center gap-1.5">
-                  <ShieldCheck size={14} className="text-emerald-600" />
-                  {language === 'ar' ? 'إدارة الخصوصية وملفات الارتباط' : 'Privacy & Cookie Preferences'}
+                  <ShieldCheck size={13} className="text-emerald-600 shrink-0" />
+                  <span>{language === 'ar' ? 'إدارة الخصوصية وملفات الارتباط' : 'Privacy & Cookie Preferences'}</span>
                 </h3>
-                <p className="text-[11px] font-semibold text-slate-600 leading-relaxed">
+                <p className="text-[10.5px] font-medium text-slate-600 leading-relaxed">
                   {language === 'ar'
                     ? 'نستخدم ملفات تعريف الارتباط المعتمدة لتأمين طلباتك وتقديم تجربة تسوق موثوقة تلائم احتياجاتك.'
                     : 'We use verified cookies to secure your shopping cart and provide an optimal, personalized browsing experience.'}
@@ -62,18 +62,18 @@ export default function CookieConsent() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center gap-2 pt-0.5">
               <button
                 type="button"
                 onClick={() => handleConsent('accepted')}
-                className="flex-1 py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition-colors text-center cursor-pointer shadow-sm shadow-emerald-700/20"
+                className="flex-1 py-1.5 sm:py-2 px-3 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg transition-colors text-center cursor-pointer shadow-sm shadow-emerald-700/20"
               >
                 {language === 'ar' ? 'موافق على الكل' : 'Accept All'}
               </button>
               <button
                 type="button"
                 onClick={() => handleConsent('essential')}
-                className="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors text-center cursor-pointer"
+                className="py-1.5 sm:py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors text-center cursor-pointer"
               >
                 {language === 'ar' ? 'الضرورية فقط' : 'Essential Only'}
               </button>

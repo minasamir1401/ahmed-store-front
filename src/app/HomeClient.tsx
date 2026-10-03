@@ -214,7 +214,7 @@ export default function HomeClient({
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                className="lg:col-span-2 rounded-2xl sm:rounded-[2.5rem] overflow-hidden relative shadow-md hover-shine border border-slate-100 glow-primary-hover min-h-[200px] xs:min-h-[260px] sm:min-h-[340px] lg:min-h-[440px]"
+                className="lg:col-span-2 rounded-2xl sm:rounded-[2.5rem] overflow-hidden relative shadow-md hover-shine border border-slate-100 glow-primary-hover aspect-[2/1] sm:aspect-[2/1] lg:aspect-auto lg:h-[440px]"
                 style={{ background: '#e8f5f0' }}
               >
                 {!hero ? (
@@ -236,65 +236,99 @@ export default function HomeClient({
                          transition={{ duration: 0.6 }}
                          className="absolute inset-0 flex items-center w-full h-full"
                       >
-                        <div className={`absolute top-1/2 -translate-y-1/2 z-10 max-w-[160px] xs:max-w-xs sm:max-w-md md:max-w-lg ${
-                          language === 'ar' 
-                            ? 'right-4 xs:right-8 md:right-16 text-right' 
-                            : 'left-4 xs:left-8 md:left-16 text-left'
-                        }`}>
-                          <motion.h1 
-                            initial={{ opacity: 0, x: dir === 'rtl' ? 40 : -40 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.2, duration: 0.5 }}
-                            className="text-lg xs:text-2xl sm:text-3xl md:text-5xl font-black text-slate-800 mb-1.5 sm:mb-3 leading-tight"
-                          >
-                            {translate(slides[currentSlide].title)}
-                          </motion.h1>
-                          <motion.p 
-                            initial={{ opacity: 0, x: dir === 'rtl' ? 30 : -30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.3, duration: 0.5 }}
-                            className="text-[9px] xs:text-xs md:text-sm font-bold text-slate-600 mb-4 sm:mb-8 leading-relaxed"
-                          >
-                            {translate(slides[currentSlide].subtitle)}
-                          </motion.p>
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.4, duration: 0.3 }}
-                          >
-                            <Link href={slides[currentSlide].buttonLink || '/products'} className="inline-block px-5 py-2.5 sm:px-10 sm:py-4 text-white rounded-2xl text-[9px] xs:text-xs font-black bg-primary hover:bg-[#235f47] transition-all hover:scale-105 shadow-lg shadow-emerald-700/10 cursor-pointer glow-primary">
-                              {translate(slides[currentSlide].buttonText) || (language === 'ar' ? 'تسوق الآن' : 'Shop Now')}
-                            </Link>
-                          </motion.div>
-                        </div>
-                        
-                        <div className="absolute inset-0 w-full h-full">
-                          <Image 
-                            src={translate(slides[currentSlide].image) || 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=700&q=80'} 
-                            fill
-                            priority
-                            className="object-cover" 
-                            sizes="(max-width: 1024px) 100vw, 66vw"
-                            alt={`${translate(slides[currentSlide]?.title || 'The VitaHub')} - The VitaHub`}
-                          />
-                        </div>
-                        <div className={`absolute inset-0 z-[1] ${
-                          language === 'ar'
-                            ? 'bg-gradient-to-l from-[#e8f5f0]/95 via-[#e8f5f0]/50 to-transparent'
-                            : 'bg-gradient-to-r from-[#e8f5f0]/95 via-[#e8f5f0]/50 to-transparent'
-                        }`} />
+                        {(() => {
+                          const slide = slides[currentSlide];
+                          const hasContent = Boolean(
+                            translate(slide?.title)?.trim() || 
+                            translate(slide?.subtitle)?.trim()
+                          );
+                          const slideLink = slide?.buttonLink || '/products';
+                          const slideImage = translate(slide?.image) || 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=700&q=80';
+                          const slideAlt = translate(slide?.title) ? `${translate(slide.title)} - The VitaHub` : 'The VitaHub';
+
+                          return (
+                            <>
+                              {hasContent ? (
+                                <>
+                                  <div className={`absolute top-1/2 -translate-y-1/2 z-10 max-w-[160px] xs:max-w-xs sm:max-w-md md:max-w-lg ${
+                                    language === 'ar' 
+                                      ? 'right-4 xs:right-8 md:right-16 text-right' 
+                                      : 'left-4 xs:left-8 md:left-16 text-left'
+                                  }`}>
+                                    <motion.h1 
+                                      initial={{ opacity: 0, x: dir === 'rtl' ? 40 : -40 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: 0.2, duration: 0.5 }}
+                                      className="text-lg xs:text-2xl sm:text-3xl md:text-5xl font-black text-slate-800 mb-1.5 sm:mb-3 leading-tight"
+                                    >
+                                      {translate(slide.title)}
+                                    </motion.h1>
+                                    <motion.p 
+                                      initial={{ opacity: 0, x: dir === 'rtl' ? 30 : -30 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: 0.3, duration: 0.5 }}
+                                      className="text-[9px] xs:text-xs md:text-sm font-bold text-slate-600 mb-4 sm:mb-8 leading-relaxed"
+                                    >
+                                      {translate(slide.subtitle)}
+                                    </motion.p>
+                                    <motion.div
+                                      initial={{ opacity: 0, scale: 0.9 }}
+                                      animate={{ opacity: 1, scale: 1 }}
+                                      transition={{ delay: 0.4, duration: 0.3 }}
+                                    >
+                                      <Link href={slideLink} className="inline-block px-5 py-2.5 sm:px-10 sm:py-4 text-white rounded-2xl text-[9px] xs:text-xs font-black bg-primary hover:bg-[#235f47] transition-all hover:scale-105 shadow-lg shadow-emerald-700/10 cursor-pointer glow-primary">
+                                        {translate(slide.buttonText) || (language === 'ar' ? 'تسوق الآن' : 'Shop Now')}
+                                      </Link>
+                                    </motion.div>
+                                  </div>
+
+                                  <div className="absolute inset-0 w-full h-full">
+                                    <Image 
+                                      src={slideImage} 
+                                      fill
+                                      priority
+                                      className="object-cover" 
+                                      sizes="(max-width: 1024px) 100vw, 66vw"
+                                      alt={slideAlt}
+                                    />
+                                  </div>
+                                  <div className={`absolute inset-0 z-[1] ${
+                                    language === 'ar'
+                                      ? 'bg-gradient-to-l from-[#e8f5f0]/95 via-[#e8f5f0]/50 to-transparent'
+                                      : 'bg-gradient-to-r from-[#e8f5f0]/95 via-[#e8f5f0]/50 to-transparent'
+                                  }`} />
+                                </>
+                              ) : (
+                                <Link href={slideLink} className="absolute inset-0 w-full h-full block group cursor-pointer" aria-label={slideAlt}>
+                                  <Image 
+                                    src={slideImage} 
+                                    fill
+                                    priority
+                                    className="object-cover group-hover:scale-[1.01] transition-transform duration-500" 
+                                    sizes="(max-width: 1024px) 100vw, 66vw"
+                                    alt={slideAlt}
+                                  />
+                                </Link>
+                              )}
+                            </>
+                          );
+                        })()}
                       </motion.div>
                     </AnimatePresence>
 
                     {/* Navigation Dots */}
                     {slides.length > 1 && (
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+                      <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
                         {slides.map((_, i) => (
                           <button
                             key={i}
-                            onClick={() => setCurrentSlide(i)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setCurrentSlide(i);
+                            }}
                             className={`h-2 rounded-full transition-all duration-350 cursor-pointer ${
-                              currentSlide === i ? 'bg-primary w-6' : 'bg-slate-300 w-2 hover:bg-slate-400'
+                              currentSlide === i ? 'bg-primary w-6' : 'bg-slate-300/80 backdrop-blur-sm w-2 hover:bg-slate-400'
                             }`}
                             aria-label={`${language === 'ar' ? 'الانتقال للشريحة' : 'Go to slide'} ${i + 1}: ${translate(slides[i]?.title || '')}`}
                           />
@@ -303,69 +337,96 @@ export default function HomeClient({
                     )}
                   </div>
                 ) : (
-                  <div className="absolute inset-0 flex items-center">
-                    <div className={`absolute top-1/2 -translate-y-1/2 z-10 max-w-[160px] xs:max-w-xs sm:max-w-md md:max-w-lg ${
-                      language === 'ar' 
-                        ? 'right-4 xs:right-8 md:right-16 text-right' 
-                        : 'left-4 xs:left-8 md:left-16 text-left'
-                    }`}>
-                      <motion.h1 
-                        initial={{ opacity: 0, x: dir === 'rtl' ? 40 : -40 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3, duration: 0.6 }}
-                        className="text-lg xs:text-2xl sm:text-3xl md:text-5xl font-black text-slate-800 mb-1.5 sm:mb-3 leading-tight"
-                      >
-                        {translate(hero.title)}
-                      </motion.h1>
-                      <motion.p 
-                        initial={{ opacity: 0, x: dir === 'rtl' ? 30 : -30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.5, duration: 0.6 }}
-                        className="text-[9px] xs:text-xs md:text-sm font-bold text-slate-600 mb-4 sm:mb-8 leading-relaxed"
-                      >
-                        {translate(hero.subtitle)}
-                      </motion.p>
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.6, duration: 0.4 }}
-                      >
-                        <Link href={hero.buttonLink} className="inline-block px-5 py-2.5 sm:px-10 sm:py-4 text-white rounded-2xl text-[9px] xs:text-xs font-black bg-primary hover:bg-[#235f47] transition-all hover:scale-105 shadow-lg shadow-emerald-700/10 cursor-pointer glow-primary">
-                          {translate(hero.buttonText)}
+                  (() => {
+                    const hasHeroContent = Boolean(
+                      translate(hero.title)?.trim() || 
+                      translate(hero.subtitle)?.trim()
+                    );
+                    const heroLink = hero.buttonLink || '/products';
+                    const heroImg = translate(hero.image) || 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=700&q=80';
+                    const heroAlt = translate(hero.title) ? `${translate(hero.title)} - The VitaHub` : 'The VitaHub';
+
+                    if (!hasHeroContent) {
+                      return (
+                        <Link href={heroLink} className="absolute inset-0 w-full h-full block group cursor-pointer" aria-label={heroAlt}>
+                          <Image 
+                            src={heroImg} 
+                            fill
+                            priority
+                            className="object-cover group-hover:scale-[1.01] transition-transform duration-500" 
+                            sizes="(max-width: 1024px) 100vw, 66vw"
+                            alt={heroAlt}
+                          />
                         </Link>
-                      </motion.div>
-                    </div>
-                    
-                    <div className="absolute inset-0 w-full h-full">
-                      <MotionImage 
-                        initial={{ scale: 1.1, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 1 }}
-                        src={translate(hero.image)} 
-                        fill
-                        priority
-                        className="object-cover" 
-                        sizes="(max-width: 1024px) 100vw, 66vw"
-                        alt={`${translate(hero.title)} - The VitaHub`}
-                      />
-                    </div>
-                    <div className={`absolute inset-0 z-[1] ${
-                      language === 'ar'
-                        ? 'bg-gradient-to-l from-[#e8f5f0]/95 via-[#e8f5f0]/50 to-transparent'
-                        : 'bg-gradient-to-r from-[#e8f5f0]/95 via-[#e8f5f0]/50 to-transparent'
-                    }`} />
-                  </div>
+                      );
+                    }
+
+                    return (
+                      <div className="absolute inset-0 flex items-center">
+                        <div className={`absolute top-1/2 -translate-y-1/2 z-10 max-w-[160px] xs:max-w-xs sm:max-w-md md:max-w-lg ${
+                          language === 'ar' 
+                            ? 'right-4 xs:right-8 md:right-16 text-right' 
+                            : 'left-4 xs:left-8 md:left-16 text-left'
+                        }`}>
+                          <motion.h1 
+                            initial={{ opacity: 0, x: dir === 'rtl' ? 40 : -40 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3, duration: 0.6 }}
+                            className="text-lg xs:text-2xl sm:text-3xl md:text-5xl font-black text-slate-800 mb-1.5 sm:mb-3 leading-tight"
+                          >
+                            {translate(hero.title)}
+                          </motion.h1>
+                          <motion.p 
+                            initial={{ opacity: 0, x: dir === 'rtl' ? 30 : -30 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.5, duration: 0.6 }}
+                            className="text-[9px] xs:text-xs md:text-sm font-bold text-slate-600 mb-4 sm:mb-8 leading-relaxed"
+                          >
+                            {translate(hero.subtitle)}
+                          </motion.p>
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.6, duration: 0.4 }}
+                          >
+                            <Link href={heroLink} className="inline-block px-5 py-2.5 sm:px-10 sm:py-4 text-white rounded-2xl text-[9px] xs:text-xs font-black bg-primary hover:bg-[#235f47] transition-all hover:scale-105 shadow-lg shadow-emerald-700/10 cursor-pointer glow-primary">
+                              {translate(hero.buttonText) || (language === 'ar' ? 'تسوق الآن' : 'Shop Now')}
+                            </Link>
+                          </motion.div>
+                        </div>
+                        
+                        <div className="absolute inset-0 w-full h-full">
+                          <MotionImage 
+                            initial={{ scale: 1.1, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 1 }}
+                            src={heroImg} 
+                            fill
+                            priority
+                            className="object-cover" 
+                            sizes="(max-width: 1024px) 100vw, 66vw"
+                            alt={heroAlt}
+                          />
+                        </div>
+                        <div className={`absolute inset-0 z-[1] ${
+                          language === 'ar'
+                            ? 'bg-gradient-to-l from-[#e8f5f0]/95 via-[#e8f5f0]/50 to-transparent'
+                            : 'bg-gradient-to-r from-[#e8f5f0]/95 via-[#e8f5f0]/50 to-transparent'
+                        }`} />
+                      </div>
+                    );
+                  })()
                 )}
               </motion.div>
 
-              <div className="grid grid-cols-2 lg:flex lg:flex-col gap-4 sm:gap-6 min-h-[110px] xs:min-h-[140px] sm:min-h-[180px] lg:min-h-0">
+              <div className="grid grid-cols-2 lg:flex lg:flex-col gap-3 sm:gap-4 lg:gap-6 lg:h-[440px]">
                 <motion.div
                   initial={{ opacity: 0, x: dir === 'rtl' ? -30 : 30 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
-                  className="flex-1"
+                  className="w-full aspect-[2/1] lg:aspect-auto lg:flex-1"
                 >
-                  <Link href={hero?.side1Link || '/categories'} className="h-full w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#f0f7f4] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
+                  <Link href={hero?.side1Link || '/categories'} className="h-full w-full rounded-2xl sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#f0f7f4] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
                     {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
                         <Image 
@@ -397,9 +458,9 @@ export default function HomeClient({
                   initial={{ opacity: 0, x: dir === 'rtl' ? -30 : 30 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.8, delay: 0.3 }}
-                  className="flex-1"
+                  className="w-full aspect-[2/1] lg:aspect-auto lg:flex-1"
                 >
-                  <Link href={hero?.side2Link || '/offers'} className="h-full w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#faf5f0] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
+                  <Link href={hero?.side2Link || '/offers'} className="h-full w-full rounded-2xl sm:rounded-[2rem] overflow-hidden relative flex items-center bg-[#faf5f0] border border-slate-100/50 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all group block">
                     {!hero ? <div className="absolute inset-0 bg-slate-100 animate-pulse" /> : (
                       <>
                         <Image 
@@ -494,7 +555,7 @@ export default function HomeClient({
                         key={cat.id || idx}
                         whileHover={{ y: -4, scale: 1.03 }}
                         transition={{ duration: 0.2 }}
-                        className="w-[130px] xs:w-[145px] sm:w-[165px] md:w-[180px] shrink-0 snap-start relative rounded-2xl overflow-hidden aspect-[4/3] group shadow-sm hover:shadow-xl hover:shadow-emerald-950/15 border border-slate-100 transition-all cursor-pointer bg-slate-900 select-none"
+                        className="w-[135px] xs:w-[150px] sm:w-[170px] md:w-[185px] shrink-0 snap-start relative rounded-2xl overflow-hidden aspect-square group shadow-sm hover:shadow-xl hover:shadow-emerald-950/15 border border-slate-100 transition-all cursor-pointer bg-slate-900 select-none"
                       >
                         <Link href={href} className="relative flex flex-col items-center justify-end w-full h-full p-2.5 sm:p-3 group overflow-hidden">
                           <div className="absolute inset-0 w-full h-full">
@@ -505,7 +566,7 @@ export default function HomeClient({
                               sizes="(max-width: 640px) 140px, 180px"
                               alt={title}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent opacity-85 group-hover:opacity-95 transition-opacity duration-300" />
+                            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/35 to-transparent opacity-85 group-hover:opacity-95 transition-opacity duration-300" />
                           </div>
 
                           <div className="text-center relative z-10 mt-auto flex flex-col items-center w-full px-1">
@@ -568,7 +629,7 @@ export default function HomeClient({
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 * idx, duration: 0.5 }}
                         whileHover={{ y: -6, scale: 1.02 }}
-                        className="relative rounded-3xl overflow-hidden aspect-[4/3] group shadow-sm hover:shadow-md border border-slate-100 transition-all cursor-pointer bg-slate-50"
+                        className="relative rounded-3xl overflow-hidden aspect-square group shadow-sm hover:shadow-md border border-slate-100 transition-all cursor-pointer bg-slate-50"
                       >
                         <Link href={href} className="relative flex flex-col items-center justify-end w-full h-full p-4 gap-2 sm:gap-3 group overflow-hidden">
                           <div className="absolute inset-0 w-full h-full">
@@ -579,7 +640,7 @@ export default function HomeClient({
                               sizes="(max-width: 768px) 50vw, 25vw"
                               alt={title}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+                            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
                           </div>
 
                           <div className="text-center relative z-10 mt-auto flex flex-col items-center">

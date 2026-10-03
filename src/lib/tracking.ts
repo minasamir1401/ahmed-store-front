@@ -67,8 +67,21 @@ const getFbc = (): string | null => {
 export const safeFbq = (action: string, eventName: string, params?: any, options?: any) => {
   if (typeof window === 'undefined') return;
   const w = window as any;
+
+  const dispatch = (act: string, ev: string, p?: any, opt?: any) => {
+    if (typeof w.fbq === 'function') {
+      if (opt !== undefined && opt !== null) {
+        w.fbq(act, ev, p, opt);
+      } else if (p !== undefined && p !== null) {
+        w.fbq(act, ev, p);
+      } else {
+        w.fbq(act, ev);
+      }
+    }
+  };
+
   if (typeof w.fbq === 'function') {
-    w.fbq(action, eventName, params, options);
+    dispatch(action, eventName, params, options);
   } else {
     w._fbqQueue = w._fbqQueue || [];
     w._fbqQueue.push([action, eventName, params, options]);
@@ -77,7 +90,9 @@ export const safeFbq = (action: string, eventName: string, params?: any, options
         clearInterval(interval);
         while (w._fbqQueue && w._fbqQueue.length > 0) {
           const item = w._fbqQueue.shift();
-          w.fbq(...item);
+          if (item) {
+            dispatch(item[0], item[1], item[2], item[3]);
+          }
         }
       }
     }, 200);
@@ -245,12 +260,10 @@ export const trackSearch = (searchQuery: string) => {
   sendEventToBackend('Search', { search_string: query }, eventId);
 
   // Meta (Facebook)
-  if (typeof (window as any).fbq === 'function') {
-    (window as any).fbq('track', 'Search', {
-      search_string: query,
-    }, { eventID: eventId });
-    logDebug('Meta', 'Search', { search_string: query, eventId });
-  }
+  safeFbq('track', 'Search', {
+    search_string: query,
+  }, { eventID: eventId });
+  logDebug('Meta', 'Search', { search_string: query, eventId });
 
   // Google Analytics
   if (typeof (window as any).gtag === 'function') {
@@ -366,16 +379,20 @@ export const trackAddToWishlist = (product: TrackedProduct) => {
   const currency = 'EGP';
 
   // Meta (Facebook)
-  if (typeof (window as any).fbq === 'function') {
-    (window as any).fbq('track', 'AddToWishlist', {
-      content_name: product.title,
-      content_ids: [product.id],
-      content_type: 'product',
-      value,
-      currency,
-    }, { eventID: eventId });
-    logDebug('Meta', 'AddToWishlist', { id: product.id, title: product.title, value, eventId });
-  }
+  const productId = String(product.id);
+  safeFbq('track', 'AddToWishlist', {
+    content_name: product.title,
+    content_ids: [productId],
+    content_type: 'product',
+    contents: [{
+      id: productId,
+      quantity: 1,
+      item_price: value,
+    }],
+    value,
+    currency,
+  }, { eventID: eventId });
+  logDebug('Meta', 'AddToWishlist', { id: productId, title: product.title, value, eventId });
 
   // Google Analytics
   if (typeof (window as any).gtag === 'function') {

@@ -208,17 +208,22 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
     }
   }, [product])
 
+  const trackedProductIdRef = useRef<string | null>(null)
+
   useEffect(() => {
-    if (product) {
+    if (product && product.id) {
       const displayTitle = getLocalizedValue(language, product.title, product.titleEn, translate);
       document.title = `${displayTitle} | The VitaHub`;
       
-      trackViewContent({
-        id: product.id,
-        title: displayTitle,
-        price: product.price,
-        image: product.image
-      });
+      if (trackedProductIdRef.current !== product.id) {
+        trackedProductIdRef.current = product.id;
+        trackViewContent({
+          id: product.id,
+          title: displayTitle,
+          price: product.price,
+          image: product.image
+        });
+      }
     }
   }, [product, language])
 

@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:meta": "node --test tests/meta-tracking.test.mjs"
+    "test:meta": "node --test tests/meta-tracking.test.mjs",
+    "test:admin": "node --test tests/admin-navigation.test.mjs",
+    "test:backup": "node --test tests/backup-download.test.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

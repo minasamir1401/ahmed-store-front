@@ -269,20 +269,20 @@ export default function AdminSettingsTab(props: any) {
                       <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100/50 space-y-3 text-right">
                         <span className="text-[11px] font-black text-slate-700 block">خطوة 1: تحميل نسخة احتياطية</span>
                         <p className="text-[9px] text-slate-400 leading-relaxed font-semibold">
-                          اختر نوع النسخة الاحتياطية المناسب لك. يمكنك تنزيل نسخة البيانات فقط بشكل فوري، أو تنزيل نسخة شاملة تحتوي على قاعدة البيانات وملفات الصور المرفوعة.
+                          اختر نسخة البيانات لحفظ جميع تفاصيل المتجر، أو النسخة الكاملة لإضافة ملفات الصور المرفوعة. كلا النوعين يُحمّل كملف ZIP يمكن استخدامه للاستعادة.
                         </p>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                           <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 space-y-3 flex flex-col justify-between shadow-2xs">
                             <div>
                               <div className="flex items-center justify-between">
-                                <span className="text-[9px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-md">فورية</span>
+                                <span className="text-[9px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-md">بدون ملفات الصور</span>
                                 <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
                                   <Zap size={14} className="text-emerald-600" /> نسخة البيانات فقط
                                 </span>
                               </div>
                               <p className="text-[9px] text-slate-500 mt-2 leading-relaxed font-medium">
-                                تشمل 100% من جداول قاعدة البيانات (المنتجات، الطلبات، الأقسام، البراندات، المقالات، الإعدادات). حجم الملف خفيف جدا والتحميل فوري في أقل من ثانية.
+                                تشمل جميع حقول المنتجات: الأسماء، الأوصاف، الأسعار، الترجمات، المكونات، الاستخدام وSEO، مع روابط الصور وباقي بيانات المتجر والطلبات والإعدادات والسجلات.
                               </p>
                             </div>
                             <button
@@ -304,7 +304,7 @@ export default function AdminSettingsTab(props: any) {
                                 </span>
                               </div>
                               <p className="text-[9px] text-slate-500 mt-2 leading-relaxed font-medium">
-                                تشمل قاعدة البيانات بالكامل بالإضافة إلى جميع الصور والملفات المرفوعة على السيرفر، مجمعة في ملف ZIP واحد للحفظ الشامل.
+                                تشمل نفس البيانات والتفاصيل الكاملة، بالإضافة إلى جميع الصور والملفات المرفوعة على السيرفر، مجمعة في ملف ZIP واحد. الصور المرتبطة بمواقع خارجية تُحفظ كروابط.
                               </p>
                             </div>
                             <button
@@ -317,11 +317,14 @@ export default function AdminSettingsTab(props: any) {
                             </button>
                           </div>
                         </div>
+                        <p className="text-[10px] text-slate-600 leading-relaxed font-semibold">
+                          لعرض التفاصيل بعد فك الضغط، افتح database.json لجميع البيانات أو tables/product.json للمنتجات. مجلد tables يحتوي على ملف لكل جدول. ملف manifest.json يعرض أعداد السجلات فقط.
+                        </p>
                       </div>
 
                       <div className="p-4 bg-red-50/40 rounded-2xl border border-red-100/30 space-y-2 text-right">
                         <span className="text-[11px] font-black text-red-600 block">خطوة 2: استعادة نسخة احتياطية</span>
-                        <p className="text-[9px] text-slate-400 leading-relaxed font-semibold">تنبيه: سيؤدي رفع ملف النسخة الاحتياطية إلى مسح كافة المنتجات، الطلبات، الأقسام والصور الحالية نهائياً واستبدالها بالبيانات الموجودة في الملف.</p>
+                        <p className="text-[9px] text-slate-400 leading-relaxed font-semibold">تنبيه: الاستعادة تستبدل بيانات المتجر الحالية ببيانات النسخة، وتستعيد ملفات الصور الموجودة داخلها. احتفظ بنسخة حديثة من بياناتك قبل الاستعادة.</p>
                         <div className="relative mt-2">
                           <input 
                             type="file" 

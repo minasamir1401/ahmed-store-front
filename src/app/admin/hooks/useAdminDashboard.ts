@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useModal } from '@/context/ModalContext'
 import {
   ADMIN_TABS,
@@ -8,10 +9,13 @@ import {
   parseAIJSON
 } from '../admin-dashboard-utils'
 import { parseImageList, serializeImageList } from '@/lib/product-images'
+import { readBackupFile } from '@/lib/backup-download'
 
 type AIProvider = 'openrouter' | 'apifree'
 
 export function useAdminDashboard() {
+  const searchParams = useSearchParams()
+  const adminSearch = searchParams.toString()
   const { showAlert, showConfirm } = useModal()
   const AI_MAX_TOKENS = {
     productFill: 4000,
@@ -22,15 +26,10 @@ export function useAdminDashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [activeTab, setActiveTab] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const p = new URLSearchParams(window.location.search).get('tab')
-      if (p && ADMIN_TABS.some(t => t.id === p)) return p
-    }
-    return 'products'
-  })
+  const [activeTab, setActiveTab] = useState('products')
   const hasOpenedModalInSessionRef = useRef(false)
-  const initialUrlProcessedRef = useRef(false)
+  const processedSearchRef = useRef<string | null>(null)
+  const itemRequestRef = useRef(0)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [data, setData] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>(DEFAULT_CATEGORIES)
@@ -535,6 +534,8 @@ export function useAdminDashboard() {
       params.set('new', '1')
     }
     const searchStr = params.toString() ? `?${params.toString()}` : ''
+    // Local actions already updated the form. Do not reload it when Next observes the URL.
+    processedSearchRef.current = params.toString()
     const targetUrl = `${window.location.pathname}${searchStr}`
     const currentUrl = `${window.location.pathname}${window.location.search}`
     if (targetUrl !== currentUrl) {
@@ -558,7 +559,7 @@ export function useAdminDashboard() {
       })
       setBrandSearch(item.brand?.name || '')
       try {
-        let sf = item.supplementFacts ? (typeof item.supplementFacts === 'string' ? JSON.parse(item.supplementFacts) : item.supplementFacts) : []
+        const sf = item.supplementFacts ? (typeof item.supplementFacts === 'string' ? JSON.parse(item.supplementFacts) : item.supplementFacts) : []
         if (Array.isArray(sf)) {
           setSupplementFactsList(sf)
         } else if (sf && Array.isArray(sf.rows)) {
@@ -645,8 +646,12 @@ export function useAdminDashboard() {
   }
 
   const openItemById = async (targetTab: string, id: string, skipHistory: boolean = false) => {
-    const foundInMemory = data.find(i => String(i.id) === String(id)) || productsList.find(i => String(i.id) === String(id))
+    const requestId = ++itemRequestRef.current
+    const isCurrentRequest = () => itemRequestRef.current === requestId
+    const foundInMemory = (targetTab === activeTab ? data.find(i => String(i.id) === String(id)) : null)
+      || (targetTab === 'products' ? productsList.find(i => String(i.id) === String(id)) : null)
     if (foundInMemory) {
+      setLoading(false)
       populateForm(foundInMemory, targetTab)
       setIsModalOpen(true)
       if (!skipHistory) {
@@ -661,6 +666,7 @@ export function useAdminDashboard() {
         const res = await fetch(`${BACKEND_API}/api/products/${id}?t=${Date.now()}`)
         if (res.ok) {
           const item = await res.json()
+          if (!isCurrentRequest()) return
           populateForm(item, targetTab)
           setIsModalOpen(true)
           if (!skipHistory) {
@@ -674,6 +680,7 @@ export function useAdminDashboard() {
           const res = await fetchWithAdminAuth(`${BACKEND_API}/api/${endpoint}?t=${Date.now()}`)
           if (res.ok) {
             const list = await res.json()
+            if (!isCurrentRequest()) return
             if (Array.isArray(list)) {
               const match = list.find(i => String(i.id) === String(id))
               if (match) {
@@ -688,17 +695,21 @@ export function useAdminDashboard() {
           }
         }
       }
+      if (!isCurrentRequest()) return
       addLog(`تعذر العثور على العنصر رقم ${id}`)
       syncAdminUrl(targetTab, null, false, true)
     } catch (err: any) {
+      if (!isCurrentRequest()) return
       addLog(`خطأ في جلب تفاصيل العنصر: ${err.message}`)
       syncAdminUrl(targetTab, null, false, true)
     } finally {
-      setLoading(false)
+      if (isCurrentRequest()) setLoading(false)
     }
   }
 
   const handleOpenModal = (item: any = null, skipHistory: boolean = false) => {
+    itemRequestRef.current++
+    setLoading(false)
     hasOpenedModalInSessionRef.current = !skipHistory
     populateForm(item, activeTab)
     setIsModalOpen(true)
@@ -708,6 +719,8 @@ export function useAdminDashboard() {
   }
 
   const handleCloseModal = (skipHistory: boolean | any = false) => {
+    itemRequestRef.current++
+    setLoading(false)
     const skip = typeof skipHistory === 'boolean' ? skipHistory : false
     setIsModalOpen(false)
     setEditingItem(null)
@@ -725,6 +738,7 @@ export function useAdminDashboard() {
   }
 
   const handleTabChange = (tabId: string) => {
+    itemRequestRef.current++
     hasOpenedModalInSessionRef.current = false
     setActiveTab(tabId)
     setIsModalOpen(false)
@@ -855,7 +869,7 @@ export function useAdminDashboard() {
         }))
 
         try {
-          let sf = parsed.supplementFacts ? (typeof parsed.supplementFacts === 'string' ? JSON.parse(parsed.supplementFacts) : parsed.supplementFacts) : []
+          const sf = parsed.supplementFacts ? (typeof parsed.supplementFacts === 'string' ? JSON.parse(parsed.supplementFacts) : parsed.supplementFacts) : []
           if (Array.isArray(sf)) {
             setSupplementFactsList(sf)
           } else if (sf && Array.isArray(sf.rows)) {
@@ -1292,31 +1306,29 @@ export function useAdminDashboard() {
     setBackupLoading(true)
     setBackupTypeLoading(type)
     addLog(type === 'data' ? 'جاري تجهيز نسخة البيانات السريعة...' : 'جاري تجهيز النسخة الاحتياطية الشاملة...')
+    let objectUrl: string | null = null
     try {
-      const token = adminToken || getStoredAdminToken()
-      if (!token) throw new Error('يرجى تسجيل الدخول مجدداً')
-
-      const downloadUrl = `${BACKEND_API}/api/admin/backup?type=${type}&token=${encodeURIComponent(token)}`
-      
+      const response = await fetchWithAdminAuth(`${BACKEND_API}/api/admin/backup?type=${type}`, {}, null)
+      const blob = await readBackupFile(response)
+      objectUrl = URL.createObjectURL(blob)
       const a = document.createElement('a')
-      a.href = downloadUrl
-      a.setAttribute('download', '')
+      a.href = objectUrl
+      a.download = `the-vitahub-${type}-backup-${new Date().toISOString().slice(0, 10)}.zip`
       a.style.display = 'none'
       document.body.appendChild(a)
       a.click()
-      setTimeout(() => {
-        a.remove()
-      }, 1500)
-      
-      addLog('بدأ تحميل النسخة الاحتياطية بنجاح')
+      a.remove()
+      addLog('تم تجهيز ملف النسخة الاحتياطية وبدء حفظه بنجاح')
     } catch (err: any) {
       await showAlert('حدث خطأ أثناء تحميل النسخة الاحتياطية: ' + err.message, 'خطأ')
       addLog('خطأ في تحميل النسخة الاحتياطية')
     } finally {
-      setTimeout(() => {
-        setBackupLoading(false)
-        setBackupTypeLoading(null)
-      }, 1500)
+      if (objectUrl) {
+        const downloadUrl = objectUrl
+        setTimeout(() => URL.revokeObjectURL(downloadUrl), 60000)
+      }
+      setBackupLoading(false)
+      setBackupTypeLoading(null)
     }
   }
 
@@ -1638,31 +1650,11 @@ export function useAdminDashboard() {
     const handlePopState = () => {
       setSelectedOrderForDetails(null)
       setSelectedOrderForWaybill(null)
-
-      if (typeof window === 'undefined') return
-      const searchParams = new URLSearchParams(window.location.search)
-      const tabParam = searchParams.get('tab')
-      const editId = searchParams.get('edit')
-      const isNew = searchParams.get('new') === '1'
-
-      const targetTab = tabParam && ADMIN_TABS.some(t => t.id === tabParam) ? tabParam : 'products'
-      if (targetTab !== activeTab) {
-        setActiveTab(targetTab)
-      }
-
-      if (editId) {
-        openItemById(targetTab, editId, true)
-      } else if (isNew) {
-        handleOpenModal(null, true)
-      } else {
-        setIsModalOpen(false)
-        setEditingItem(null)
-      }
     }
 
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
-  }, [activeTab, data, productsList])
+  }, [])
 
   useEffect(() => {
     let auth = sessionStorage.getItem('mithaly_admin_auth')
@@ -1688,29 +1680,42 @@ export function useAdminDashboard() {
   }, [])
 
   useEffect(() => {
-    if (!isLoggedIn) return
-    if (initialUrlProcessedRef.current) return
-    initialUrlProcessedRef.current = true
-
-    if (typeof window === 'undefined') return
-    const searchParams = new URLSearchParams(window.location.search)
-    const tabParam = searchParams.get('tab')
-    const editId = searchParams.get('edit')
-    const isNew = searchParams.get('new') === '1'
-
-    const effectiveTab = tabParam && ADMIN_TABS.some(t => t.id === tabParam) ? tabParam : activeTab
-    if (effectiveTab !== activeTab) {
-      setActiveTab(effectiveTab)
+    if (!isLoggedIn) {
+      processedSearchRef.current = null
+      itemRequestRef.current++
+      return
     }
+    if (processedSearchRef.current === adminSearch) return
+    processedSearchRef.current = adminSearch
+    itemRequestRef.current++
+    hasOpenedModalInSessionRef.current = false
 
-    if (editId) {
-      openItemById(effectiveTab, editId, true)
-    } else if (isNew) {
-      handleOpenModal(null, true)
-    } else if (!searchParams.has('tab')) {
-      syncAdminUrl(effectiveTab, null, false, true)
-    }
-  }, [isLoggedIn])
+    const params = new URLSearchParams(adminSearch)
+    const tabParam = params.get('tab')
+    const editId = params.get('edit')
+    const isNew = params.get('new') === '1'
+
+    const effectiveTab = tabParam && ADMIN_TABS.some(t => t.id === tabParam) ? tabParam : 'products'
+    queueMicrotask(() => {
+      if (processedSearchRef.current !== adminSearch) return
+      if (effectiveTab !== activeTab) setActiveTab(effectiveTab)
+
+      if (editId) {
+        setIsModalOpen(false)
+        setEditingItem(null)
+        openItemById(effectiveTab, editId, true)
+      } else if (isNew) {
+        setLoading(false)
+        populateForm(null, effectiveTab)
+        setIsModalOpen(true)
+      } else {
+        setLoading(false)
+        setIsModalOpen(false)
+        setEditingItem(null)
+        if (!params.has('tab')) syncAdminUrl(effectiveTab, null, false, true)
+      }
+    })
+  }, [isLoggedIn, adminSearch])
 
   useEffect(() => {
     if (activeTab === 'whatsapp' && isLoggedIn) {

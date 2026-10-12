@@ -14,11 +14,20 @@ import ShippingReturnsTab from './components/ShippingReturnsTab'
 import WhatsappTab from './components/WhatsappTab'
 import IndexingTab from './components/IndexingTab'
 import ProductsForm from './components/ProductsForm'
+import AdminImage from './components/AdminImage'
 import OffersForm from './components/OffersForm'
 import MedicalTipsForm from './components/MedicalTipsForm'
 import PixelsTab from './components/PixelsTab'
 
-export default function AdminDashboard() {
+export default function AdminPage() {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" aria-label="جاري تحميل لوحة التحكم" /></div>}>
+      <AdminDashboard />
+    </React.Suspense>
+  )
+}
+
+function AdminDashboard() {
   const {
     showAlert,
     showConfirm,
@@ -154,6 +163,14 @@ export default function AdminDashboard() {
   } = useAdminDashboard()
 
   const [logoLoading, setLogoLoading] = React.useState(false)
+  const mainRef = React.useRef<HTMLElement>(null)
+
+  React.useEffect(() => {
+    if (!isModalOpen) return
+    // The list and editor share a scroll container; reveal the editor after opening a lower row.
+    mainRef.current?.scrollTo({ top: 0, behavior: 'instant' })
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [isModalOpen, editingItem?.id])
 
   const items = data
   const propsObj = {
@@ -325,7 +342,7 @@ export default function AdminDashboard() {
 
       <div className="flex-1 flex overflow-hidden relative print:hidden">
         {/* Mobile Sidebar Overlay */}
-        {isSidebarOpen && (
+        {isSidebarOpen && !isModalOpen && (
           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 md:hidden animate-in fade-in" onClick={() => setIsSidebarOpen(false)} />
         )}
 
@@ -381,7 +398,7 @@ export default function AdminDashboard() {
         </aside>
 
         {/* Main Body Area */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 print:hidden">
+        <main ref={mainRef} className="flex-1 overflow-y-auto p-4 md:p-8 print:hidden">
           
           {/* KPI Dashboard Cards Grid */}
           {!isModalOpen && (
@@ -545,7 +562,7 @@ export default function AdminDashboard() {
                               <div className="flex items-center gap-4">
                                 {activeTab !== 'orders' && (
                                   <div className="h-12 w-12 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden shrink-0 shadow-sm">
-                                    <img src={item.image || 'https://placehold.co/400x400?text=Vitamins+HUB'} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-300" alt="item" />
+                                    <AdminImage src={item.image || '/logo-header.jpg'} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-300" alt={item.title || item.name || 'صورة العنصر'} />
                                   </div>
                                 )}
                                 <div className="min-w-0">
@@ -572,12 +589,8 @@ export default function AdminDashboard() {
                                       <>
                                         <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-500">ID: {item.id.substring(0, 8)}</span>
                                         {item.categoryId && <span className="text-emerald-600 font-black">#{categories.find(c => c.id === item.categoryId)?.name || 'غير مصنف'}</span>}
-                                        {activeTab === 'products' && (
-                                          item.desc && item.desc.length > 200 ? (
-                                            <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded font-black border border-emerald-100/50">SEO مكتمل</span>
-                                          ) : (
-                                            <span className="bg-slate-100 text-slate-400 px-2 py-0.5 rounded font-bold border border-slate-200/50">يحتاج SEO</span>
-                                          )
+                                        {activeTab === 'products' && item.desc && item.desc.length > 200 && (
+                                          <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded font-black border border-emerald-100/50">SEO مكتمل</span>
                                         )}
                                       </>
                                     )}
@@ -678,7 +691,7 @@ export default function AdminDashboard() {
                     // Simpler tabs forms (brands, categories)
                     <div className="space-y-8 max-w-xl mx-auto py-10">
                       <div className="aspect-video bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
-                         {formData.image ? <img src={formData.image} className="w-full h-full object-contain p-4" alt="preview" /> : <Upload size={36} className="text-slate-300" />}
+                         {formData.image ? <AdminImage src={formData.image} className="w-full h-full object-contain p-4" alt="preview" /> : <Upload size={36} className="text-slate-300" />}
                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                             <span className="text-white font-black text-xs bg-emerald-600 px-4 py-2 rounded-xl shadow-md">تغيير الصورة</span>
                          </div>

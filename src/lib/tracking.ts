@@ -528,11 +528,14 @@ export const trackPurchase = (order: TrackedOrder) => {
 
   const value = Number(order.total) || 0;
   const currency = 'EGP';
-  const itemIds = order.items.map(i => String(i.productId));
+  const rawItems = Array.isArray(order.items) ? order.items : [];
+  const itemIds = rawItems
+    .map(i => String(i.productId || (i as any).id || ''))
+    .filter(Boolean);
 
   // Meta (Facebook)
-  const contents = order.items.map(i => ({
-    id: String(i.productId),
+  const contents = rawItems.map(i => ({
+    id: String(i.productId || (i as any).id || ''),
     quantity: Number(i.quantity) || 1,
     item_price: Number(i.price) || 0,
   }));
@@ -542,7 +545,7 @@ export const trackPurchase = (order: TrackedOrder) => {
     contents,
     value,
     currency,
-    num_items: order.items.reduce((acc, i) => acc + (Number(i.quantity) || 1), 0),
+    num_items: rawItems.reduce((acc, i) => acc + (Number(i.quantity) || 1), 0),
   }, { eventID: eventId });
   logDebug('Meta', 'Purchase', { transactionId: order.orderNumber, itemIds, value, eventId });
 
@@ -554,8 +557,8 @@ export const trackPurchase = (order: TrackedOrder) => {
       currency,
       tax: 0,
       shipping: Number(order.shippingFee) || 0,
-      items: order.items.map(i => ({
-        item_id: i.productId,
+      items: rawItems.map(i => ({
+        item_id: String(i.productId || (i as any).id || ''),
         item_name: i.title,
         price: Number(i.price) || 0,
         quantity: Number(i.quantity) || 1
@@ -567,8 +570,8 @@ export const trackPurchase = (order: TrackedOrder) => {
   // TikTok
   if (typeof (window as any).ttq?.track === 'function') {
     (window as any).ttq.track('CompletePayment', {
-      contents: order.items.map(i => ({
-        content_id: i.productId,
+      contents: rawItems.map(i => ({
+        content_id: String(i.productId || (i as any).id || ''),
         content_name: i.title,
         content_type: 'product',
         price: Number(i.price) || 0,

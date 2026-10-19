@@ -38,6 +38,9 @@ export async function GET(
         headers: {
           'Content-Type': response.headers.get('content-type') || 'image/jpeg',
           'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+          'Cross-Origin-Resource-Policy': 'cross-origin',
         },
       });
     } catch (e) {
@@ -45,5 +48,23 @@ export async function GET(
     }
   }
 
-  return new NextResponse('Image not found', { status: 404 });
+  return new NextResponse('Image not found', {
+    status: 404,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Cross-Origin-Resource-Policy': 'cross-origin',
+    },
+  });
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+      'Access-Control-Allow-Headers': '*',
+      'Cross-Origin-Resource-Policy': 'cross-origin',
+    },
+  });
 }

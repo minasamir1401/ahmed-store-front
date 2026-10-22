@@ -16,7 +16,7 @@ import Link from 'next/link'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { productImageAlt, productImageThumb, productImageVersion, safeBrandImage, withImageVersion } from '@/lib/product-images'
+import { productImageAlt, productImageThumb, productMainImage, productImageVersion, safeBrandImage, withImageVersion } from '@/lib/product-images'
 import { BrandLogo } from '@/components/BrandLogo'
 import { trackViewContent, trackAddToCart } from '@/lib/tracking'
 
@@ -173,7 +173,10 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
 
   const [product, setProduct] = useState<any>(initialProduct)
   const [loading, setLoading] = useState(!initialProduct)
-  const [activeImage, setActiveImage] = useState(initialProduct?.image || '')
+  const [activeImage, setActiveImage] = useState(() => {
+    const raw = initialProduct?.image || ''
+    return productMainImage(raw).replace(/^http:\/\//i, 'https://') || raw
+  })
   const [quantity, setQuantity] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
   const [selectedSize, setSelectedSize] = useState<any>(() => {
@@ -237,7 +240,10 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
       .then(data => {
         if (data && data.error) throw new Error(data.error)
         setProduct(data)
-        if (!activeImage) setActiveImage(data.image)
+        if (!activeImage) {
+          const raw = data.image || ''
+          setActiveImage(productMainImage(raw).replace(/^http:\/\//i, 'https://') || raw)
+        }
         setLoading(false)
 
         try {
@@ -314,7 +320,12 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
     }
   }
   const imageVersion = productImageVersion(product)
-  const allImages = [product.image, ...additionalImages].filter(Boolean).map((src: string) => withImageVersion(src, imageVersion))
+  const allImages = [product.image, ...additionalImages]
+    .filter(Boolean)
+    .map((src: string) => {
+      const main = productMainImage(src).replace(/^http:\/\//i, 'https://') || src
+      return withImageVersion(main, imageVersion)
+    })
   const mainImageAlt = productImageAlt(product, getLocalizedValue(language, product.title, product.titleEn, translate))
   const mainImageWidth = product.imageWidth || 800
   const mainImageHeight = product.imageHeight || 800
@@ -604,15 +615,28 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                       whileTap={{ scale: 0.95 }}
                       className={`aspect-[4/5] cursor-pointer transition-all relative flex items-center justify-center ${activeImage === img ? 'opacity-100 scale-105' : 'opacity-60 hover:opacity-100'}`}
                     >
-                        <div className="w-full h-full relative z-10 p-2 pointer-events-auto">
-                          <Image
-                            src={productImageThumb(img) || img}
-                            alt={`${mainImageAlt} ${i + 1}`}
-                            fill
-                            unoptimized={Boolean(img && /^https?:\/\//i.test(img))}
-                            className="object-contain mix-blend-multiply"
-                            sizes="(max-width: 768px) 25vw, 150px"
-                          />
+                        <div className="w-full h-full relative z-10 p-2 pointer-events-auto" style={{ position: 'relative' }}>
+                          {(() => {
+                            const thumbSrc = (productImageThumb(img) || img).replace(/^http:\/\//i, 'https://')
+                            return /^https?:\/\//i.test(thumbSrc) ? (
+                              <img
+                                src={thumbSrc}
+                                alt={`${mainImageAlt} ${i + 1}`}
+                                loading="lazy"
+                                className="w-full h-full object-contain mix-blend-multiply"
+                                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                              />
+                            ) : (
+                              <Image
+                                src={thumbSrc}
+                                alt={`${mainImageAlt} ${i + 1}`}
+                                fill
+                                className="object-contain mix-blend-multiply"
+                                sizes="(max-width: 768px) 25vw, 150px"
+                                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                              />
+                            )
+                          })()}
                         </div>
 
                     </motion.div>

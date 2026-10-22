@@ -2,7 +2,6 @@
 
 import React from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { ShoppingCart, Check, Heart, Star } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -33,7 +32,6 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
   const [isAdded, setIsAdded] = React.useState(false)
   const [isHovered, setIsHovered] = React.useState(false)
   const [imgError, setImgError] = React.useState(false)
-  const [fallbackNative, setFallbackNative] = React.useState(false)
   const { addToCart } = useCart()
   const { toggleWishlist, isInWishlist } = useWishlist()
   const { t, translate, language } = useLanguage()
@@ -159,7 +157,7 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
           <div className="relative w-full h-full">
             {cardImage ? (
               <>
-                {/* Frame overlay - CSS background so search bots do not index the empty frame */}
+                {/* Frame overlay */}
                 <div
                   data-nosnippet
                   aria-hidden="true"
@@ -168,26 +166,13 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
                 />
                 {/* Product image - constrained inside frame inner box */}
                 <div className="absolute top-[17.5%] bottom-[19.5%] left-[9%] right-[9%] z-[15]">
-                  {fallbackNative ? (
+                  {imgError ? null : (
                     <img
                       src={cardImage}
                       alt={imgAlt}
-                      width={200}
-                      height={250}
                       loading="lazy"
                       className="w-full h-full object-contain pointer-events-none"
                       onError={() => setImgError(true)}
-                    />
-                  ) : (
-                    <Image
-                      src={cardImage}
-                      alt={imgAlt}
-                      fill
-                      className="object-contain"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
-                      loading="lazy"
-                      onError={() => setFallbackNative(true)}
-                      style={{ pointerEvents: 'none' }}
                     />
                   )}
                 </div>

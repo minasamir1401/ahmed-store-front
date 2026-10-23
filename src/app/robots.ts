@@ -30,6 +30,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
           '/api/og/',
           '/facebook-feed.xml',
           '/facebook-feed.csv',
+          '/facebook-catalog.xml',
           '/uploads/',
           '/_next/image'
         ],

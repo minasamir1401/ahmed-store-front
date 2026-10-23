@@ -34,7 +34,7 @@ const nextConfig = {
         ],
       },
       {
-        source: '/(facebook-feed\\.xml|facebook-feed\\.csv|catalog-feed\\.xml)',
+        source: '/(facebook-feed\\.xml|facebook-feed\\.csv|facebook-catalog\\.xml|catalog-feed\\.xml)',
         headers: [
           { key: 'Access-Control-Allow-Origin', value: '*' },
           { key: 'Access-Control-Allow-Methods', value: 'GET, HEAD, OPTIONS' },
@@ -118,6 +118,11 @@ const nextConfig = {
   // ─── API Rewrites ──────────────────────────────────────────────────────────
   async rewrites() {
     return [
+      // Accept the catalog URL used in Commerce Manager through the existing XML handler.
+      {
+        source: '/facebook-catalog.xml',
+        destination: '/facebook-feed.xml',
+      },
       {
         source: '/api/:path*',
         destination: `${BACKEND_URL}/api/:path*`,

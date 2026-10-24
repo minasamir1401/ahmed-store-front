@@ -174,6 +174,7 @@ function AdminDashboard() {
 
   const items = data
   const propsObj = {
+    savedProduct: editingItem,
     formData,
     setFormData,
     handleSave,

@@ -17,6 +17,7 @@ export default function AdminImage(props: AdminImageProps) {
 function ImagePreview({ src, alt, className }: AdminImageProps) {
   const [failed, setFailed] = useState(false)
   const external = /^(https?:)?\/\//i.test(src)
+  const normalizedSrc = src.startsWith('//') ? `https:${src}` : src.replace(/^http:\/\//i, 'https://')
 
   if (failed) {
     return (
@@ -29,7 +30,7 @@ function ImagePreview({ src, alt, className }: AdminImageProps) {
 
   return (
     <Image
-      src={src.startsWith('//') ? `https:${src}` : src}
+      src={normalizedSrc}
       alt={alt}
       width={800}
       height={800}

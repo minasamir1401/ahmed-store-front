@@ -16,7 +16,7 @@ import Link from 'next/link'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { productImageAlt, productImageThumb, productMainImage, productImageVersion, safeBrandImage, withImageVersion } from '@/lib/product-images'
+import { productImageAlt, productImageThumb, productDisplayImages, safeBrandImage } from '@/lib/product-images'
 import { BrandLogo } from '@/components/BrandLogo'
 import { trackViewContent, trackAddToCart } from '@/lib/tracking'
 
@@ -45,10 +45,6 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [zoomState, setZoomState] = useState({ isHovered: false, x: 50, y: 50 })
   const [hasError, setHasError] = useState(false)
-
-  useEffect(() => {
-    setHasError(false)
-  }, [src])
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = containerRef.current?.getBoundingClientRect()
@@ -173,10 +169,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
 
   const [product, setProduct] = useState<any>(initialProduct)
   const [loading, setLoading] = useState(!initialProduct)
-  const [activeImage, setActiveImage] = useState(() => {
-    const raw = initialProduct?.image || ''
-    return productMainImage(raw).replace(/^http:\/\//i, 'https://') || raw
-  })
+  const [selectedImage, setSelectedImage] = useState({ productId: initialProduct?.id || '', index: 0 })
   const [quantity, setQuantity] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
   const [selectedSize, setSelectedSize] = useState<any>(() => {
@@ -240,10 +233,6 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
       .then(data => {
         if (data && data.error) throw new Error(data.error)
         setProduct(data)
-        if (!activeImage) {
-          const raw = data.image || ''
-          setActiveImage(productMainImage(raw).replace(/^http:\/\//i, 'https://') || raw)
-        }
         setLoading(false)
 
         try {
@@ -303,29 +292,8 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
   const titleBi = parseBilingual(product.title)
   const titleEn = product.titleEn || titleBi.en || titleBi.ar
   const wishlistTitle = JSON.stringify({ ar: titleBi.ar, en: titleEn })
-  let additionalImages: string[] = []
-  if (product.images) {
-    const rawImgs = String(product.images).trim()
-    if (rawImgs.startsWith('[') && rawImgs.endsWith(']')) {
-      try {
-        const parsed = JSON.parse(rawImgs)
-        if (Array.isArray(parsed)) {
-          additionalImages = parsed.map((img: any) => String(img).trim()).filter(Boolean)
-        }
-      } catch {
-        additionalImages = rawImgs.split(',').map((img: string) => img.trim()).filter(Boolean)
-      }
-    } else {
-      additionalImages = rawImgs.split(',').map((img: string) => img.trim()).filter(Boolean)
-    }
-  }
-  const imageVersion = productImageVersion(product)
-  const allImages = [product.image, ...additionalImages]
-    .filter(Boolean)
-    .map((src: string) => {
-      const main = productMainImage(src).replace(/^http:\/\//i, 'https://') || src
-      return withImageVersion(main, imageVersion)
-    })
+  const allImages = productDisplayImages(product)
+  const activeImage = allImages[selectedImage.productId === product.id ? selectedImage.index : 0] || allImages[0] || ''
   const mainImageAlt = productImageAlt(product, getLocalizedValue(language, product.title, product.titleEn, translate))
   const mainImageWidth = product.imageWidth || 800
   const mainImageHeight = product.imageHeight || 800
@@ -610,7 +578,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                     <motion.div
                       key={i}
                       variants={scaleIn}
-                      onClick={() => setActiveImage(img)}
+                      onClick={() => setSelectedImage({ productId: product.id, index: i })}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       className={`aspect-[4/5] cursor-pointer transition-all relative flex items-center justify-center ${activeImage === img ? 'opacity-100 scale-105' : 'opacity-60 hover:opacity-100'}`}
@@ -631,6 +599,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
                                 src={thumbSrc}
                                 alt={`${mainImageAlt} ${i + 1}`}
                                 fill
+                                unoptimized
                                 className="object-contain mix-blend-multiply"
                                 sizes="(max-width: 768px) 25vw, 150px"
                                 onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}

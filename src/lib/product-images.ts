@@ -25,12 +25,13 @@ export const productMainImage = (src?: string | null) => {
 
 export const absoluteProductImageUrl = (src: string | null | undefined, siteUrl: string) => {
   if (!src) return ''
-  if (/^https?:\/\//i.test(src)) return src
-  
-  // URL Encode the path to prevent SEO crawlers (like Google/Facebook) from rejecting URLs with spaces or Arabic characters
-  const encodedPath = src.split('/').map(segment => encodeURIComponent(segment)).join('/')
-  
-  return `${siteUrl.replace(/\/+$/, '')}${encodedPath.startsWith('/') ? encodedPath : `/${encodedPath}`}`
+  try {
+    // Preserve revision queries and already-encoded filenames while encoding spaces/Unicode.
+    const url = new URL(src, `${siteUrl.replace(/\/+$/, '')}/`)
+    return /^https?:$/.test(url.protocol) ? url.href : ''
+  } catch {
+    return ''
+  }
 }
 
 export const productImageVersion = (product?: VersionedImageSource | null) => {
@@ -95,4 +96,31 @@ export const parseImageList = (raw: any): string[] => {
 export const serializeImageList = (list: string[]): string => {
   const cleaned = list.map((s: string) => String(s).trim().replace(/^[\["']+|[\]"']+$/g, '')).filter(Boolean)
   return cleaned.length > 0 ? JSON.stringify(cleaned) : ''
+}
+
+type StoredProductImages = VersionedImageSource & {
+  id?: string
+  image?: string | null
+  images?: unknown
+}
+
+// Saved images already have a first-party JPEG endpoint. Use it for both the
+// storefront and the editor instead of hotlinking sites that reject browsers.
+export const productDisplayImages = (product: StoredProductImages): string[] => {
+  if (!product.id) return [product.image || '', ...parseImageList(product.images)].filter(Boolean)
+  const base = `/api/catalog/image/${encodeURIComponent(product.id)}`
+  const version = productImageVersion(product)
+  return [
+    ...(product.image ? [withImageVersion(`${base}.jpg`, version)] : []),
+    ...parseImageList(product.images).map((_, index) => withImageVersion(`${base}/gallery/${index}.jpg`, version)),
+  ]
+}
+
+// An unsaved replacement must preview the new source, never the old cached image.
+export const savedProductImagePreview = (product: StoredProductImages | null | undefined, source: string): string => {
+  if (!product?.id || !source) return source
+  const images = productDisplayImages(product)
+  if (source === product.image) return images[0] || source
+  const index = parseImageList(product.images).indexOf(source)
+  return index < 0 ? source : images[index + (product.image ? 1 : 0)] || source
 }

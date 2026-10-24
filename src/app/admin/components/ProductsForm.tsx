@@ -1,11 +1,11 @@
 import React from 'react';
 import { Loader2, CheckCircle2, Upload, Plus, Edit2, Trash2, Eye, Search, Sparkles, Image as ImageIcon, Languages } from 'lucide-react';
-import { parseImageList, serializeImageList } from '@/lib/product-images';
+import { parseImageList, serializeImageList, savedProductImagePreview } from '@/lib/product-images';
 import AdminImage from './AdminImage';
 
 export default function ProductsForm(props: any) {
   const { 
-    formData, setFormData, handleSave, loading, uploading, setUploading, handleFileUpload, 
+    formData, savedProduct, setFormData, handleSave, loading, uploading, setUploading, handleFileUpload,
     categories, brandSearch, setBrandSearch, showBrandSuggestions, setShowBrandSuggestions,
     filteredBrands, brandUploading, isAILoading, handleAIFill,
     handleAutoTranslate, isTranslatingLoading,
@@ -38,7 +38,7 @@ export default function ProductsForm(props: any) {
           <div className="relative aspect-square bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 hover:border-emerald-500/50 flex flex-col items-center justify-center overflow-hidden group shadow-inner transition-all">
             {formData.image ? (
               <>
-                <AdminImage src={formData.image} className="w-full h-full object-contain p-3 transition-transform duration-300 group-hover:scale-105" alt="غلاف المنتج" />
+                <AdminImage src={savedProductImagePreview(savedProduct, formData.image)} className="w-full h-full object-contain p-3 transition-transform duration-300 group-hover:scale-105" alt="غلاف المنتج" />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
                   <div className="relative">
                     <button type="button" className="bg-white text-emerald-600 p-2 rounded-xl shadow-lg hover:scale-110 transition-all flex items-center gap-1 text-[9px] font-black cursor-pointer">
@@ -128,7 +128,7 @@ export default function ProductsForm(props: any) {
           <div className="relative aspect-square bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 hover:border-blue-500/50 flex flex-col items-center justify-center overflow-hidden group shadow-inner transition-all">
             {secondImage ? (
               <>
-                <AdminImage src={secondImage} className="w-full h-full object-contain p-3 transition-transform duration-300 group-hover:scale-105" alt="الصورة الثانية" />
+                <AdminImage src={savedProductImagePreview(savedProduct, secondImage)} className="w-full h-full object-contain p-3 transition-transform duration-300 group-hover:scale-105" alt="الصورة الثانية" />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
                   <div className="relative">
                     <button type="button" className="bg-white text-emerald-600 p-2 rounded-xl shadow-lg hover:scale-110 transition-all flex items-center gap-1 text-[9px] font-black cursor-pointer">
@@ -218,7 +218,7 @@ export default function ProductsForm(props: any) {
           <div className="grid grid-cols-4 gap-2.5">
             {extraImages.map((img: string, idx: number) => (
               <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 group shadow-sm hover:shadow-md transition-all">
-                <AdminImage src={img} className="w-full h-full object-cover" alt="معرض إضافي" />
+                <AdminImage src={savedProductImagePreview(savedProduct, img)} className="w-full h-full object-cover" alt="معرض إضافي" />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5">
                   <div className="relative">
                     <button type="button" className="bg-white text-emerald-600 p-1.5 rounded-lg shadow hover:scale-110 transition-all flex items-center gap-1 text-[8px] font-black cursor-pointer">

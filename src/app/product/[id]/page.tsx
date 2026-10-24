@@ -1,7 +1,7 @@
 import ProductPageClient from './ProductPageClient'
 import type { Metadata } from 'next'
 import { cache } from 'react'
-import { absoluteProductImageUrl, productImageAlt, productImageVersion, productMainImage, withImageVersion } from '@/lib/product-images'
+import { absoluteProductImageUrl, productImageAlt, productDisplayImages } from '@/lib/product-images'
 import { getServerSiteUrl as getSiteUrl } from '@/lib/seo'
 import { getProductIdFromParam, getProductUrlParam } from '@/lib/slug'
 import { redirect } from 'next/navigation'
@@ -31,6 +31,7 @@ type ProductData = {
   seoKeywords?: string | null
   seoKeywordsEn?: string | null
   image?: string | null
+  images?: string | null
   imageAlt?: string | null
   imageWidth?: number | null
   imageHeight?: number | null
@@ -111,8 +112,7 @@ const productSeoDescription = (product: ProductData, isEn: boolean) => {
 }
 
 const productSeoImage = (product: ProductData, siteUrl: string) => {
-  const imageUrl = absoluteProductImageUrl(productMainImage(product.image), siteUrl) || `${siteUrl}/logo-header.jpg`
-  return withImageVersion(imageUrl, productImageVersion(product))
+  return absoluteProductImageUrl(productDisplayImages(product)[0], siteUrl) || `${siteUrl}/logo-header.jpg`
 }
 
 // dynamic SEO metadata generation on the server

@@ -20,15 +20,15 @@ export async function GET(
 
   for (const baseUrl of backendBaseUrls) {
     try {
-      const targetUrl = `${baseUrl}/api/catalog/image/${subPath}`;
+      const targetUrl = `${baseUrl}/api/catalog/image/${subPath}${request.nextUrl.search}`;
       const response = await fetch(targetUrl, {
         headers: {
           'Accept': 'image/jpeg,image/*,*/*',
         },
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal.timeout(30000),
       });
 
-      if (!response.ok) {
+      if (!response.ok || !response.headers.get('content-type')?.startsWith('image/')) {
         continue;
       }
 
@@ -37,7 +37,7 @@ export async function GET(
         status: 200,
         headers: {
           'Content-Type': response.headers.get('content-type') || 'image/jpeg',
-          'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400',
+          'Cache-Control': response.headers.get('cache-control') || 'public, max-age=3600',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
           'Cross-Origin-Resource-Policy': 'cross-origin',

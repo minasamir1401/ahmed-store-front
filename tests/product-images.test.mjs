@@ -20,6 +20,7 @@ test('saved product main and gallery images use first-party JPEG URLs, including
       '/api/catalog/image/product-a/gallery/1.jpg',
     ]);
     assert.ok(urls.every(url => new URL(url, 'https://store.example').searchParams.get('v') === String(Date.parse(product.updatedAt))));
+    assert.ok(urls.every(url => new URL(url, 'https://store.example').searchParams.get('format') === 'square-v1'));
   }
 });
 

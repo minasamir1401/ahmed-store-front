@@ -111,8 +111,8 @@ export const productDisplayImages = (product: StoredProductImages): string[] => 
   const base = `/api/catalog/image/${encodeURIComponent(product.id)}`
   const version = productImageVersion(product)
   return [
-    ...(product.image ? [withImageVersion(`${base}.jpg`, version)] : []),
-    ...parseImageList(product.images).map((_, index) => withImageVersion(`${base}/gallery/${index}.jpg`, version)),
+    ...(product.image ? [withImageVersion(`${base}.jpg?format=square-v1`, version)] : []),
+    ...parseImageList(product.images).map((_, index) => withImageVersion(`${base}/gallery/${index}.jpg?format=square-v1`, version)),
   ]
 }
 

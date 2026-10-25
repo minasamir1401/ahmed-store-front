@@ -10,6 +10,7 @@ const option = (name, fallback) => args.find(a => a.startsWith(`--${name}=`))?.s
 const base = option('base', 'https://the-vitahub.com').replace(/\/$/, '');
 const mode = option('mode', 'catalog');
 const reportPath = option('report', 'image-audit.json');
+const requireSquare = args.includes('--require-square');
 const results = [];
 const read = async url => {
   const response = await fetch(url, { signal: AbortSignal.timeout(30000) });
@@ -76,6 +77,7 @@ async function worker() {
         const stats = await image.stats();
         Object.assign(result, { format: metadata.format, width: metadata.width, height: metadata.height, hash: crypto.createHash('sha256').update(buffer).digest('hex') });
         if (stats.channels.every(c => c.stdev < 0.5)) throw new Error('Blank image');
+        if (requireSquare && (metadata.format !== 'jpeg' || metadata.width !== 1024 || metadata.height !== 1024 || metadata.space !== 'srgb')) throw new Error('Expected a 1024x1024 sRGB JPEG');
         if (mode === 'sources' && new URL(job.url).origin !== base && ['same-origin', 'same-site'].includes(result.corp)) throw new Error(`Browser blocked by CORP: ${result.corp}`);
         result.ok = true;
         break;

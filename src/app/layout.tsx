@@ -5,6 +5,7 @@ import FloatingActions from "@/components/FloatingActions";
 import BottomNav from "@/components/BottomNav";
 import CookieConsent from "@/components/CookieConsent";
 import { getServerSiteUrl } from "@/lib/seo";
+import { META_PIXEL_ID } from "@/lib/meta-pixel";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -222,7 +223,7 @@ export default async function RootLayout({
   const lang = requestHeaders.get('x-lang') || 'ar';
   const dir = lang === 'en' ? 'ltr' : 'rtl';
 
-  const fbPixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || '2785073648526058';
+  const fbPixelId = META_PIXEL_ID;
 
   return (
     <html

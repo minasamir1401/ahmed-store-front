@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { META_PIXEL_ID } from '@/lib/meta-pixel';
 import { Loader2, CheckCircle2, Upload, Plus, Edit2, Trash2, Eye, Search, Smartphone, Shield, LogIn, Lock as LockIcon, Database, DownloadCloud, Sparkles, Mail, Send, Truck, ArrowRight, ShieldCheck, Zap, Archive, Share2, Copy, Check, ExternalLink } from 'lucide-react';
 
 
@@ -177,12 +178,12 @@ export default function AdminSettingsTab(props: any) {
                           <input 
                             type="text" 
                             readOnly 
-                            value="2785073648526058" 
+                            value={META_PIXEL_ID}
                             className="flex-1 bg-white rounded-xl py-2.5 px-3 font-mono font-bold text-xs text-slate-800 border border-slate-200 outline-none text-left dir-ltr" 
                           />
                           <button 
                             type="button" 
-                            onClick={() => handleCopy('2785073648526058', 'pixel')} 
+                            onClick={() => handleCopy(META_PIXEL_ID, 'pixel')}
                             className="bg-slate-200 hover:bg-slate-300 text-slate-700 p-2.5 rounded-xl transition-all flex items-center justify-center cursor-pointer shrink-0"
                             title="نسخ المعرف"
                           >

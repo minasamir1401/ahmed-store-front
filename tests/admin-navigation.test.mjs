@@ -11,13 +11,15 @@ function compile(relativePath) {
 }
 
 // Execute the real hook with a deterministic React/Next hook scheduler and public API fixtures.
-function dashboard(initialSearch = '?tab=products', responses = {}, respond) {
+function dashboard(initialSearch = '?tab=products', responses = {}, respond, savedView) {
   const slots = [];
   let cursor = 0;
   let effects = [];
   let dirty = true;
   let current;
   const location = { pathname: '/admin', search: initialSearch, href: `https://example.com/admin${initialSearch}` };
+  const history = [initialSearch];
+  let historyIndex = 0;
   const setUrl = url => {
     location.search = new URL(url, location.href).search;
     location.href = `https://example.com/admin${location.search}`;
@@ -49,17 +51,23 @@ function dashboard(initialSearch = '?tab=products', responses = {}, respond) {
   const requests = [];
   const alerts = [];
   const stored = new Map([['mithaly_admin_auth', 'true'], ['mithaly_admin_token', 'fixture-token']]);
+  if (savedView) stored.set('mithaly_admin_products_view', JSON.stringify(savedView));
   const storage = { getItem: key => stored.get(key) ?? null, setItem: (key, value) => stored.set(key, value), removeItem: key => stored.delete(key) };
   const context = vm.createContext({
     exports: {}, URLSearchParams, Headers, FormData, TextDecoder, console, queueMicrotask, crypto,
     process: { env: {} }, sessionStorage: storage, localStorage: storage,
-    window: { location, history: { pushState: (_, __, url) => setUrl(url), replaceState: (_, __, url) => setUrl(url), back() {} }, addEventListener() {}, removeEventListener() {} },
+    window: { location, history: {
+      pushState: (_, __, url) => { history.splice(++historyIndex); history.push(url); setUrl(url); },
+      replaceState: (_, __, url) => { history[historyIndex] = url; setUrl(url); },
+      back() { if (historyIndex > 0) setUrl(history[--historyIndex]); },
+    }, addEventListener() {}, removeEventListener() {} },
     setInterval: () => 1, clearInterval() {},
     setTimeout: fn => { queueMicrotask(fn); return 1; }, clearTimeout() {},
     fetch: async (url, init) => {
       requests.push({ url: String(url), init });
       const response = respond?.(String(url), init);
       if (response !== undefined) return await response;
+      if (/\/api\/products\?/.test(String(url))) return new Response(JSON.stringify({ items: [], total: 0 }));
       const match = String(url).match(/\/api\/products\/([^?]+)/);
       if (match) return { ok: true, json: async () => await (responses[match[1]] ?? { id: match[1], title: `Product ${match[1]}` }) };
       return { ok: true, status: 200, json: async () => [] };
@@ -87,6 +95,7 @@ function dashboard(initialSearch = '?tab=products', responses = {}, respond) {
   return {
     requests, alerts, storage,
     get state() { return current; },
+    get search() { return location.search; },
     navigate: setUrl,
     async settle() {
       for (let i = 0; i < 25; i++) {
@@ -176,6 +185,158 @@ test('leaving a pending edit request clears loading and ignores its eventual res
   resolveProduct({ id: 'slow-product', title: 'Stale product' });
   await waiting.settle();
   assert.equal(waiting.state.isModalOpen, false);
+});
+
+function productPages(count = 80) {
+  return url => {
+    if (!/\/api\/products\?/.test(url)) return;
+    const params = new URL(url, 'https://example.test').searchParams;
+    const page = Number(params.get('page') || 1);
+    const limit = Number(params.get('limit') || count);
+    const query = params.get('q') || '';
+    const items = Array.from({ length: count }, (_, i) => ({ id: `product-${i + 1}`, title: `Product ${i + 1}`, titleEn: `English ${i + 1}` }))
+      .filter(item => `${item.title} ${item.titleEn}`.toLowerCase().includes(query.toLowerCase()));
+    return new Response(JSON.stringify({ items: items.slice((page - 1) * limit, page * limit), total: items.length, page, limit }));
+  };
+}
+
+test('products request 25 rows per page and never download the legacy full catalog', async () => {
+  const app = dashboard('?tab=products', {}, productPages());
+  await app.settle();
+  assert.equal(app.state.visibleData.length, 25);
+  assert.equal(app.state.visibleData[0].id, 'product-1');
+  assert.equal(app.state.productsTotal, 80);
+  assert.equal(app.state.productsPageCount, 4);
+  app.state.handleProductsPageChange(2);
+  await app.settle();
+  assert.equal(app.state.visibleData[0].id, 'product-26');
+  assert.match(app.search, /page=2/);
+  app.state.handleProductsPageChange(4);
+  await app.settle();
+  assert.equal(app.state.visibleData.length, 5);
+  app.state.handleProductsPageChange(5);
+  await app.settle();
+  assert.equal(app.state.productsPage, 4);
+  const lists = app.requests.filter(request => /\/api\/products\?/.test(request.url));
+  assert.ok(lists.length > 0);
+  assert.ok(lists.every(request => new URL(request.url, 'https://example.test').searchParams.has('limit')));
+});
+
+test('editing, closing, tab changes and refresh preserve the products page and search', async () => {
+  const fixture = productPages();
+  const app = dashboard('?tab=products&page=2', {}, fixture);
+  await app.settle();
+  assert.equal(app.state.productsPage, 2);
+  app.state.handleOpenModal(app.state.visibleData[0]);
+  await app.settle();
+  assert.match(app.search, /page=2&edit=product-26/);
+  app.state.setFormData({ title: 'Unsaved product' });
+  await app.settle();
+  assert.equal(app.state.formData.title, 'Unsaved product');
+  app.state.handleCloseModal();
+  await app.settle();
+  assert.equal(app.state.isModalOpen, false);
+  assert.equal(app.state.productsPage, 2);
+  app.state.handleTabChange('brands');
+  await app.settle();
+  app.state.handleTabChange('products');
+  await app.settle();
+  assert.equal(app.state.visibleData[0].id, 'product-26');
+  app.state.handleTabChange('products');
+  await app.settle();
+  assert.equal(app.state.visibleData[0].id, 'product-26');
+  const refreshed = dashboard(app.search, {}, fixture);
+  await refreshed.settle();
+  assert.equal(refreshed.state.productsPage, 2);
+  const reopened = dashboard('?tab=products', {}, fixture, JSON.parse(app.storage.getItem('mithaly_admin_products_view')));
+  await reopened.settle();
+  assert.equal(reopened.state.productsPage, 2);
+  assert.match(reopened.search, /page=2/);
+});
+
+test('product search queries the whole catalog, resets page and survives editor links', async () => {
+  const fixture = productPages();
+  const app = dashboard('?tab=products&page=3', {}, fixture);
+  await app.settle();
+  app.state.setSearchQuery('English 80');
+  await app.settle();
+  assert.equal(app.state.productsPage, 1);
+  assert.equal(app.state.productsTotal, 1);
+  assert.equal(app.state.visibleData[0].id, 'product-80');
+  app.state.handleOpenModal(app.state.visibleData[0]);
+  await app.settle();
+  const refreshed = dashboard(app.search, {}, fixture);
+  await refreshed.settle();
+  assert.equal(refreshed.state.isModalOpen, true);
+  assert.equal(refreshed.state.searchQuery, 'English 80');
+  refreshed.state.handleCloseModal();
+  await refreshed.settle();
+  assert.equal(refreshed.state.visibleData[0].id, 'product-80');
+  assert.match(refreshed.search, /q=English\+80/);
+  app.state.setSearchQuery('missing product');
+  await app.settle();
+  assert.equal(app.state.productsTotal, 0);
+  assert.equal(app.state.visibleData.length, 0);
+  assert.equal(app.state.productsPageCount, 1);
+});
+
+test('opening products from another initial tab restores the saved products view', async () => {
+  const app = dashboard('?tab=brands', {}, productPages(), { page: 2, query: '' });
+  await app.settle();
+  app.state.handleTabChange('products');
+  await app.settle();
+  assert.equal(app.state.productsPage, 2);
+  assert.equal(app.state.visibleData[0].id, 'product-26');
+  assert.match(app.search, /page=2/);
+});
+
+test('browser navigation restores page and search, and stale list requests cannot overwrite results', async () => {
+  let release;
+  const pending = new Promise(resolve => { release = resolve; });
+  const fixture = productPages();
+  const app = dashboard('?tab=products&page=2', {}, url => {
+    const params = new URL(url, 'https://example.test').searchParams;
+    if (params.get('q') === 'slow') return pending;
+    return fixture(url);
+  });
+  await app.settle();
+  app.state.setSearchQuery('slow');
+  await app.settle();
+  app.state.setSearchQuery('English 80');
+  await app.settle();
+  release(new Response(JSON.stringify({ items: [{ id: 'stale' }], total: 1 })));
+  await app.settle();
+  assert.equal(app.state.visibleData[0].id, 'product-80');
+  app.navigate('?tab=products&page=3');
+  await app.settle();
+  assert.equal(app.state.searchQuery, '');
+  assert.equal(app.state.visibleData[0].id, 'product-51');
+});
+
+test('deleting the last product on a page returns to the last available page', async () => {
+  let count = 26;
+  const app = dashboard('?tab=products&page=2', {}, (url, init) => {
+    if (init?.method === 'DELETE') { count--; return new Response('{}'); }
+    return productPages(count)(url);
+  });
+  await app.settle();
+  assert.equal(app.state.visibleData.length, 1);
+  await app.state.handleDelete('product-26');
+  await app.settle();
+  assert.equal(app.state.productsPage, 1);
+  assert.equal(app.state.productsTotal, 25);
+  assert.equal(app.state.visibleData.length, 25);
+  assert.match(app.search, /page=1/);
+});
+
+test('invalid page links normalize to a valid page without dropping an open editor', async () => {
+  for (const page of ['-1', 'NaN', '2.5', '999']) {
+    const app = dashboard(`?tab=products&page=${page}&edit=product-1`, {}, productPages(25));
+    await app.settle();
+    assert.equal(app.state.productsPage, 1);
+    assert.equal(app.state.isModalOpen, true);
+    assert.match(app.search, /page=1&edit=product-1/);
+  }
 });
 
 test('email test sends current unsaved fields, trims the recipient and never sends masked credentials', async () => {

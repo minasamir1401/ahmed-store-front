@@ -44,6 +44,12 @@ function AdminDashboard() {
     isSidebarOpen,
     setIsSidebarOpen,
     data,
+    visibleData,
+    productsPage,
+    productsPageSize,
+    productsTotal,
+    productsPageCount,
+    handleProductsPageChange,
     categories,
     brands,
     productsList,
@@ -163,6 +169,35 @@ function AdminDashboard() {
   const [receiptCopied, setReceiptCopied] = React.useState(false)
   const mainRef = React.useRef<HTMLElement>(null)
 
+  React.useLayoutEffect(() => {
+    if (!isLoggedIn || isModalOpen || activeTab !== 'products' || loading || data.length === 0) return
+    const main = mainRef.current
+    if (!main) return
+    const key = 'mithaly_admin_products_scroll'
+    let top = 0
+    let windowTop = 0
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(key) || 'null')
+      if (saved?.page === productsPage && saved?.query === searchQuery) {
+        top = Math.max(0, Number(saved.top) || 0)
+        windowTop = Math.max(0, Number(saved.windowTop) || 0)
+      }
+    } catch {}
+    main.scrollTo({ top, behavior: 'instant' })
+    window.scrollTo({ top: windowTop, behavior: 'instant' })
+    const rememberScroll = () => {
+      try {
+        sessionStorage.setItem(key, JSON.stringify({ page: productsPage, query: searchQuery, top: main.scrollTop, windowTop: window.scrollY }))
+      } catch {}
+    }
+    main.addEventListener('scroll', rememberScroll, { passive: true })
+    window.addEventListener('scroll', rememberScroll, { passive: true })
+    return () => {
+      main.removeEventListener('scroll', rememberScroll)
+      window.removeEventListener('scroll', rememberScroll)
+    }
+  }, [isLoggedIn, isModalOpen, activeTab, productsPage, searchQuery, loading, data])
+
   React.useEffect(() => {
     if (!isModalOpen) return
     // The list and editor share a scroll container; reveal the editor after opening a lower row.
@@ -171,6 +206,26 @@ function AdminDashboard() {
   }, [isModalOpen, editingItem?.id])
 
   const items = data
+  const productsPagination = activeTab === 'products' && (
+    <nav aria-label="صفحات المنتجات" className="flex flex-wrap items-center justify-between gap-3 px-4 md:px-6 py-4 border-y border-slate-100 bg-slate-50/50">
+      <div className="text-xs font-bold text-slate-500" aria-live="polite">
+        <span>الصفحة {productsPage} من {productsPageCount}</span>
+        <span className="block mt-1 text-[11px]">
+          {productsTotal === 0 ? 'لا توجد منتجات' : `عرض ${(productsPage - 1) * productsPageSize + 1}–${Math.min(productsPage * productsPageSize, productsTotal)} من ${productsTotal} منتج`}
+        </span>
+      </div>
+      <div className="flex items-center gap-2">
+        <button type="button" onClick={() => handleProductsPageChange(productsPage - 1)} disabled={loading || productsPage <= 1}
+          className="px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-black hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
+          السابق
+        </button>
+        <button type="button" onClick={() => handleProductsPageChange(productsPage + 1)} disabled={loading || productsPage >= productsPageCount}
+          className="px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-black hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
+          التالي
+        </button>
+      </div>
+    </nav>
+  )
   const propsObj = {
     savedProduct: editingItem,
     formData,
@@ -594,6 +649,7 @@ ${itemsText}
               </div>
               
               {/* Active Tab Main Tables List */}
+              {productsPagination}
               {activeTab === 'hero' ? ( <HeroTab {...propsObj} /> ) : activeTab === 'shipping-returns' ? ( <ShippingReturnsTab {...propsObj} /> ) : activeTab === 'admin-settings' ? ( <AdminSettingsTab {...propsObj} /> ) : activeTab === 'whatsapp' ? ( <WhatsappTab {...propsObj} /> ) : activeTab === 'indexing' ? ( <IndexingTab {...propsObj} /> ) : activeTab === 'pixels' ? ( <PixelsTab {...propsObj} /> ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-right border-collapse min-w-[700px]">
@@ -605,12 +661,12 @@ ${itemsText}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100/50">
-                      {loading && data.length === 0 ? (
+                      {loading && (activeTab === 'products' || data.length === 0) ? (
                         <tr><td colSpan={3} className="py-20 text-center"><Loader2 className="animate-spin mx-auto text-emerald-600" size={32} /></td></tr>
-                      ) : (Array.isArray(data) ? data : []).filter(i => (i.title || i.name || i.orderNumber || i.customerName || '').toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
+                      ) : visibleData.length === 0 ? (
                         <tr><td colSpan={3} className="py-20 text-center text-slate-400 font-bold text-xs">لا توجد بيانات تطابق بحثك حالياً</td></tr>
                       ) : (
-                        (Array.isArray(data) ? data : []).filter(i => (i.title || i.name || i.orderNumber || i.customerName || '').toLowerCase().includes(searchQuery.toLowerCase())).map((item) => (
+                        visibleData.map((item) => (
                           <tr key={item.id} className="hover:bg-slate-50/40 transition-colors group">
                             <td className="px-6 md:px-8 py-5">
                               <div className="flex items-center gap-4">
@@ -699,6 +755,7 @@ ${itemsText}
                   </table>
                 </div>
               )}
+              {productsPagination}
             </div>
           ) : (
             // Full Screen Form Overhaul

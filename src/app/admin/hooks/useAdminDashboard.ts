@@ -14,6 +14,13 @@ import { getExcelImportFileError, importExcelFile, waitForExcelImportJob } from 
 
 type AIProvider = 'openrouter' | 'apifree'
 
+const PRODUCTS_PAGE_SIZE = 25
+const PRODUCTS_VIEW_KEY = 'mithaly_admin_products_view'
+const parseProductsPage = (value: string | null) => {
+  const page = Number(value)
+  return Number.isSafeInteger(page) && page > 0 ? Math.min(page, 100000) : 1
+}
+
 export function useAdminDashboard() {
   const searchParams = useSearchParams()
   const adminSearch = searchParams.toString()
@@ -31,6 +38,11 @@ export function useAdminDashboard() {
   const hasOpenedModalInSessionRef = useRef(false)
   const processedSearchRef = useRef<string | null>(null)
   const itemRequestRef = useRef(0)
+  const dataRequestRef = useRef(0)
+  const productsViewInitializedRef = useRef(false)
+  const productsViewRef = useRef({ page: 1, query: '' })
+  const [productsPage, setProductsPage] = useState(1)
+  const [productsTotal, setProductsTotal] = useState(0)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [data, setData] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>(DEFAULT_CATEGORIES)
@@ -78,7 +90,7 @@ export function useAdminDashboard() {
   })
   const [brandSearch, setBrandSearch] = useState('')
   const [showBrandSuggestions, setShowBrandSuggestions] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQueryValue] = useState('')
   const [adminToken, setAdminToken] = useState<string | null>(null)
   const [whatsappStatus, setWhatsappStatus] = useState<any>({ status: 'disconnected', qr: '' })
   const [wsLoading, setWsLoading] = useState(false)
@@ -261,18 +273,21 @@ export function useAdminDashboard() {
     try {
       const [ordRes, prodRes, brandRes, catRes] = await Promise.all([
         fetchWithAdminAuth(`${BACKEND_API}/api/orders?t=${Date.now()}`),
-        fetch(`${BACKEND_API}/api/products?t=${Date.now()}`),
+        fetch(`${BACKEND_API}/api/products?page=1&limit=1&t=${Date.now()}`),
         fetch(`${BACKEND_API}/api/brands?t=${Date.now()}`),
         fetch(`${BACKEND_API}/api/categories?t=${Date.now()}`)
       ])
 
       let ords: any[] = []
-      let prods: any[] = []
+      let productsTotal = 0
       let bnds: any[] = []
       let cats: any[] = []
 
       if (ordRes.ok) ords = await ordRes.json()
-      if (prodRes.ok) prods = await prodRes.json()
+      if (prodRes.ok) {
+        const products = await prodRes.json()
+        productsTotal = products.total || 0
+      }
       if (brandRes.ok) bnds = await brandRes.json()
       if (catRes.ok) cats = await catRes.json()
 
@@ -282,7 +297,7 @@ export function useAdminDashboard() {
       setStats({
         totalSales: sales,
         totalOrders: ords.length,
-        totalProducts: prods.length,
+        totalProducts: productsTotal,
         totalBrands: bnds.length,
         totalCategories: cats.length,
         pendingOrders: pending
@@ -298,7 +313,7 @@ export function useAdminDashboard() {
       const [catRes, brandRes, prodRes] = await Promise.all([
         fetch(`${BACKEND_API}/api/categories?t=${Date.now()}`),
         fetch(`${BACKEND_API}/api/brands?t=${Date.now()}`),
-        fetch(`${BACKEND_API}/api/products?t=${Date.now()}`)
+        activeTab === 'products' ? Promise.resolve(null) : fetch(`${BACKEND_API}/api/products?t=${Date.now()}`)
       ])
 
       if (catRes.ok) {
@@ -311,7 +326,7 @@ export function useAdminDashboard() {
         setBrands(Array.isArray(bnds) ? bnds : [])
         addLog(`تم تحميل ${Array.isArray(bnds) ? bnds.length : 0} ماركة`)
       }
-      if (prodRes.ok) {
+      if (prodRes?.ok) {
         const prods = await prodRes.json()
         setProductsList(Array.isArray(prods) ? prods : [])
         addLog(`تم تحميل ${Array.isArray(prods) ? prods.length : 0} منتج`)
@@ -323,6 +338,9 @@ export function useAdminDashboard() {
 
   const fetchData = async () => {
     if (!isLoggedIn) return
+    if (activeTab === 'products' && (!productsViewInitializedRef.current
+      || productsPage !== productsViewRef.current.page || searchQuery !== productsViewRef.current.query)) return
+    const requestId = ++dataRequestRef.current
     if (activeTab === 'whatsapp' || activeTab === 'admin-settings') {
       setLoading(true)
       try {
@@ -361,10 +379,31 @@ export function useAdminDashboard() {
     try {
       const endpoint = ADMIN_TABS.find(t => t.id === activeTab)?.endpoint
       addLog(`جاري طلب ${endpoint}...`)
-      const res = await fetchWithAdminAuth(`${BACKEND_API}/api/${endpoint}?t=${Date.now()}`)
+      const params = new URLSearchParams({ t: String(Date.now()) })
+      if (activeTab === 'products') {
+        params.set('page', String(productsPage))
+        params.set('limit', String(PRODUCTS_PAGE_SIZE))
+        params.set('full', 'true')
+        if (searchQuery.trim()) params.set('q', searchQuery.trim())
+      }
+      const res = await fetchWithAdminAuth(`${BACKEND_API}/api/${endpoint}?${params}`)
       if (!res.ok) throw new Error(`Status ${res.status}`)
       const json = await res.json()
-      if (activeTab === 'hero') {
+      if (dataRequestRef.current !== requestId) return
+      if (activeTab === 'products') {
+        if (!Array.isArray(json.items) || !Number.isSafeInteger(json.total) || json.total < 0) {
+          throw new Error('استجابة قائمة المنتجات غير صالحة')
+        }
+        setProductsTotal(json.total)
+        const lastPage = Math.max(1, Math.ceil(json.total / PRODUCTS_PAGE_SIZE))
+        if (productsPage > lastPage) {
+          setProductsPage(lastPage)
+          const current = new URLSearchParams(window.location.search)
+          syncAdminUrl('products', current.get('edit'), current.get('new') === '1', true, { page: lastPage, query: searchQuery })
+          return
+        }
+        setData(json.items)
+      } else if (activeTab === 'hero') {
         setFormData(json)
         setData([json])
       } else {
@@ -373,10 +412,11 @@ export function useAdminDashboard() {
       addLog('تم جلب البيانات بنجاح')
       fetchStats()
     } catch (err: any) {
+      if (dataRequestRef.current !== requestId) return
       console.error('Fetch error:', err)
       addLog(`خطأ: ${err.message}`)
     } finally {
-      setLoading(false)
+      if (dataRequestRef.current === requestId) setLoading(false)
     }
   }
 
@@ -523,11 +563,19 @@ export function useAdminDashboard() {
     tab: string,
     editId: string | null = null,
     isNew: boolean = false,
-    replace: boolean = false
+    replace: boolean = false,
+    productsView = productsViewRef.current
   ) => {
     if (typeof window === 'undefined') return
     const params = new URLSearchParams()
     if (tab) params.set('tab', tab)
+    if (tab === 'products') {
+      productsViewInitializedRef.current = true
+      params.set('page', String(productsView.page))
+      if (productsView.query) params.set('q', productsView.query)
+      productsViewRef.current = productsView
+      try { sessionStorage.setItem(PRODUCTS_VIEW_KEY, JSON.stringify(productsView)) } catch {}
+    }
     if (editId) {
       params.set('edit', editId)
     } else if (isNew) {
@@ -547,6 +595,32 @@ export function useAdminDashboard() {
       }
     }
   }
+
+  const setSearchQuery = (query: string) => {
+    if (query === searchQuery) return
+    setSearchQueryValue(query)
+    if (activeTab === 'products') {
+      setData([])
+      setLoading(true)
+      setProductsPage(1)
+      syncAdminUrl('products', null, false, true, { page: 1, query })
+    }
+  }
+
+  const productsPageCount = Math.max(1, Math.ceil(productsTotal / PRODUCTS_PAGE_SIZE))
+  const handleProductsPageChange = (page: number) => {
+    if (loading) return
+    const nextPage = Math.max(1, Math.min(page, productsPageCount))
+    if (nextPage === productsPage) return
+    setData([])
+    setLoading(true)
+    setProductsPage(nextPage)
+    syncAdminUrl('products', null, false, false, { page: nextPage, query: searchQuery })
+  }
+
+  const visibleData = activeTab === 'products' ? data : data.filter(item =>
+    String(item.title || item.name || item.orderNumber || item.customerName || '').toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   const populateForm = (item: any = null, targetTab: string = activeTab) => {
     if (item) {
@@ -741,6 +815,17 @@ export function useAdminDashboard() {
     itemRequestRef.current++
     hasOpenedModalInSessionRef.current = false
     setActiveTab(tabId)
+    if (tabId !== activeTab) setData([])
+    if (tabId === 'products') {
+      if (!productsViewInitializedRef.current) {
+        try {
+          const saved = JSON.parse(sessionStorage.getItem(PRODUCTS_VIEW_KEY) || 'null')
+          if (saved) productsViewRef.current = { page: parseProductsPage(String(saved.page)), query: typeof saved.query === 'string' ? saved.query : '' }
+        } catch {}
+      }
+      setProductsPage(productsViewRef.current.page)
+    }
+    setSearchQueryValue(tabId === 'products' ? productsViewRef.current.query : '')
     setIsModalOpen(false)
     setEditingItem(null)
     syncAdminUrl(tabId, null, false, false)
@@ -1714,9 +1799,27 @@ export function useAdminDashboard() {
     const isNew = params.get('new') === '1'
 
     const effectiveTab = tabParam && ADMIN_TABS.some(t => t.id === tabParam) ? tabParam : 'products'
+    let productsView = productsViewRef.current
+    if (effectiveTab === 'products') {
+      productsView = { page: parseProductsPage(params.get('page')), query: params.get('q') || '' }
+      if (!productsViewInitializedRef.current && !params.has('page') && !params.has('q')) {
+        try {
+          const saved = JSON.parse(sessionStorage.getItem(PRODUCTS_VIEW_KEY) || 'null')
+          if (saved) productsView = { page: parseProductsPage(String(saved.page)), query: typeof saved.query === 'string' ? saved.query : '' }
+        } catch {}
+      }
+      productsViewInitializedRef.current = true
+    }
     queueMicrotask(() => {
       if (processedSearchRef.current !== adminSearch) return
       if (effectiveTab !== activeTab) setActiveTab(effectiveTab)
+      if (effectiveTab === 'products') {
+        productsViewRef.current = productsView
+        setProductsPage(productsView.page)
+        setSearchQueryValue(productsView.query)
+        // Canonical links keep the page and search when refreshing or returning from an editor.
+        syncAdminUrl(effectiveTab, editId, isNew, true, productsView)
+      }
 
       if (editId) {
         setIsModalOpen(false)
@@ -1751,9 +1854,13 @@ export function useAdminDashboard() {
     if (isLoggedIn) {
       queueMicrotask(() => {
         fetchData().catch(() => {})
-        fetchMeta().catch(() => {})
       })
     }
+    return () => { dataRequestRef.current++ }
+  }, [activeTab, isLoggedIn, productsPage, activeTab === 'products' ? searchQuery : ''])
+
+  useEffect(() => {
+    if (isLoggedIn) fetchMeta().catch(() => {})
   }, [activeTab, isLoggedIn])
 
   return {
@@ -1771,6 +1878,12 @@ export function useAdminDashboard() {
     isSidebarOpen,
     setIsSidebarOpen,
     data,
+    visibleData,
+    productsPage,
+    productsPageSize: PRODUCTS_PAGE_SIZE,
+    productsTotal,
+    productsPageCount,
+    handleProductsPageChange,
     categories,
     brands,
     productsList,

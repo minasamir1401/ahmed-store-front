@@ -221,6 +221,7 @@ export default function WhatsappTab(props: any) {
                   type={showResendKey ? "text" : "password"} 
                   value={resendApiKey || ''} 
                   onChange={e => setResendApiKey(e.target.value)} 
+                  autoComplete="new-password"
                   className="w-full bg-slate-50 rounded-2xl py-3.5 pr-4 pl-12 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right dir-ltr" 
                   placeholder="re_xxxxxxxxxxxxxxxxxxxxxxxxx" 
                   required
@@ -329,6 +330,7 @@ export default function WhatsappTab(props: any) {
                           type={showSmtpPass ? "text" : "password"}
                           value={smtpPass || ''}
                           onChange={e => setSmtpPass(e.target.value)}
+                          autoComplete="new-password"
                           className="w-full bg-white rounded-xl py-2.5 pr-3 pl-10 font-bold outline-none border border-slate-200 text-xs text-slate-700 dir-ltr text-left"
                           placeholder="xxxx xxxx xxxx xxxx"
                         />

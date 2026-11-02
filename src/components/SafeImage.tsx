@@ -76,6 +76,8 @@ export default function SafeImage({
     )
   }
 
+  const isExternal = typeof src === 'string' && /^(https?:)?\/\//i.test(src)
+
   return (
     <Image
       src={src}
@@ -84,6 +86,7 @@ export default function SafeImage({
       width={width}
       height={height}
       className={className}
+      unoptimized={rest.unoptimized ?? isExternal}
       onError={() => {
         if (fallbackSrc) {
           setErrorState('fallback-native')

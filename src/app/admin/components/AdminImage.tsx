@@ -16,10 +16,8 @@ export default function AdminImage(props: AdminImageProps) {
 
 function ImagePreview({ src, alt, className }: AdminImageProps) {
   const [failed, setFailed] = useState(false)
-  const external = /^(https?:)?\/\//i.test(src)
-  const normalizedSrc = src.startsWith('//') ? `https:${src}` : src.replace(/^http:\/\//i, 'https://')
 
-  if (failed) {
+  if (!src || !src.trim() || failed) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-3 text-slate-400" role="img" aria-label={`تعذر تحميل ${alt}`}>
         <ImageOff size={24} />
@@ -28,6 +26,8 @@ function ImagePreview({ src, alt, className }: AdminImageProps) {
     )
   }
 
+  const normalizedSrc = src.startsWith('//') ? `https:${src}` : src.replace(/^http:\/\//i, 'https://')
+
   return (
     <Image
       src={normalizedSrc}
@@ -35,8 +35,7 @@ function ImagePreview({ src, alt, className }: AdminImageProps) {
       width={800}
       height={800}
       className={className}
-      // External previews use the same-origin optimizer to avoid remote CORP restrictions.
-      unoptimized={!external}
+      unoptimized={true}
       onError={() => setFailed(true)}
     />
   )

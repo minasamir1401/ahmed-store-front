@@ -516,7 +516,7 @@ ${itemsText}
                       <button 
                         onClick={() => excelImportJobId ? void handleExcelImport() : excelInputRef.current?.click()}
                         disabled={excelImporting}
-                        title="ملفات .xlsx و.xls و.xlsm و.csv حتى 50 ميجابايت"
+                        title="ملفات .xlsx و.xls و.xlsm و.csv حتى 200 ميجابايت"
                         className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white flex-1 md:flex-none px-4 md:px-6 py-3 rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-blue-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer"
                       >
                         {excelImporting ? (

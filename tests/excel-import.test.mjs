@@ -27,15 +27,18 @@ test('Excel validation accepts supported spreadsheets independently of browser M
   for (const name of ['products.xlsx', 'products.xls', 'products.xlsm', 'products.csv', 'PRODUCTS.XLSX', 'products.xlsx ']) {
     assert.equal(getExcelImportFileError({ name, size: 1024 }), null);
   }
-  assert.equal(getExcelImportFileError({ name: 'products.xlsx', size: 50 * 1024 * 1024 }), null);
+  for (const size of [50 * 1024 * 1024, Math.ceil(94.9 * 1024 * 1024), 200 * 1024 * 1024]) {
+    assert.equal(getExcelImportFileError({ name: 'products.xlsx', size }), null);
+  }
 });
 
 test('format, empty file and size validation explain the actual rejection separately', () => {
   const formatError = getExcelImportFileError({ name: 'products.pdf', size: 1024 });
   assert.match(formatError, /صيغة الملف/);
-  assert.doesNotMatch(formatError, /50/);
+  assert.doesNotMatch(formatError, /200/);
   assert.match(getExcelImportFileError({ name: 'products.xls', size: 0 }), /فارغ/);
-  assert.match(getExcelImportFileError({ name: 'products.xlsx', size: 60 * 1024 * 1024 }), /60\.0.*50/);
+  assert.match(getExcelImportFileError({ name: 'products.xlsx', size: 200 * 1024 * 1024 + 1 }), /200/);
+  assert.match(getExcelImportFileError({ name: 'products.xlsx', size: 210 * 1024 * 1024 }), /210\.0.*200/);
 });
 
 test('streamed import reads fragmented Arabic results, ignores heartbeats and reports batch progress', async () => {
@@ -72,7 +75,7 @@ test('HTML and empty 499/504 responses explain uncertain partial writes instead 
 
 test('server validation and file size errors retain actionable messages', async () => {
   await assert.rejects(readExcelImportResponse(new Response(JSON.stringify({ error: 'ملف Excel فارغ.' }), { status: 400 }), () => {}), /ملف Excel فارغ/);
-  await assert.rejects(readExcelImportResponse(new Response('', { status: 413 }), () => {}), /50/);
+  await assert.rejects(readExcelImportResponse(new Response('', { status: 413 }), () => {}), /200/);
   await assert.rejects(readExcelImportResponse(new Response('Internal Server Error', { status: 500 }), () => {}), /HTTP 500/);
 });
 
@@ -90,7 +93,7 @@ test('a read failure after the HTTP response starts still warns about uncertain 
 });
 
 test('Next proxy can forward the entire allowed Excel file including multipart overhead', () => {
-  assert.equal(nextConfig.experimental.proxyClientMaxBodySize, '52mb');
+  assert.equal(nextConfig.experimental.proxyClientMaxBodySize, '202mb');
   assert.equal(nextConfig.experimental.proxyTimeout, 120000);
 });
 

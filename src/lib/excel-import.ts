@@ -24,9 +24,9 @@ export function getExcelImportFileError(file: Pick<File, 'name' | 'size'>): stri
     return 'صيغة الملف غير مدعومة. اختر ملف Excel بصيغة .xlsx أو .xls أو .xlsm، أو ملف .csv.'
   }
   if (file.size === 0) return 'الملف فارغ. اختر ملفاً يحتوي على بيانات المنتجات.'
-  if (file.size > 50 * 1024 * 1024) {
+  if (file.size > 200 * 1024 * 1024) {
     const size = (file.size / (1024 * 1024)).toFixed(1)
-    return `حجم الملف ${size} ميجابايت ويتجاوز الحد الأقصى للرفع (50 ميجابايت). احذف الصور المدمجة غير المستخدمة أو قسّم الملف إلى ملفات أصغر.`
+    return `حجم الملف ${size} ميجابايت ويتجاوز الحد الأقصى للرفع (200 ميجابايت).`
   }
   return null
 }
@@ -120,7 +120,7 @@ export async function readExcelImportResponse(response: Response, onProgress: (p
     if ([408, 499, 502, 503, 504, 524].includes(response.status)) {
       throw new Error(`${interruptedMessage} (HTTP ${response.status})`)
     }
-    if (response.status === 413) throw new Error('حجم الملف يتجاوز حد الرفع المسموح. الحد الأقصى لملف Excel هو 50 ميجابايت.')
+    if (response.status === 413) throw new Error('حجم الملف يتجاوز حد الرفع المسموح. الحد الأقصى لملف Excel هو 200 ميجابايت.')
     throw new Error(`تعذر استيراد الملف. استجاب الخادم بخطأ HTTP ${response.status}.`)
   }
 

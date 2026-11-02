@@ -245,12 +245,12 @@ test('Excel handler requests background updates, prevents overlapping uploads an
 test('invalid Excel names and sizes are rejected before sending any import request', async () => {
   const app = dashboard();
   await app.settle();
-  for (const file of [{ name: 'products.xl', size: 10 }, { name: 'products.xlsx', size: 50 * 1024 * 1024 + 1 }]) {
+  for (const file of [{ name: 'products.xl', size: 10 }, { name: 'products.xlsx', size: 200 * 1024 * 1024 + 1 }]) {
     await app.state.handleExcelImport({ target: { files: [file], value: file.name } });
   }
   assert.equal(app.requests.some(request => request.url.includes('/import-excel?')), false);
   assert.equal(app.alerts.filter(message => message.includes('صيغة الملف')).length, 1);
-  assert.equal(app.alerts.filter(message => message.includes('50')).length, 1);
+  assert.equal(app.alerts.filter(message => message.includes('200')).length, 1);
 });
 
 test('Excel handler uploads legacy Excel and CSV files rather than rejecting them as oversized XLSX', async () => {

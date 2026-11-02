@@ -10,7 +10,7 @@ import {
 } from '../admin-dashboard-utils'
 import { parseImageList, serializeImageList } from '@/lib/product-images'
 import { readBackupFile } from '@/lib/backup-download'
-import { readExcelImportResponse } from '@/lib/excel-import'
+import { getExcelImportFileError, importExcelFile, waitForExcelImportJob } from '@/lib/excel-import'
 
 type AIProvider = 'openrouter' | 'apifree'
 
@@ -48,6 +48,7 @@ export function useAdminDashboard() {
   const [restoreLoading, setRestoreLoading] = useState(false)
   const [cleanLoading, setCleanLoading] = useState(false)
   const [excelImporting, setExcelImporting] = useState(false)
+  const [excelImportJobId, setExcelImportJobId] = useState<string | null>(null)
   const excelImportActiveRef = useRef(false)
   const [aiProvider, setAiProvider] = useState<AIProvider>('openrouter')
 
@@ -105,6 +106,10 @@ export function useAdminDashboard() {
   const galleryFileInputRef = useRef<HTMLInputElement>(null)
   const brandLogoRef = useRef<HTMLInputElement>(null)
   const excelInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setExcelImportJobId(sessionStorage.getItem('mithaly_excel_import_job'))
+  }, [])
 
   const addLog = (msg: string) => setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev].slice(0, 4))
 
@@ -1362,38 +1367,43 @@ export function useAdminDashboard() {
     }
   }
 
-  const handleExcelImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file || excelImportActiveRef.current) return
-    if (!/\.xlsx$/i.test(file.name) || file.size > 50 * 1024 * 1024) {
-      await showAlert('يرجى اختيار ملف .xlsx لا يتجاوز حجمه 50 ميجابايت.', 'ملف غير صالح')
-      e.target.value = ''
+  const handleExcelImport = async (e?: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e?.target.files?.[0]
+    const pendingJobId = sessionStorage.getItem('mithaly_excel_import_job')
+    if ((!file && !pendingJobId) || excelImportActiveRef.current) return
+    const fileError = file && !pendingJobId ? getExcelImportFileError(file) : null
+    if (fileError) {
+      await showAlert(fileError, 'ملف غير صالح')
+      if (e) e.target.value = ''
       return
     }
 
     excelImportActiveRef.current = true
     setExcelImporting(true)
-    addLog(`يجري استيراد المنتجات من ملف Excel: ${file.name}...`)
+    addLog(pendingJobId ? 'جاري متابعة عملية الاستيراد السابقة...' : `يجري استيراد المنتجات من ملف Excel: ${file!.name}...`)
 
-    const uploadData = new FormData()
-    uploadData.append('file', file)
+    const requestImport = (path: string, init?: RequestInit) => fetchWithAdminAuth(`${BACKEND_API}/api/products/import-excel${path}`, init, null)
+    const onProgress = (progress: { totalRows: number; processedCount: number; importedCount: number; updatedCount: number }) => {
+      addLog(`تقدّم الاستيراد: ${progress.processedCount}/${progress.totalRows} منتج، إضافة ${progress.importedCount} وتحديث ${progress.updatedCount}.`)
+    }
+    const clearPendingImport = () => {
+      sessionStorage.removeItem('mithaly_excel_import_job')
+      setExcelImportJobId(null)
+    }
 
     try {
-      // Use fetchWithAdminAuth to send the request
-      const res = await fetchWithAdminAuth(
-        `${BACKEND_API}/api/products/import-excel`,
-        { method: 'POST', body: uploadData, headers: { Accept: 'application/x-ndjson' } },
-        null
-      )
-
-      const result = await readExcelImportResponse(res, progress => {
-        addLog(`تقدّم الاستيراد: ${progress.processedCount}/${progress.totalRows} منتج، إضافة ${progress.importedCount} وتحديث ${progress.updatedCount}.`)
-      })
+      const result = pendingJobId
+        ? await waitForExcelImportJob(pendingJobId, requestImport, onProgress, true)
+        : await importExcelFile(file!, crypto.randomUUID(), requestImport, onProgress, jobId => {
+          sessionStorage.setItem('mithaly_excel_import_job', jobId)
+          setExcelImportJobId(jobId)
+        })
+      clearPendingImport()
       addLog(result.message || 'تم استيراد المنتجات بنجاح!')
       await showAlert(result.message || 'تم استيراد المنتجات بنجاح!', 'استيراد ناجح')
       fetchData()
-      fetchStats()
     } catch (err: any) {
+      if (err.isExcelImportFinished) clearPendingImport()
       console.error('Excel Import Error:', err)
       addLog(`فشل الاستيراد: ${err.message}`)
       await showAlert(
@@ -1408,6 +1418,13 @@ export function useAdminDashboard() {
         excelInputRef.current.value = ''
       }
     }
+  }
+
+  const handleClearExcelImport = async () => {
+    if (excelImportActiveRef.current) return
+    if (!(await showConfirm('إنهاء المتابعة لا يلغي العملية على الخادم. راجع المنتجات المحفوظة قبل رفع ملف جديد لتجنب تكرار التحديثات.', 'إنهاء متابعة الاستيراد'))) return
+    sessionStorage.removeItem('mithaly_excel_import_job')
+    setExcelImportJobId(null)
   }
 
   const handleCleanBase64Images = async () => {
@@ -1809,7 +1826,9 @@ export function useAdminDashboard() {
     brandLogoRef,
     excelInputRef,
     excelImporting,
+    excelImportJobId,
     handleExcelImport,
+    handleClearExcelImport,
     addLog,
     getAuthHeaders,
     fetchWithAdminAuth,

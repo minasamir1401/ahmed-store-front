@@ -48,12 +48,14 @@ function dashboard(initialSearch = '?tab=products', responses = {}, respond) {
   const modules = {};
   const requests = [];
   const alerts = [];
-  const storage = { getItem: key => ({ mithaly_admin_auth: 'true', mithaly_admin_token: 'fixture-token' })[key] ?? null, setItem() {}, removeItem() {} };
+  const stored = new Map([['mithaly_admin_auth', 'true'], ['mithaly_admin_token', 'fixture-token']]);
+  const storage = { getItem: key => stored.get(key) ?? null, setItem: (key, value) => stored.set(key, value), removeItem: key => stored.delete(key) };
   const context = vm.createContext({
-    exports: {}, URLSearchParams, Headers, FormData, TextDecoder, console, queueMicrotask,
+    exports: {}, URLSearchParams, Headers, FormData, TextDecoder, console, queueMicrotask, crypto,
     process: { env: {} }, sessionStorage: storage, localStorage: storage,
     window: { location, history: { pushState: (_, __, url) => setUrl(url), replaceState: (_, __, url) => setUrl(url), back() {} }, addEventListener() {}, removeEventListener() {} },
     setInterval: () => 1, clearInterval() {},
+    setTimeout: fn => { queueMicrotask(fn); return 1; }, clearTimeout() {},
     fetch: async (url, init) => {
       requests.push({ url: String(url), init });
       const response = respond?.(String(url), init);
@@ -83,7 +85,7 @@ function dashboard(initialSearch = '?tab=products', responses = {}, respond) {
   vm.runInContext(compile('../src/app/admin/hooks/useAdminDashboard.ts'), context);
   const hook = context.exports.useAdminDashboard;
   return {
-    requests, alerts,
+    requests, alerts, storage,
     get state() { return current; },
     navigate: setUrl,
     async settle() {
@@ -215,10 +217,14 @@ test('repeated test-email submissions share the active request and HTML errors e
   assert.equal(app.state.testEmailLoading, false);
 });
 
-test('Excel handler opts into streaming, prevents overlapping requests and reports proxy interruption', async () => {
+test('Excel handler requests background updates, prevents overlapping uploads and recovers a 499 response', async () => {
   let finish;
   const pending = new Promise(resolve => { finish = resolve; });
-  const app = dashboard('?tab=products', {}, url => url.endsWith('/import-excel') ? pending : undefined);
+  const result = { success: true, totalRows: 50, importedCount: 0, updatedCount: 50, message: 'تم تحديث 50 منتج.' };
+  const app = dashboard('?tab=products', {}, url => {
+    if (url.includes('/import-excel?')) return pending;
+    if (url.includes('/import-excel/status?')) return new Response(JSON.stringify({ jobId: new URL(url, 'https://example.test').searchParams.get('jobId'), status: 'completed', result }));
+  });
   await app.settle();
   const event = { target: { files: [new File(['fixture'], 'products.xlsx')], value: 'products.xlsx' } };
   const first = app.state.handleExcelImport(event);
@@ -226,11 +232,13 @@ test('Excel handler opts into streaming, prevents overlapping requests and repor
   finish(new Response('', { status: 499 }));
   await first;
   await app.settle();
-  const requests = app.requests.filter(request => request.url.endsWith('/import-excel'));
+  const requests = app.requests.filter(request => request.url.includes('/import-excel?'));
   assert.equal(requests.length, 1);
   assert.equal(requests[0].init.headers.get('Accept'), 'application/x-ndjson');
   assert.equal(requests[0].init.headers.has('Content-Type'), false);
-  assert.ok(app.alerts.some(message => message.includes('HTTP 499') && message.includes('راجع القائمة')));
+  assert.match(requests[0].url, /async=1&jobId=/);
+  assert.ok(app.alerts.some(message => message.includes('50')));
+  assert.equal(app.storage.getItem('mithaly_excel_import_job'), null);
   assert.equal(app.state.excelImporting, false);
 });
 
@@ -240,6 +248,48 @@ test('invalid Excel names and sizes are rejected before sending any import reque
   for (const file of [{ name: 'products.xl', size: 10 }, { name: 'products.xlsx', size: 50 * 1024 * 1024 + 1 }]) {
     await app.state.handleExcelImport({ target: { files: [file], value: file.name } });
   }
-  assert.equal(app.requests.some(request => request.url.endsWith('/import-excel')), false);
-  assert.equal(app.alerts.filter(message => message.includes('50')).length, 2);
+  assert.equal(app.requests.some(request => request.url.includes('/import-excel?')), false);
+  assert.equal(app.alerts.filter(message => message.includes('صيغة الملف')).length, 1);
+  assert.equal(app.alerts.filter(message => message.includes('50')).length, 1);
+});
+
+test('Excel handler uploads legacy Excel and CSV files rather than rejecting them as oversized XLSX', async () => {
+  const result = { success: true, totalRows: 50, importedCount: 0, updatedCount: 50 };
+  const app = dashboard('?tab=products', {}, url => url.includes('/import-excel?') ? new Response(JSON.stringify(result)) : undefined);
+  await app.settle();
+  for (const name of ['products.xls', 'products.xlsm', 'products.csv']) {
+    await app.state.handleExcelImport({ target: { files: [new File(['fixture'], name)], value: name } });
+  }
+  assert.equal(app.requests.filter(request => request.url.includes('/import-excel?')).length, 3);
+  assert.equal(app.alerts.some(message => message.includes('صيغة الملف')), false);
+});
+
+test('a pending Excel job survives page reload and resumes with status requests only', async () => {
+  const result = { success: true, totalRows: 50, importedCount: 0, updatedCount: 50 };
+  const app = dashboard('?tab=products', {}, url => url.includes('/import-excel/status?') ? new Response(JSON.stringify({ jobId: 'pending-job', status: 'completed', result })) : undefined);
+  app.storage.setItem('mithaly_excel_import_job', 'pending-job');
+  await app.settle();
+  assert.equal(app.state.excelImportJobId, 'pending-job');
+  await app.state.handleExcelImport();
+  await app.settle();
+  assert.equal(app.requests.some(request => request.url.includes('/import-excel?')), false);
+  assert.equal(app.storage.getItem('mithaly_excel_import_job'), null);
+  assert.equal(app.state.excelImportJobId, null);
+});
+
+test('unconfirmed import IDs remain resumable until the admin explicitly dismisses tracking', async () => {
+  const app = dashboard('?tab=products', {}, url => {
+    if (url.includes('/import-excel?')) return new Response('', { status: 499 });
+    if (url.includes('/import-excel/status?')) return new Response('{}', { status: 404 });
+  });
+  await app.settle();
+  await app.state.handleExcelImport({ target: { files: [new File(['fixture'], 'products.xlsx')], value: 'products.xlsx' } });
+  await app.settle();
+  assert.ok(app.storage.getItem('mithaly_excel_import_job'));
+  assert.ok(app.state.excelImportJobId);
+  await app.state.handleClearExcelImport();
+  await app.settle();
+  assert.equal(app.storage.getItem('mithaly_excel_import_job'), null);
+  assert.equal(app.state.excelImportJobId, null);
+  assert.equal(app.requests.filter(request => request.url.includes('/import-excel?')).length, 1);
 });

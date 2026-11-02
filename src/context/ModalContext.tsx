@@ -20,6 +20,18 @@ interface ModalContextType {
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined)
 
+function modalText(value: unknown, fallback: string): string {
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  if (value && typeof value === 'object') {
+    const details = value as Record<string, unknown>
+    for (const text of [details.message, details.error, details.path]) {
+      if (typeof text === 'string') return text
+    }
+  }
+  return fallback
+}
+
 export function ModalProvider({ children }: { children: ReactNode }) {
   const [modal, setModal] = useState<ModalConfig | null>(null)
 
@@ -27,18 +39,22 @@ export function ModalProvider({ children }: { children: ReactNode }) {
     return new Promise<boolean>((resolve) => {
       setModal({
         type: 'alert',
-        title,
-        message,
+        title: modalText(title, 'تنبيه'),
+        message: modalText(message, 'تعذر عرض تفاصيل التنبيه.'),
         resolve
       })
     })
   }
 
   const showConfirm = (message: string, title: string = 'تأكيد') => {
+    // Never allow a malformed runtime message to authorize a destructive action.
+    if (typeof message !== 'string') {
+      return showAlert(modalText(message, 'تعذر عرض تفاصيل التأكيد.'), 'تعذر تأكيد العملية').then(() => false)
+    }
     return new Promise<boolean>((resolve) => {
       setModal({
         type: 'confirm',
-        title,
+        title: modalText(title, 'تأكيد'),
         message,
         resolve
       })

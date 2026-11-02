@@ -1,7 +1,9 @@
-import React from 'react'
-import { Lock, LogIn, User } from 'lucide-react'
+import React, { useState } from 'react'
+import { Lock, LogIn, User, Eye, EyeOff } from 'lucide-react'
 
 export default function AdminLoginForm({ username, setUsername, password, setPassword, handleLogin }: any) {
+  const [showPassword, setShowPassword] = useState(false)
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4" dir="rtl">
       <form onSubmit={handleLogin} className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl w-full max-w-md space-y-6 border border-slate-100/50">
@@ -24,7 +26,23 @@ export default function AdminLoginForm({ username, setUsername, password, setPas
             <label className="text-[10px] font-black text-slate-400 uppercase mr-1">كلمة المرور</label>
             <div className="relative">
               <Lock size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" className="w-full bg-slate-50 rounded-2xl py-3.5 pr-12 pl-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700" placeholder="••••••••" required />
+              <input 
+                type={showPassword ? 'text' : 'password'} 
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                autoComplete="current-password" 
+                className="w-full bg-slate-50 rounded-2xl py-3.5 pr-12 pl-12 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700" 
+                placeholder="••••••••" 
+                required 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
+                aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
           </div>
         </div>

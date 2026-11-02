@@ -370,13 +370,24 @@ export default function WhatsappTab(props: any) {
 
           <div className="space-y-4 text-right">
             <div className="space-y-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">البريد الإلكتروني للمستلم التجريبي</label>
+              <div className="flex items-center justify-between mr-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase block">البريد الإلكتروني للمستلم التجريبي</label>
+                {adminNotificationEmail && (
+                  <button
+                    type="button"
+                    onClick={() => setTestRecipient(adminNotificationEmail)}
+                    className="text-[10px] font-bold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer"
+                  >
+                    استخدام بريد الإدارة
+                  </button>
+                )}
+              </div>
               <input 
                 type="email" 
                 value={testRecipient || ''} 
                 onChange={e => setTestRecipient(e.target.value)} 
                 className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right dir-ltr" 
-                placeholder="mina15g4y@gmail.com" 
+                placeholder={adminNotificationEmail || "the.vitaminshub@gmail.com"} 
                 required 
                 disabled={testEmailLoading}
               />

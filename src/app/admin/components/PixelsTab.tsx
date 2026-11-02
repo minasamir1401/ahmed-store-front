@@ -101,8 +101,14 @@ export default function PixelsTab({ BACKEND_API, fetchWithAdminAuth }: PixelsTab
 
   const getEventCount = (name: string) => {
     if (!stats || !stats.eventCounts) return 0
-    const found = stats.eventCounts.find((e: any) => e.eventName === name)
-    return found ? found.count : 0
+    if (Array.isArray(stats.eventCounts)) {
+      const found = stats.eventCounts.find((e: any) => e.eventName === name)
+      return found ? found.count : 0
+    }
+    if (typeof stats.eventCounts === 'object') {
+      return stats.eventCounts[name] || 0
+    }
+    return 0
   }
 
   // Parse user agent to get a simple browser/OS string

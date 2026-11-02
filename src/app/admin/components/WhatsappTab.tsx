@@ -12,6 +12,7 @@ export default function WhatsappTab(props: any) {
     fromName, setFromName,
     whatsappNumber, setWhatsappNumber,
     receivingNumber, setReceivingNumber,
+    adminNotificationEmail, setAdminNotificationEmail,
     smtpHost, setSmtpHost,
     smtpPort, setSmtpPort,
     smtpUser, setSmtpUser,
@@ -174,6 +175,22 @@ export default function WhatsappTab(props: any) {
                 required 
                 disabled={settingsSaveLoading}
               />
+            </div>
+
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">إيميل استلام تنبيهات الطلبات الجديدة (Admin Email)</label>
+                <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">تنبيه فوري</span>
+              </div>
+              <input 
+                type="email" 
+                value={adminNotificationEmail || ''} 
+                onChange={e => setAdminNotificationEmail && setAdminNotificationEmail(e.target.value)} 
+                className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right dir-ltr" 
+                placeholder="the.vitaminshub@gmail.com" 
+                disabled={settingsSaveLoading}
+              />
+              <p className="text-[9px] text-slate-400 font-semibold px-1">يصل إلى هذا البريد إشعار فوري بكامل تفاصيل أي طلب جديد يتم على المتجر سواء سجل العميل بالإيميل أو برقم الهاتف.</p>
             </div>
           </div>
 

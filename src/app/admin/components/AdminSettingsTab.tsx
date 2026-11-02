@@ -139,7 +139,7 @@ export default function AdminSettingsTab(props: any) {
                         <input 
                           type="email" 
                           value={adminNotificationEmail || ''} 
-                          onChange={e => setAdminNotificationEmail(e.target.value)} 
+                          onChange={e => setAdminNotificationEmail && setAdminNotificationEmail(e.target.value)} 
                           className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-blue-500/20 focus:bg-white transition-all text-xs text-slate-700 dir-ltr text-left" 
                           placeholder="the.vitaminshub@gmail.com" 
                           disabled={settingsSaveLoading}

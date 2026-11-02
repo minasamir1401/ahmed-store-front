@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useModal } from '@/context/ModalContext'
 import {
@@ -10,6 +10,7 @@ import {
 } from '../admin-dashboard-utils'
 import { parseImageList, serializeImageList } from '@/lib/product-images'
 import { readBackupFile } from '@/lib/backup-download'
+import { readExcelImportResponse } from '@/lib/excel-import'
 
 type AIProvider = 'openrouter' | 'apifree'
 
@@ -47,6 +48,7 @@ export function useAdminDashboard() {
   const [restoreLoading, setRestoreLoading] = useState(false)
   const [cleanLoading, setCleanLoading] = useState(false)
   const [excelImporting, setExcelImporting] = useState(false)
+  const excelImportActiveRef = useRef(false)
   const [aiProvider, setAiProvider] = useState<AIProvider>('openrouter')
 
   const handleAiProviderChange = (provider: AIProvider) => {
@@ -88,15 +90,12 @@ export function useAdminDashboard() {
   const [whatsappNumber, setWhatsappNumber] = useState('01201450111')
   const [receivingNumber, setReceivingNumber] = useState('01009596452')
   const [adminNotificationEmail, setAdminNotificationEmail] = useState('the.vitaminshub@gmail.com')
-  const [smtpHost, setSmtpHost] = useState('')
-  const [smtpPort, setSmtpPort] = useState('465')
-  const [smtpUser, setSmtpUser] = useState('')
-  const [smtpPass, setSmtpPass] = useState('')
   const [shippingRates, setShippingRates] = useState('{}')
   const [returnPolicy, setReturnPolicy] = useState('')
 
   const [testRecipient, setTestRecipient] = useState('')
   const [testEmailLoading, setTestEmailLoading] = useState(false)
+  const testEmailActiveRef = useRef(false)
   const [settingsSaveLoading, setSettingsSaveLoading] = useState(false)
   const [logs, setLogs] = useState<string[]>([])
   const [selectedOrderForWaybill, setSelectedOrderForWaybill] = useState<any>(null)
@@ -238,7 +237,7 @@ export function useAdminDashboard() {
     } catch (err: any) {
       if (err.isAdminUnauthorized) throw err
       if (err.name === 'TypeError' || err.message?.includes('Failed to fetch')) {
-        throw new Error('تم حظر الطلب بواسطة المتصفح أو أداة حظر الإعلانات (AdBlock). يرجى إيقاف AdBlock للموقع ثم المحاولة.')
+        throw new Error('تعذر الاتصال بالخادم. تحقق من اتصال الإنترنت وتوفر الخدمة؛ قد يكون الطلب محجوباً بواسطة المتصفح أو أداة حظر الإعلانات.')
       }
       throw err
     }
@@ -342,10 +341,6 @@ export function useAdminDashboard() {
           if (json.whatsapp_number !== undefined) setWhatsappNumber(json.whatsapp_number)
           if (json.receiving_number !== undefined) setReceivingNumber(json.receiving_number)
           if (json.admin_notification_email !== undefined) setAdminNotificationEmail(json.admin_notification_email)
-          if (json.smtp_host !== undefined) setSmtpHost(json.smtp_host === 'smtp.resend.com' ? '' : json.smtp_host)
-          if (json.smtp_port !== undefined) setSmtpPort(json.smtp_port)
-          if (json.smtp_user !== undefined) setSmtpUser(json.smtp_user === 'resend' ? '' : json.smtp_user)
-          if (json.smtp_pass !== undefined) setSmtpPass(json.smtp_pass)
           if (json.shipping_rates !== undefined) setShippingRates(json.shipping_rates)
           if (json.return_policy !== undefined) setReturnPolicy(json.return_policy)
         }
@@ -1369,8 +1364,14 @@ export function useAdminDashboard() {
 
   const handleExcelImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file) return
+    if (!file || excelImportActiveRef.current) return
+    if (!/\.xlsx$/i.test(file.name) || file.size > 50 * 1024 * 1024) {
+      await showAlert('يرجى اختيار ملف .xlsx لا يتجاوز حجمه 50 ميجابايت.', 'ملف غير صالح')
+      e.target.value = ''
+      return
+    }
 
+    excelImportActiveRef.current = true
     setExcelImporting(true)
     addLog(`يجري استيراد المنتجات من ملف Excel: ${file.name}...`)
 
@@ -1381,23 +1382,17 @@ export function useAdminDashboard() {
       // Use fetchWithAdminAuth to send the request
       const res = await fetchWithAdminAuth(
         `${BACKEND_API}/api/products/import-excel`,
-        { method: 'POST', body: uploadData },
+        { method: 'POST', body: uploadData, headers: { Accept: 'application/x-ndjson' } },
         null
       )
 
-      if (res.ok) {
-        const result = await res.json()
-        addLog(result.message || 'تم استيراد المنتجات بنجاح!')
-        await showAlert(
-          result.message || 'تم استيراد المنتجات بنجاح!',
-          'استيراد ناجح'
-        )
-        // Refresh products list
-        fetchData()
-      } else {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.error || 'حدث خطأ غير معروف')
-      }
+      const result = await readExcelImportResponse(res, progress => {
+        addLog(`تقدّم الاستيراد: ${progress.processedCount}/${progress.totalRows} منتج، إضافة ${progress.importedCount} وتحديث ${progress.updatedCount}.`)
+      })
+      addLog(result.message || 'تم استيراد المنتجات بنجاح!')
+      await showAlert(result.message || 'تم استيراد المنتجات بنجاح!', 'استيراد ناجح')
+      fetchData()
+      fetchStats()
     } catch (err: any) {
       console.error('Excel Import Error:', err)
       addLog(`فشل الاستيراد: ${err.message}`)
@@ -1405,7 +1400,9 @@ export function useAdminDashboard() {
         err.message || 'تعذر معالجة واستيراد ملف Excel',
         'خطأ في الاستيراد'
       )
+      fetchData()
     } finally {
+      excelImportActiveRef.current = false
       setExcelImporting(false)
       if (excelInputRef.current) {
         excelInputRef.current.value = ''
@@ -1470,6 +1467,13 @@ export function useAdminDashboard() {
     }
   }
 
+  const emailSettingsPayload = () => ({
+    resend_api_key: resendApiKey && resendApiKey.trim().startsWith('***') ? undefined : resendApiKey.trim(),
+    from_email: fromEmail || 'orders@the-vitahub.com',
+    from_name: fromName || 'The VitaHub',
+    admin_notification_email: adminNotificationEmail || 'the.vitaminshub@gmail.com',
+  })
+
   const handleSaveGeneralSettings = async (e: React.FormEvent) => {
     e.preventDefault()
     setSettingsSaveLoading(true)
@@ -1477,16 +1481,9 @@ export function useAdminDashboard() {
       const res = await fetchWithAdminAuth(`${BACKEND_API}/api/admin/settings`, {
         method: 'POST',
         body: JSON.stringify({
-          resend_api_key: resendApiKey,
-          from_email: fromEmail || 'orders@the-vitahub.com',
-          from_name: fromName || 'The VitaHub',
+          ...emailSettingsPayload(),
           whatsapp_number: whatsappNumber,
           receiving_number: receivingNumber,
-          admin_notification_email: adminNotificationEmail || 'the.vitaminshub@gmail.com',
-          smtp_host: smtpHost,
-          smtp_port: smtpPort,
-          smtp_user: smtpUser,
-          smtp_pass: smtpPass,
           shipping_rates: shippingRates,
           return_policy: returnPolicy
         })
@@ -1506,27 +1503,31 @@ export function useAdminDashboard() {
 
   const handleSendTestEmail = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (testEmailActiveRef.current || settingsSaveLoading) return
     if (!testRecipient.trim()) {
       await showAlert('يرجى إدخال البريد الإلكتروني للمستلم لتجربة الإرسال.', 'حقل مطلوب')
       return
     }
+    testEmailActiveRef.current = true
     setTestEmailLoading(true)
     try {
       const res = await fetchWithAdminAuth(`${BACKEND_API}/api/admin/settings/test-email`, {
         method: 'POST',
         body: JSON.stringify({
-          to: testRecipient
+          to: testRecipient.trim(),
+          settings: emailSettingsPayload(),
         })
       })
-      const json = await res.json()
+      const json = await res.json().catch(() => ({}))
       if (res.ok) {
         await showAlert('تم إرسال البريد الإلكتروني التجريبي بنجاح! تفقد صندوق بريدك الوارد (والـ Spam).', 'تم الإرسال بنجاح')
       } else {
-        await showAlert('فشل إرسال البريد التجريبي: ' + (json.error || 'خطأ غير معروف'), 'خطأ')
+        await showAlert('فشل إرسال البريد التجريبي: ' + (json.error || `استجاب الخادم بخطأ HTTP ${res.status}.`), 'خطأ')
       }
     } catch (err: any) {
       await showAlert('خطأ في الاتصال بالخادم: ' + err.message, 'خطأ')
     } finally {
+      testEmailActiveRef.current = false
       setTestEmailLoading(false)
     }
   }
@@ -1860,14 +1861,6 @@ export function useAdminDashboard() {
     setReceivingNumber,
     adminNotificationEmail,
     setAdminNotificationEmail,
-    smtpHost,
-    setSmtpHost,
-    smtpPort,
-    setSmtpPort,
-    smtpUser,
-    setSmtpUser,
-    smtpPass,
-    setSmtpPass,
     testRecipient,
     setTestRecipient,
     testEmailLoading,

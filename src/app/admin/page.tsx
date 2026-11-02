@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React from 'react'
 import {
@@ -18,6 +18,7 @@ import AdminImage from './components/AdminImage'
 import OffersForm from './components/OffersForm'
 import MedicalTipsForm from './components/MedicalTipsForm'
 import PixelsTab from './components/PixelsTab'
+import { productDisplayImages } from '@/lib/product-images'
 
 export default function AdminPage() {
   return (
@@ -147,14 +148,6 @@ function AdminDashboard() {
     setReceivingNumber,
     adminNotificationEmail,
     setAdminNotificationEmail,
-    smtpHost,
-    setSmtpHost,
-    smtpPort,
-    setSmtpPort,
-    smtpUser,
-    setSmtpUser,
-    smtpPass,
-    setSmtpPass,
     testRecipient,
     setTestRecipient,
     testEmailLoading,
@@ -278,14 +271,6 @@ function AdminDashboard() {
     setReceivingNumber,
     adminNotificationEmail,
     setAdminNotificationEmail,
-    smtpHost,
-    setSmtpHost,
-    smtpPort,
-    setSmtpPort,
-    smtpUser,
-    setSmtpUser,
-    smtpPass,
-    setSmtpPass,
     testRecipient,
     setTestRecipient,
     testEmailLoading,
@@ -618,7 +603,7 @@ ${itemsText}
                               <div className="flex items-center gap-4">
                                 {activeTab !== 'orders' && (
                                   <div className="h-12 w-12 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden shrink-0 shadow-sm">
-                                    <AdminImage src={item.image || '/logo-header.jpg'} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-300" alt={item.title || item.name || 'صورة العنصر'} />
+                                    <AdminImage src={(activeTab === 'products' ? productDisplayImages(item)[0] : item.image) || '/logo-header.jpg'} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-300" alt={item.title || item.name || 'صورة العنصر'} />
                                   </div>
                                 )}
                                 <div className="min-w-0">

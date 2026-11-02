@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '@/context/CartContext'
 import { useLanguage } from '@/context/LanguageContext'
+import { productDisplayImages } from '@/lib/product-images'
 
 export default function CartPage() {
   const { cart: items, removeFromCart: removeItem, updateQuantity, cartTotal: subtotal } = useCart()
@@ -63,7 +64,7 @@ export default function CartPage() {
                       </button>
                       
                       <div className="w-20 h-20 xs:w-28 xs:h-28 md:w-32 md:h-32 flex-shrink-0 bg-slate-50 rounded-2xl p-2 xs:p-4 border border-slate-50 flex items-center justify-center">
-                        <img src={item.image} className="max-h-full max-w-full object-contain" alt={translate(item.title)} />
+                        <img src={productDisplayImages({ id: String(item.id), image: item.image })[0] || '/logo-header.jpg'} className="max-h-full max-w-full object-contain" alt={translate(item.title)} />
                       </div>
                       
                       <div className="flex-1 flex flex-col justify-between min-w-0">

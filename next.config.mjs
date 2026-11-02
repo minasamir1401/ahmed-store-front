@@ -6,6 +6,8 @@ const nextConfig = {
   compress: true,
   experimental: {
     proxyTimeout: 120000,
+    // Excel accepts 50 MiB files; leave room for the multipart envelope.
+    proxyClientMaxBodySize: '52mb',
   },
   images: {
     remotePatterns: [

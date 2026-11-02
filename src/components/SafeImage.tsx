@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Image, { ImageProps } from 'next/image'
 
 interface SafeImageProps extends Omit<ImageProps, 'src'> {
@@ -9,7 +9,11 @@ interface SafeImageProps extends Omit<ImageProps, 'src'> {
   fallbackComponent?: React.ReactNode
 }
 
-export default function SafeImage({
+export default function SafeImage(props: SafeImageProps) {
+  return <ImagePreview key={`${props.src || ''}:${props.fallbackSrc || ''}`} {...props} />
+}
+
+function ImagePreview({
   src,
   alt = '',
   fallbackSrc,
@@ -18,19 +22,18 @@ export default function SafeImage({
   fill,
   width,
   height,
+  onError,
+  unoptimized,
   ...rest
 }: SafeImageProps) {
   const [errorState, setErrorState] = useState<'none' | 'fallback-native' | 'failed'>('none')
-
-  useEffect(() => {
-    setErrorState('none')
-  }, [src])
 
   const isBlockedUrl = (url?: string | null): boolean => {
     if (!url) return true
     const blockedKeywords = ['/publicidad/', 'doubleclick', 'adnxs', 'googlesyndication']
     return blockedKeywords.some(keyword => url.toLowerCase().includes(keyword))
   }
+  const hasFallback = Boolean(fallbackSrc && fallbackSrc !== src && !isBlockedUrl(fallbackSrc))
 
   if (!src || errorState === 'failed' || isBlockedUrl(src)) {
     if (fallbackComponent) {
@@ -64,19 +67,24 @@ export default function SafeImage({
   if (errorState === 'fallback-native') {
     return (
       <img
-        src={fallbackSrc || src}
+        src={hasFallback ? fallbackSrc : src}
         alt={alt}
         className={className}
-        style={fill ? { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' } : undefined}
+        style={{ ...(fill ? { position: 'absolute', inset: 0, width: '100%', height: '100%' } : {}), ...rest.style }}
         width={!fill ? width : undefined}
         height={!fill ? height : undefined}
-        loading="lazy"
-        onError={() => setErrorState('failed')}
+        loading={rest.loading || 'lazy'}
+        onLoad={rest.onLoad}
+        onError={event => {
+          setErrorState('failed')
+          onError?.(event)
+        }}
       />
     )
   }
 
   const isExternal = typeof src === 'string' && /^(https?:)?\/\//i.test(src)
+  const isUnoptimized = unoptimized ?? isExternal
 
   return (
     <Image
@@ -86,13 +94,11 @@ export default function SafeImage({
       width={width}
       height={height}
       className={className}
-      unoptimized={rest.unoptimized ?? isExternal}
-      onError={() => {
-        if (fallbackSrc) {
-          setErrorState('fallback-native')
-        } else {
-          setErrorState('fallback-native')
-        }
+      unoptimized={isUnoptimized}
+      onError={event => {
+        // Retrying an already-direct external request cannot bypass DNS or CORP failures.
+        setErrorState(hasFallback || !isUnoptimized ? 'fallback-native' : 'failed')
+        onError?.(event)
       }}
       {...rest}
     />

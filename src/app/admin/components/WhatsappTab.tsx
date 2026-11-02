@@ -3,8 +3,6 @@ import { Loader2, CheckCircle2, Smartphone, Mail, Send, Eye, EyeOff } from 'luci
 
 export default function WhatsappTab(props: any) {
   const [showResendKey, setShowResendKey] = React.useState(false);
-  const [showSmtpPass, setShowSmtpPass] = React.useState(false);
-  const [showSmtpSection, setShowSmtpSection] = React.useState(false);
   const { 
     whatsappStatus, handleWhatsappLogout, wsLoading,
     resendApiKey, setResendApiKey,
@@ -13,10 +11,6 @@ export default function WhatsappTab(props: any) {
     whatsappNumber, setWhatsappNumber,
     receivingNumber, setReceivingNumber,
     adminNotificationEmail, setAdminNotificationEmail,
-    smtpHost, setSmtpHost,
-    smtpPort, setSmtpPort,
-    smtpUser, setSmtpUser,
-    smtpPass, setSmtpPass,
     testRecipient, setTestRecipient,
     testEmailLoading, settingsSaveLoading,
     handleSaveGeneralSettings, handleSendTestEmail
@@ -151,6 +145,9 @@ export default function WhatsappTab(props: any) {
           </div>
 
           <div className="space-y-4 text-right">
+            {/* Hidden username field for credential form accessibility */}
+            <input type="text" name="username" autoComplete="username" style={{ display: 'none' }} aria-hidden="true" tabIndex={-1} readOnly value="admin" />
+
             <div className="space-y-1">
               <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">رقم الواتساب والاتصال الأساسي للموقع</label>
               <input 
@@ -214,6 +211,9 @@ export default function WhatsappTab(props: any) {
           </div>
 
           <div className="space-y-4 text-right">
+            {/* Hidden username field for credential form accessibility */}
+            <input type="text" name="username" autoComplete="username" style={{ display: 'none' }} aria-hidden="true" tabIndex={-1} readOnly value="admin" />
+
             <div className="space-y-1">
               <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">مفتاح API الخاص بـ Resend (API Key)</label>
               <div className="relative flex items-center">
@@ -251,7 +251,7 @@ export default function WhatsappTab(props: any) {
                 />
                 {fromEmail && /@(gmail|yahoo|hotmail|outlook|live)\.com$/i.test(fromEmail) && (
                   <p className="text-[10px] text-amber-600 font-bold mt-1 leading-normal">
-                    تنبيه: منصة Resend لا تسمح بالإرسال من إيميلات مجانية مثل @gmail.com. يجب إدخال بريد تابع لنطاقك الموثق (مثل orders@the-vitahub.com). للإرسال عبر الجيميل، استخدم خيار SMTP بالأسفل.
+                    تنبيه: منصة Resend لا تسمح بالإرسال من إيميلات مجانية مثل @gmail.com. يجب إدخال بريد تابع لنطاقك الموثق (مثل orders@the-vitahub.com).
                   </p>
                 )}
               </div>
@@ -275,78 +275,6 @@ export default function WhatsappTab(props: any) {
                 لكي يتم إرسال الإيميلات لكافة العملاء وإيميل الإدارة، يجب أن تكون حالة النطاق <strong>the-vitahub.com</strong> تظهر كـ <strong>Verified</strong> في لوحة تحكم <a href="https://resend.com/domains" target="_blank" rel="noreferrer" className="underline font-bold text-blue-900">resend.com/domains</a> بإضافة سجلات الـ DNS (SPF و DKIM).
               </div>
             </div>
-
-            {/* Optional SMTP Settings Section */}
-            <div className="pt-2 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={() => setShowSmtpSection(!showSmtpSection)}
-                className="text-xs font-bold text-slate-600 hover:text-slate-800 flex items-center justify-between w-full p-2 bg-slate-50 rounded-xl transition-all cursor-pointer"
-              >
-                <span>خيار بديل: إرسال عبر Gmail SMTP (فوري بدون انتظار DNS)</span>
-                <span className="text-[10px] text-blue-600 underline font-black">{showSmtpSection ? 'إخفاء' : 'إظهار الإعدادات'}</span>
-              </button>
-
-              {showSmtpSection && (
-                <div className="mt-3 p-4 bg-slate-50/70 rounded-2xl border border-slate-150 space-y-3">
-                  <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-                    إذا أردت إرسال كافة الإيميلات مباشرة من حساب Gmail الخاص بك (مثل the.vitaminshub@gmail.com) دون الحاجة لانتظار توثيق الـ DNS، قم بتوليد كلمة مرور تطبيقات من إعدادات حساب Google وضعها هنا:
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">خادم SMTP (Host)</label>
-                      <input
-                        type="text"
-                        value={smtpHost || ''}
-                        onChange={e => setSmtpHost(e.target.value)}
-                        className="w-full bg-white rounded-xl py-2.5 px-3 font-bold outline-none border border-slate-200 text-xs text-slate-700 dir-ltr text-left"
-                        placeholder="smtp.gmail.com"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">المنفذ (Port)</label>
-                      <input
-                        type="text"
-                        value={smtpPort || '465'}
-                        onChange={e => setSmtpPort(e.target.value)}
-                        className="w-full bg-white rounded-xl py-2.5 px-3 font-bold outline-none border border-slate-200 text-xs text-slate-700 dir-ltr text-left"
-                        placeholder="465"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">بريد الـ SMTP (User Email)</label>
-                      <input
-                        type="email"
-                        value={smtpUser || ''}
-                        onChange={e => setSmtpUser(e.target.value)}
-                        className="w-full bg-white rounded-xl py-2.5 px-3 font-bold outline-none border border-slate-200 text-xs text-slate-700 dir-ltr text-left"
-                        placeholder="the.vitaminshub@gmail.com"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-slate-400 uppercase mr-1 block">كلمة مرور التطبيقات (App Password)</label>
-                      <div className="relative flex items-center">
-                        <input
-                          type={showSmtpPass ? "text" : "password"}
-                          value={smtpPass || ''}
-                          onChange={e => setSmtpPass(e.target.value)}
-                          autoComplete="new-password"
-                          className="w-full bg-white rounded-xl py-2.5 pr-3 pl-10 font-bold outline-none border border-slate-200 text-xs text-slate-700 dir-ltr text-left"
-                          placeholder="xxxx xxxx xxxx xxxx"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowSmtpPass(!showSmtpPass)}
-                          className="absolute left-3 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
-                        >
-                          {showSmtpPass ? <EyeOff size={14} /> : <Eye size={14} />}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
 
           <div className="flex justify-end pt-4 border-t border-slate-50">
@@ -364,11 +292,14 @@ export default function WhatsappTab(props: any) {
             <div className="bg-blue-50 w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-blue-600">
               <Send size={22} />
             </div>
-            <h3 className="text-lg font-black text-slate-800">تجربة إرسال بريد إلكتروني عبر Resend</h3>
-            <p className="text-[10px] text-slate-400 font-bold">إرسال رسالة فحص تجريبية للتأكد من صحة الربط مع منصة Resend السحابية</p>
+            <h3 className="text-lg font-black text-slate-800">تجربة إرسال بريد إلكتروني</h3>
+            <p className="text-[10px] text-slate-400 font-bold">اختبار إعدادات Resend الحالية أعلاه دون حفظها. المفاتيح المخفية تستخدم بيانات الاعتماد المحفوظة.</p>
           </div>
 
           <div className="space-y-4 text-right">
+            {/* Hidden username field for credential form accessibility */}
+            <input type="text" name="username" autoComplete="username" style={{ display: 'none' }} aria-hidden="true" tabIndex={-1} readOnly value="admin" />
+
             <div className="space-y-1">
               <div className="flex items-center justify-between mr-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase block">البريد الإلكتروني للمستلم التجريبي</label>
@@ -389,13 +320,13 @@ export default function WhatsappTab(props: any) {
                 className="w-full bg-slate-50 rounded-2xl py-3.5 px-4 font-bold outline-none border border-transparent focus:border-emerald-500/20 focus:bg-white transition-all text-xs text-slate-700 text-right dir-ltr" 
                 placeholder={adminNotificationEmail || "the.vitaminshub@gmail.com"} 
                 required 
-                disabled={testEmailLoading}
+                disabled={testEmailLoading || settingsSaveLoading}
               />
             </div>
           </div>
 
           <div className="flex justify-end pt-4 border-t border-slate-50">
-            <button type="submit" disabled={testEmailLoading} className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white py-4 rounded-2xl font-black text-xs shadow-lg shadow-blue-600/10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer">
+            <button type="submit" disabled={testEmailLoading || settingsSaveLoading} className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white py-4 rounded-2xl font-black text-xs shadow-lg shadow-blue-600/10 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer">
               {testEmailLoading ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />} إرسال رسالة تجريبية
             </button>
           </div>

@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { productImageAlt, productMainImage } from '@/lib/product-images'
+import { productImageAlt, productDisplayImages } from '@/lib/product-images'
 import { trackAddToCart, trackAddToWishlist } from '@/lib/tracking'
 import { getProductUrlParam } from '@/lib/slug'
 
@@ -19,6 +19,9 @@ interface ProductCardProps {
   price: number
   oldPrice?: number | null
   image: string
+  images?: unknown
+  updatedAt?: string | null
+  imageUpdatedAt?: string | null
   imageAlt?: string | null
   imageWidth?: number | null
   imageHeight?: number | null
@@ -28,10 +31,10 @@ interface ProductCardProps {
   desc?: string | null
 }
 
-export default function ProductCard({ id, title, titleEn, price, oldPrice, image, imageAlt, imageWidth, imageHeight, tag, discountType, discountValue, desc }: ProductCardProps) {
+export default function ProductCard({ id, title, titleEn, price, oldPrice, image, images, updatedAt, imageUpdatedAt, imageAlt, imageWidth, imageHeight, tag, discountType, discountValue, desc }: ProductCardProps) {
   const [isAdded, setIsAdded] = React.useState(false)
   const [isHovered, setIsHovered] = React.useState(false)
-  const [imgError, setImgError] = React.useState(false)
+  const [failedImage, setFailedImage] = React.useState<string | null>(null)
   const { addToCart } = useCart()
   const { toggleWishlist, isInWishlist } = useWishlist()
   const { t, translate, language } = useLanguage()
@@ -88,8 +91,8 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
 
   const discountPercent = oldPrice && price ? Math.round(((oldPrice - price) / oldPrice) * 100) : null
   const imgAlt = productImageAlt({ imageAlt, title, titleEn }, displayTitle)
-  const rawImage = productMainImage(image)
-  const cardImage = (!imgError && rawImage) ? rawImage.replace(/^http:\/\//i, 'https://') : null
+  const displayImage = productDisplayImages({ id, image, images, updatedAt, imageUpdatedAt })[0]
+  const cardImage = displayImage && failedImage !== displayImage ? displayImage : null
 
   return (
     <motion.div
@@ -166,15 +169,14 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
                 />
                 {/* Product image - constrained inside frame inner box */}
                 <div className="absolute top-[17.5%] bottom-[19.5%] left-[9%] right-[9%] z-[15]">
-                  {imgError ? null : (
-                    <img
-                      src={cardImage}
-                      alt={imgAlt}
-                      loading="lazy"
-                      className="w-full h-full object-contain pointer-events-none"
-                      onError={() => setImgError(true)}
-                    />
-                  )}
+                  <img
+                    key={cardImage}
+                    src={cardImage}
+                    alt={imgAlt}
+                    loading="lazy"
+                    className="w-full h-full object-contain pointer-events-none"
+                    onError={() => setFailedImage(cardImage)}
+                  />
                 </div>
               </>
             ) : (

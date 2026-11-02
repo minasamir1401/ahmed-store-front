@@ -12,6 +12,7 @@ import { useModal } from '@/context/ModalContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { trackInitiateCheckout, trackPurchase } from '@/lib/tracking'
 import { governorates, districtsByGovernorate } from '@/lib/locations'
+import { productDisplayImages } from '@/lib/product-images'
 
 export default function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart()
@@ -635,7 +636,7 @@ export default function CheckoutPage() {
                   {cart.map((item) => (
                     <div key={item.id} className={`flex gap-3 xs:gap-4 ${isRtl ? 'flex-row' : 'flex-row-reverse'}`}>
                       <div className="w-14 h-14 xs:w-16 xs:h-16 bg-slate-50 rounded-xl border p-2 flex-shrink-0 flex items-center justify-center">
-                        <img src={item.image} className="max-h-full max-w-full object-contain" alt={translate(item.title)} />
+                        <img src={productDisplayImages({ id: String(item.id), image: item.image })[0] || '/logo-header.jpg'} className="max-h-full max-w-full object-contain" alt={translate(item.title)} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="text-xs xs:text-sm font-bold line-clamp-1">{translate(item.title)}</h4>

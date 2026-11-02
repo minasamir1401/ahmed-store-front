@@ -11,7 +11,7 @@ function compile(relativePath) {
 }
 
 // Execute the real hook with a deterministic React/Next hook scheduler and public API fixtures.
-function dashboard(initialSearch = '?tab=products', responses = {}) {
+function dashboard(initialSearch = '?tab=products', responses = {}, respond) {
   const slots = [];
   let cursor = 0;
   let effects = [];
@@ -46,13 +46,18 @@ function dashboard(initialSearch = '?tab=products', responses = {}) {
     },
   };
   const modules = {};
+  const requests = [];
+  const alerts = [];
   const storage = { getItem: key => ({ mithaly_admin_auth: 'true', mithaly_admin_token: 'fixture-token' })[key] ?? null, setItem() {}, removeItem() {} };
   const context = vm.createContext({
-    exports: {}, URLSearchParams, Headers, console, queueMicrotask,
+    exports: {}, URLSearchParams, Headers, FormData, TextDecoder, console, queueMicrotask,
     process: { env: {} }, sessionStorage: storage, localStorage: storage,
     window: { location, history: { pushState: (_, __, url) => setUrl(url), replaceState: (_, __, url) => setUrl(url), back() {} }, addEventListener() {}, removeEventListener() {} },
     setInterval: () => 1, clearInterval() {},
-    fetch: async url => {
+    fetch: async (url, init) => {
+      requests.push({ url: String(url), init });
+      const response = respond?.(String(url), init);
+      if (response !== undefined) return await response;
       const match = String(url).match(/\/api\/products\/([^?]+)/);
       if (match) return { ok: true, json: async () => await (responses[match[1]] ?? { id: match[1], title: `Product ${match[1]}` }) };
       return { ok: true, status: 200, json: async () => [] };
@@ -60,7 +65,7 @@ function dashboard(initialSearch = '?tab=products', responses = {}) {
     require: name => {
       if (name === 'react') return react;
       if (name === 'next/navigation') return { useSearchParams: () => new URLSearchParams(location.search) };
-      if (name === '@/context/ModalContext') return { useModal: () => ({ showAlert: async () => {}, showConfirm: async () => true }) };
+      if (name === '@/context/ModalContext') return { useModal: () => ({ showAlert: async message => { alerts.push(message); }, showConfirm: async () => true }) };
       return modules[name];
     },
   });
@@ -68,6 +73,7 @@ function dashboard(initialSearch = '?tab=products', responses = {}) {
     ['../admin-dashboard-utils', '../src/app/admin/admin-dashboard-utils.ts'],
     ['@/lib/product-images', '../src/lib/product-images.ts'],
     ['@/lib/backup-download', '../src/lib/backup-download.ts'],
+    ['@/lib/excel-import', '../src/lib/excel-import.ts'],
   ]) {
     context.exports = {};
     vm.runInContext(compile(file), context);
@@ -77,6 +83,7 @@ function dashboard(initialSearch = '?tab=products', responses = {}) {
   vm.runInContext(compile('../src/app/admin/hooks/useAdminDashboard.ts'), context);
   const hook = context.exports.useAdminDashboard;
   return {
+    requests, alerts,
     get state() { return current; },
     navigate: setUrl,
     async settle() {
@@ -167,4 +174,72 @@ test('leaving a pending edit request clears loading and ignores its eventual res
   resolveProduct({ id: 'slow-product', title: 'Stale product' });
   await waiting.settle();
   assert.equal(waiting.state.isModalOpen, false);
+});
+
+test('email test sends current unsaved fields, trims the recipient and never sends masked credentials', async () => {
+  const app = dashboard('?tab=whatsapp', {}, url => url.endsWith('/test-email') ? new Response('{}') : undefined);
+  await app.settle();
+  app.state.setResendApiKey('***1234');
+  app.state.setSmtpPass('***5678');
+  app.state.setSmtpHost(' smtp.example.com ');
+  app.state.setSmtpPort('587');
+  app.state.setSmtpUser(' sender@example.com ');
+  app.state.setFromEmail('new-sender@example.com');
+  app.state.setTestRecipient(' recipient@example.com ');
+  await app.settle();
+  await app.state.handleSendTestEmail({ preventDefault() {} });
+  const payload = JSON.parse(app.requests.find(request => request.url.endsWith('/test-email')).init.body);
+  assert.equal(payload.to, 'recipient@example.com');
+  assert.equal(payload.settings.from_email, 'new-sender@example.com');
+  assert.equal(payload.settings.smtp_host, 'smtp.example.com');
+  assert.equal(payload.settings.smtp_secure, 'false');
+  assert.equal('resend_api_key' in payload.settings, false);
+  assert.equal('smtp_pass' in payload.settings, false);
+  assert.equal(app.requests.filter(request => request.url.endsWith('/api/admin/settings') && request.init?.method === 'POST').length, 0);
+});
+
+test('repeated test-email submissions share the active request and HTML errors expose the HTTP status', async () => {
+  let finish;
+  const pending = new Promise(resolve => { finish = resolve; });
+  const app = dashboard('?tab=whatsapp', {}, url => url.endsWith('/test-email') ? pending : undefined);
+  await app.settle();
+  app.state.setTestRecipient('recipient@example.com');
+  await app.settle();
+  const first = app.state.handleSendTestEmail({ preventDefault() {} });
+  await app.state.handleSendTestEmail({ preventDefault() {} });
+  finish(new Response('<html>Proxy error</html>', { status: 502 }));
+  await first;
+  await app.settle();
+  assert.equal(app.requests.filter(request => request.url.endsWith('/test-email')).length, 1);
+  assert.ok(app.alerts.some(message => message.includes('HTTP 502')));
+  assert.equal(app.state.testEmailLoading, false);
+});
+
+test('Excel handler opts into streaming, prevents overlapping requests and reports proxy interruption', async () => {
+  let finish;
+  const pending = new Promise(resolve => { finish = resolve; });
+  const app = dashboard('?tab=products', {}, url => url.endsWith('/import-excel') ? pending : undefined);
+  await app.settle();
+  const event = { target: { files: [new File(['fixture'], 'products.xlsx')], value: 'products.xlsx' } };
+  const first = app.state.handleExcelImport(event);
+  await app.state.handleExcelImport(event);
+  finish(new Response('', { status: 499 }));
+  await first;
+  await app.settle();
+  const requests = app.requests.filter(request => request.url.endsWith('/import-excel'));
+  assert.equal(requests.length, 1);
+  assert.equal(requests[0].init.headers.get('Accept'), 'application/x-ndjson');
+  assert.equal(requests[0].init.headers.has('Content-Type'), false);
+  assert.ok(app.alerts.some(message => message.includes('HTTP 499') && message.includes('راجع القائمة')));
+  assert.equal(app.state.excelImporting, false);
+});
+
+test('invalid Excel names and sizes are rejected before sending any import request', async () => {
+  const app = dashboard();
+  await app.settle();
+  for (const file of [{ name: 'products.xl', size: 10 }, { name: 'products.xlsx', size: 50 * 1024 * 1024 + 1 }]) {
+    await app.state.handleExcelImport({ target: { files: [file], value: file.name } });
+  }
+  assert.equal(app.requests.some(request => request.url.endsWith('/import-excel')), false);
+  assert.equal(app.alerts.filter(message => message.includes('50')).length, 2);
 });

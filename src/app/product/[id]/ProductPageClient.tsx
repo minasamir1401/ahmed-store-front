@@ -1312,7 +1312,7 @@ export default function ProductPageClient({ params, initialProduct }: { params: 
             className="fixed bottom-[68px] lg:bottom-6 left-1.5 right-1.5 max-[340px]:left-1 max-[340px]:right-1 xs:left-3 xs:right-3 sm:left-auto sm:right-6 sm:w-96 lg:right-8 z-50"
           >
             <div className="w-full bg-white rounded-[1.5rem] xs:rounded-[2rem] shadow-2xl border border-slate-100 p-1.5 max-[340px]:p-1 xs:p-4 flex items-center gap-1.5 max-[340px]:gap-1 xs:gap-4">
-              <Image unoptimized={Boolean(product.image && /^https?:\/\//i.test(product.image))} src={productImageThumb(product.image) || product.image} alt={mainImageAlt} width={72} height={72} className="w-9 h-9 max-[340px]:w-8 max-[340px]:h-8 rounded-xl xs:rounded-2xl object-contain bg-[#f0f7f4] p-1 border border-slate-100 flex-shrink-0" sizes="72px" />
+              <Image unoptimized src={allImages[0] || '/logo-header.jpg'} alt={mainImageAlt} width={72} height={72} className="w-9 h-9 max-[340px]:w-8 max-[340px]:h-8 rounded-xl xs:rounded-2xl object-contain bg-[#f0f7f4] p-1 border border-slate-100 flex-shrink-0" sizes="72px" />
               <div className="flex-1 min-w-0">
                 <p className="text-[9px] xs:text-xs font-bold text-gray-500 truncate">{getLocalizedValue(language, product.title, product.titleEn, translate)}</p>
                 <p className="text-xs max-[340px]:text-[11px] xs:text-lg font-black text-primary">{currentPrice} {t('currency')}</p>

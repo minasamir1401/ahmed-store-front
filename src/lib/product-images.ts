@@ -105,7 +105,7 @@ type StoredProductImages = VersionedImageSource & {
 }
 
 export const isFramedProductImage = (src?: string | null) =>
-  typeof src === 'string' && /^\/uploads\/product-frames\/v2-[a-f0-9]{64}\.jpg$/.test(src)
+  typeof src === 'string' && /^\/uploads\/product-frames\/v[23]-[a-f0-9]{64}\.jpg$/.test(src)
 
 // Saved images already have a first-party JPEG endpoint. Use it for both the
 // storefront and the editor instead of hotlinking sites that reject browsers.

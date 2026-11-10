@@ -7,6 +7,8 @@ import { isFramedProductImage } from '@/lib/product-images'
 // Use Node.js runtime instead of Edge because sharp relies on native Node.js addons
 export const runtime = 'nodejs'
 
+const jpegOptions = { quality: 97, chromaSubsampling: '4:4:4' }
+
 async function fetchWithFallbacks(urlPath: string, req: NextRequest): Promise<Buffer> {
   // 1. Try local file system (only if it's not a remote upload)
   if (!urlPath.startsWith('/uploads/') && !urlPath.startsWith('uploads/')) {
@@ -95,7 +97,7 @@ export async function GET(req: NextRequest) {
     if (isFramedProductImage(imgUrl)) {
       const jpeg = await sharp(productBuffer)
         .resize(1080, 1080, { fit: 'contain', background: 'white' })
-        .jpeg({ quality: 90 })
+        .jpeg(jpegOptions)
         .toBuffer()
       return new Response(new Uint8Array(jpeg), {
         headers: { 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=31536000, immutable' },
@@ -125,6 +127,7 @@ export async function GET(req: NextRequest) {
 
       // 2. Resize product to 750x750 (with transparent background) to sit inside the frame
       const resizedProduct = await sharp(productBuffer)
+        .rotate()
         .resize(750, 750, {
           fit: 'contain',
           background: { r: 255, g: 255, b: 255, alpha: 0 }
@@ -134,7 +137,7 @@ export async function GET(req: NextRequest) {
       // 3. Center the product in the frame above the footer
       finalImage = await sharp(baseFrame)
         .composite([{ input: resizedProduct, left: 165, top: 90 }])
-        .jpeg({ quality: 90 }) // Convert output to JPEG for maximum compatibility
+        .jpeg(jpegOptions)
         .toBuffer()
     } catch (e: any) {
       return new NextResponse(`Sharp processing failed: ${e.message}`, {

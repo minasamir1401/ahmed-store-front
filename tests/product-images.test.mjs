@@ -51,7 +51,7 @@ test('SEO image URLs preserve revision queries and encoded filenames without dou
 
 test('saved merged files display directly in mixed galleries without changing the original gallery order', () => {
   const front = `/uploads/product-frames/v2-${'a'.repeat(64)}.jpg`;
-  const side = `/uploads/product-frames/v2-${'b'.repeat(64)}.jpg`;
+  const side = `/uploads/product-frames/v3-${'b'.repeat(64)}.jpg`;
   const partial = { ...product, image: front, images: JSON.stringify(['/uploads/old-back.jpg', side]) };
   const urls = Array.from(productDisplayImages(partial));
   assert.equal(urls[0], front);

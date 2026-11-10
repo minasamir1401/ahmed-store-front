@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { productImageAlt, productDisplayImages } from '@/lib/product-images'
+import { isFramedProductImage, productImageAlt, productDisplayImages } from '@/lib/product-images'
 import { trackAddToCart, trackAddToWishlist } from '@/lib/tracking'
 import { getProductUrlParam } from '@/lib/slug'
 
@@ -93,6 +93,7 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
   const imgAlt = productImageAlt({ imageAlt, title, titleEn }, displayTitle)
   const displayImage = productDisplayImages({ id, image, images, updatedAt, imageUpdatedAt })[0]
   const cardImage = displayImage && failedImage !== displayImage ? displayImage : null
+  const hasFrame = isFramedProductImage(cardImage)
 
   return (
     <motion.div
@@ -161,14 +162,14 @@ export default function ProductCard({ id, title, titleEn, price, oldPrice, image
             {cardImage ? (
               <>
                 {/* Frame overlay */}
-                <div
+                {!hasFrame && <div
                   data-nosnippet
                   aria-hidden="true"
                   className="absolute inset-0 w-full h-full z-10 pointer-events-none bg-contain bg-center bg-no-repeat select-none"
-                  style={{ backgroundImage: "url('/frame.webp')" }}
-                />
+                  style={{ backgroundImage: "url('/frame.webp?v=2')" }}
+                />}
                 {/* Product image - constrained inside frame inner box */}
-                <div className="absolute top-[17.5%] bottom-[19.5%] left-[9%] right-[9%] z-[15]">
+                <div className={cn('absolute z-[15]', hasFrame ? 'inset-0' : 'top-[6%] bottom-[19.5%] left-[9%] right-[9%]')}>
                   <img
                     key={cardImage}
                     src={cardImage}

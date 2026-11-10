@@ -48,3 +48,14 @@ test('SEO image URLs preserve revision queries and encoded filenames without dou
   assert.equal(absoluteProductImageUrl('/uploads/front image.jpg', 'https://store.example'), 'https://store.example/uploads/front%20image.jpg');
   assert.equal(absoluteProductImageUrl('javascript:alert(1)', 'https://store.example'), '');
 });
+
+test('saved merged files display directly in mixed galleries without changing the original gallery order', () => {
+  const front = `/uploads/product-frames/v2-${'a'.repeat(64)}.jpg`;
+  const side = `/uploads/product-frames/v2-${'b'.repeat(64)}.jpg`;
+  const partial = { ...product, image: front, images: JSON.stringify(['/uploads/old-back.jpg', side]) };
+  const urls = Array.from(productDisplayImages(partial));
+  assert.equal(urls[0], front);
+  assert.match(urls[1], /^\/api\/catalog\/image\/product-a\/gallery\/0\.jpg\?/);
+  assert.equal(urls[2], side);
+  assert.equal(savedProductImagePreview(partial, side), side);
+});

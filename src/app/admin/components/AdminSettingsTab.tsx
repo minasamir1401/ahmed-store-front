@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { META_PIXEL_ID } from '@/lib/meta-pixel';
+import ProductFramesPanel from './ProductFramesPanel';
 import { Loader2, CheckCircle2, Upload, Plus, Edit2, Trash2, Eye, Search, Smartphone, Shield, LogIn, Lock as LockIcon, Database, DownloadCloud, Sparkles, Mail, Send, Truck, ArrowRight, ShieldCheck, Zap, Archive, Share2, Copy, Check, ExternalLink } from 'lucide-react';
 
 
@@ -27,7 +28,7 @@ export default function AdminSettingsTab(props: any) {
     testRecipient, setTestRecipient,
     testEmailLoading, settingsSaveLoading,
     handleSaveGeneralSettings, handleSendTestEmail,
-    returnPolicy, setReturnPolicy
+    returnPolicy, setReturnPolicy, BACKEND_API, fetchWithAdminAuth
   } = props;
 
   return (
@@ -345,6 +346,12 @@ export default function AdminSettingsTab(props: any) {
                       </div>
                     </div>
                   </div>
+
+                  <ProductFramesPanel
+                    endpoint={`${BACKEND_API}/api/admin/settings/product-frames`}
+                    request={fetchWithAdminAuth}
+                    blocked={backupLoading || restoreLoading || cleanLoading}
+                  />
 
                   {/* Base64 Database Image Cleanup Section */}
                   <div className="bg-white border border-slate-100 rounded-[2.5rem] p-6 md:p-10 space-y-6 shadow-sm max-w-xl mx-auto relative overflow-hidden mt-8">

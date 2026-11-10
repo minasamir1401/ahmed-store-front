@@ -104,15 +104,20 @@ type StoredProductImages = VersionedImageSource & {
   images?: unknown
 }
 
+export const isFramedProductImage = (src?: string | null) =>
+  typeof src === 'string' && /^\/uploads\/product-frames\/v2-[a-f0-9]{64}\.jpg$/.test(src)
+
 // Saved images already have a first-party JPEG endpoint. Use it for both the
 // storefront and the editor instead of hotlinking sites that reject browsers.
 export const productDisplayImages = (product: StoredProductImages): string[] => {
   if (!product.id) return [product.image || '', ...parseImageList(product.images)].filter(Boolean)
   const base = `/api/catalog/image/${encodeURIComponent(product.id)}`
   const version = productImageVersion(product)
+  const displaySource = (source: string, catalogPath: string) =>
+    isFramedProductImage(source) ? source : withImageVersion(`${catalogPath}?format=square-v1`, version)
   return [
-    ...(product.image ? [withImageVersion(`${base}.jpg?format=square-v1`, version)] : []),
-    ...parseImageList(product.images).map((_, index) => withImageVersion(`${base}/gallery/${index}.jpg?format=square-v1`, version)),
+    ...(product.image ? [displaySource(product.image, `${base}.jpg`)] : []),
+    ...parseImageList(product.images).map((source, index) => displaySource(source, `${base}/gallery/${index}.jpg`)),
   ]
 }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import sharp from 'sharp'
 import path from 'path'
 import fs from 'fs/promises'
+import { isFramedProductImage } from '@/lib/product-images'
 
 // Use Node.js runtime instead of Edge because sharp relies on native Node.js addons
 export const runtime = 'nodejs'
@@ -91,6 +92,16 @@ export async function GET(req: NextRequest) {
       })
     }
 
+    if (isFramedProductImage(imgUrl)) {
+      const jpeg = await sharp(productBuffer)
+        .resize(1080, 1080, { fit: 'contain', background: 'white' })
+        .jpeg({ quality: 90 })
+        .toBuffer()
+      return new Response(new Uint8Array(jpeg), {
+        headers: { 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=31536000, immutable' },
+      })
+    }
+
     let frameBuffer: Buffer;
     try {
       frameBuffer = await fetchWithFallbacks('/frame.png', req)
@@ -104,10 +115,10 @@ export async function GET(req: NextRequest) {
     // Process image with Sharp: Composite product ON TOP of frame
     let finalImage: Buffer
     try {
-      // 1. Resize base frame to 1080x1080
+      // 1. Fit the portrait frame inside the square sharing image without stretching it
       const baseFrame = await sharp(frameBuffer)
         .resize(1080, 1080, {
-          fit: 'fill',
+          fit: 'contain',
           background: { r: 255, g: 255, b: 255, alpha: 1 }
         })
         .toBuffer()
@@ -120,9 +131,9 @@ export async function GET(req: NextRequest) {
         })
         .toBuffer()
 
-      // 3. Composite product image on top of the frame
+      // 3. Center the product in the frame above the footer
       finalImage = await sharp(baseFrame)
-        .composite([{ input: resizedProduct, gravity: 'center' }])
+        .composite([{ input: resizedProduct, left: 165, top: 90 }])
         .jpeg({ quality: 90 }) // Convert output to JPEG for maximum compatibility
         .toBuffer()
     } catch (e: any) {

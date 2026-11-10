@@ -1,4 +1,5 @@
-export const BACKEND_API = process.env.NEXT_PUBLIC_API_URL || ''
+// The local dashboard uses the site's API rewrite, so browser requests stay on the same origin.
+export const BACKEND_API = process.env.NODE_ENV === 'development' ? '' : (process.env.NEXT_PUBLIC_API_URL || '')
 
 export const DEFAULT_DOSAGE_CALCULATOR = {
   enabled: true,

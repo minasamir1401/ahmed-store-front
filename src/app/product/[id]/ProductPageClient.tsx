@@ -16,7 +16,7 @@ import Link from 'next/link'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { productImageAlt, productImageThumb, productDisplayImages, safeBrandImage } from '@/lib/product-images'
+import { isFramedProductImage, productImageAlt, productImageThumb, productDisplayImages, safeBrandImage } from '@/lib/product-images'
 import { BrandLogo } from '@/components/BrandLogo'
 import { trackViewContent, trackAddToCart } from '@/lib/tracking'
 
@@ -45,6 +45,7 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [zoomState, setZoomState] = useState({ isHovered: false, x: 50, y: 50 })
   const [hasError, setHasError] = useState(false)
+  const hasFrame = isFramedProductImage(src)
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = containerRef.current?.getBoundingClientRect()
@@ -66,14 +67,14 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
       onMouseLeave={handleMouseLeave}
     >
       {/* Frame overlay - CSS background so search engine bots do not index the empty frame as a product image */}
-      <div
+      {!hasFrame && <div
         data-nosnippet
         aria-hidden="true"
         className="absolute inset-0 w-full h-full pointer-events-none bg-contain bg-center bg-no-repeat select-none"
-        style={{ zIndex: 10, backgroundImage: "url('/frame.webp')" }}
-      />
+        style={{ zIndex: 10, backgroundImage: "url('/frame.webp?v=2')" }}
+      />}
       {/* Product display image - z-[15] (on top of frame) with contained cursor zoom */}
-      <div className="absolute top-[17.5%] bottom-[19.5%] left-[9%] right-[9%] overflow-hidden flex items-center justify-center" style={{ zIndex: 15 }}>
+      <div className={`absolute overflow-hidden flex items-center justify-center ${hasFrame ? 'inset-0' : 'top-[6%] bottom-[19.5%] left-[9%] right-[9%]'}`} style={{ zIndex: 15 }}>
         {src && !hasError ? (
           <img
             src={src.replace(/^http:\/\//i, 'https://')}
@@ -81,7 +82,7 @@ function WooZoom({ src, alt }: { src: string; alt: string }) {
             width={500}
             height={500}
             onError={() => setHasError(true)}
-            className="w-full h-full object-contain mix-blend-multiply select-none transition-transform duration-150 ease-out pointer-events-none"
+            className={`w-full h-full object-contain select-none transition-transform duration-150 ease-out pointer-events-none ${hasFrame ? '' : 'mix-blend-multiply'}`}
             draggable={false}
             style={{
               transform: zoomState.isHovered ? 'scale(1.8)' : 'scale(1)',

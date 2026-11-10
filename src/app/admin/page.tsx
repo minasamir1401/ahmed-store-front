@@ -788,7 +788,8 @@ ${itemsText}
                   <button
                     type="button"
                     onClick={handleSave}
-                    className="bg-emerald-600 text-white px-4 sm:px-8 py-2 sm:py-3 rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-emerald-600/10 hover:scale-[1.02] transition-all cursor-pointer"
+                    disabled={activeTab === 'products' && uploading}
+                    className="bg-emerald-600 text-white px-4 sm:px-8 py-2 sm:py-3 rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-emerald-600/10 hover:scale-[1.02] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-wait"
                   >
                     {loading ? <Loader2 className="animate-spin" size={14} /> : 'حفظ العنصر'}
                   </button>

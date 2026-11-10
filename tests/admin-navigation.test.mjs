@@ -142,6 +142,60 @@ test('direct links and returning to edit links populate the form', async () => {
   assert.equal(app.state.editingItem.id, 'product-a');
 });
 
+test('product photo uploads request framing and preserve the order of replaced and added gallery images', async () => {
+  const filenames = [];
+  const app = dashboard('?tab=products&edit=product-a', {
+    'product-a': { id: 'product-a', title: 'Fixture', images: JSON.stringify(['/back.jpg', '/extra.jpg']) },
+  }, (url, init) => {
+    if (!url.startsWith('/api/upload')) return;
+    assert.equal(url, '/api/upload?type=product');
+    const name = init.body.get('image').name;
+    filenames.push(name);
+    return new Response(JSON.stringify({ url: `/uploads/framed-${name}`, width: 1139, height: 1381 }));
+  });
+  const file = name => new File(['photo'], name, { type: 'image/png' });
+  await app.settle();
+  await app.state.handleFileUpload(file('cover.png'), 'main');
+  await app.settle();
+  await app.state.handleFileUpload(file('back.png'), 'second');
+  await app.settle();
+  await app.state.handleFileUpload(file('replacement.png'), 'gallery', { index: 1, source: '/extra.jpg' });
+  await app.settle();
+  await app.state.handleFileUpload([file('first.png'), file('second.png')], 'gallery');
+  await app.settle();
+  assert.deepEqual(filenames, ['cover.png', 'back.png', 'replacement.png', 'first.png', 'second.png']);
+  assert.equal(app.state.formData.image, '/uploads/framed-cover.png');
+  assert.equal(app.state.formData.imageHeight, 1381);
+  assert.deepEqual(JSON.parse(app.state.formData.images), [
+    '/uploads/framed-back.png', '/uploads/framed-replacement.png', '/uploads/framed-first.png', '/uploads/framed-second.png',
+  ]);
+});
+
+test('a pending product gallery upload cannot alter the next product or save an incomplete gallery', async () => {
+  let resolveUpload;
+  const pending = new Promise(resolve => { resolveUpload = resolve; });
+  const app = dashboard('?tab=products&edit=product-a', {
+    'product-a': { id: 'product-a', title: 'First', image: '/first.jpg' },
+    'product-b': { id: 'product-b', title: 'Second', image: '/second.jpg' },
+  }, url => {
+    if (url === '/api/upload?type=product') return pending;
+  });
+  await app.settle();
+  const upload = app.state.handleFileUpload([
+    new File(['photo'], 'pending.png'), new File(['photo'], 'not-started.png'),
+  ], 'gallery');
+  await app.state.handleSave({ preventDefault() {} });
+  assert.ok(!app.requests.some(request => request.init?.method === 'PATCH'));
+  app.navigate('?tab=products&edit=product-b');
+  await app.settle();
+  resolveUpload(new Response(JSON.stringify({ url: '/uploads/framed-pending.jpg' })));
+  await upload;
+  await app.settle();
+  assert.equal(app.requests.filter(request => request.url === '/api/upload?type=product').length, 1);
+  assert.equal(app.state.formData.image, '/second.jpg');
+  assert.ok(!app.state.formData.images);
+});
+
 test('local URL updates preserve unsaved edits and new forms use the destination tab', async () => {
   const app = dashboard();
   await app.settle();

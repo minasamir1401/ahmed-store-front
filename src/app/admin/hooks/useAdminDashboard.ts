@@ -38,6 +38,7 @@ export function useAdminDashboard() {
   const hasOpenedModalInSessionRef = useRef(false)
   const processedSearchRef = useRef<string | null>(null)
   const itemRequestRef = useRef(0)
+  const productUploadActiveRef = useRef(false)
   const dataRequestRef = useRef(0)
   const productsViewInitializedRef = useRef(false)
   const productsViewRef = useRef({ page: 1, query: '' })
@@ -512,50 +513,65 @@ export function useAdminDashboard() {
     return result
   }
 
-  const handleFileUpload = async (file: File, type: 'main' | 'second' | 'brand' | 'gallery' | 'side1' | 'side2' | 'prod1' | 'prod2' | 'prod3' | 'prod4') => {
-    if (!file) return
+  const handleFileUpload = async (
+    selection: File | File[],
+    type: 'main' | 'second' | 'brand' | 'gallery' | 'side1' | 'side2' | 'prod1' | 'prod2' | 'prod3' | 'prod4',
+    gallerySlot?: { index: number; source: string }
+  ) => {
+    if (!selection) return
+    const files = Array.isArray(selection) ? selection : [selection]
+    if (!files.length) return
+    const isProductPhoto = activeTab === 'products' && (type === 'main' || type === 'second' || type === 'gallery')
+    if (isProductPhoto && productUploadActiveRef.current) return
+    if (isProductPhoto) productUploadActiveRef.current = true
+    const requestId = itemRequestRef.current
     if (type === 'brand') setBrandUploading(true)
     else setUploading(true)
 
     try {
-      const altText = type === 'brand' ? formData.brandName : formData.imageAlt || formData.title || file.name
-      const uploadType = (type === 'side1' || type === 'side2') ? 'side-banner' : undefined
-      const result = await uploadAdminImage(file, altText, formData.title, uploadType)
-      if (type === 'brand') setFormData((prev: any) => ({ ...prev, brandImage: result.url }))
-      else if (type === 'main') setFormData((prev: any) => ({
-        ...prev,
-        image: result.url,
-        imageAlt: prev.imageAlt || result.altText || prev.title || '',
-        imageWidth: result.width || prev.imageWidth || null,
-        imageHeight: result.height || prev.imageHeight || null
-      }))
-      else if (type === 'second') {
-        setFormData((prev: any) => {
-          const current = parseImageList(prev.images)
-          const updated = [result.url, ...current.slice(1)]
-          return { ...prev, images: serializeImageList(updated) }
-        })
+      const uploadType = isProductPhoto ? 'product' : (type === 'side1' || type === 'side2') ? 'side-banner' : undefined
+      for (const file of files) {
+        if (requestId !== itemRequestRef.current) return
+        try {
+          const altText = type === 'brand' ? formData.brandName : formData.imageAlt || formData.title || file.name
+          const result = await uploadAdminImage(file, altText, formData.title, uploadType)
+          if (requestId !== itemRequestRef.current) return
+          if (type === 'brand') setFormData((prev: any) => ({ ...prev, brandImage: result.url }))
+          else if (type === 'main') setFormData((prev: any) => ({
+            ...prev,
+            image: result.url,
+            imageAlt: prev.imageAlt || result.altText || prev.title || '',
+            imageWidth: result.width || prev.imageWidth || null,
+            imageHeight: result.height || prev.imageHeight || null
+          }))
+          else if (type === 'second' || type === 'gallery') {
+            setFormData((prev: any) => {
+              const current = parseImageList(prev.images)
+              if (gallerySlot && current[gallerySlot.index] !== gallerySlot.source) return prev
+              if (type === 'second') current[0] = result.url
+              else if (gallerySlot) current[gallerySlot.index] = result.url
+              else current.push(result.url)
+              return { ...prev, images: serializeImageList(current) }
+            })
+          }
+          else if (type === 'side1') setFormData((prev: any) => ({ ...prev, side1Image: result.url }))
+          else if (type === 'side2') setFormData((prev: any) => ({ ...prev, side2Image: result.url }))
+          else if (type.startsWith('prod')) setFormData((prev: any) => ({ ...prev, [`${type}Image`]: result.url }))
+          addLog('تم رفع الصورة بنجاح')
+        } catch (err: any) {
+          if (requestId !== itemRequestRef.current) return
+          if (err.isAdminUnauthorized) {
+            addLog('انتهت جلسة المسؤول أثناء رفع الصورة')
+            return
+          }
+          await showAlert('فشل الرفع: ' + err.message, 'خطأ في الرفع')
+          addLog('خطأ في الرفع: ' + err.message)
+        }
       }
-      else if (type === 'side1') setFormData((prev: any) => ({ ...prev, side1Image: result.url }))
-      else if (type === 'side2') setFormData((prev: any) => ({ ...prev, side2Image: result.url }))
-      else if (type.startsWith('prod')) setFormData((prev: any) => ({ ...prev, [`${type}Image`]: result.url }))
-      else if (type === 'gallery') {
-        setFormData((prev: any) => {
-          const current = parseImageList(prev.images)
-          return { ...prev, images: serializeImageList([...current, result.url]) }
-        })
-      }
-      addLog('تم رفع الصورة بنجاح')
-    } catch (err: any) {
-      if (err.isAdminUnauthorized) {
-        addLog('انتهت جلسة المسؤول أثناء رفع الصورة')
-        return
-      }
-      await showAlert('فشل الرفع: ' + err.message, 'خطأ في الرفع')
-      addLog('خطأ في الرفع: ' + err.message)
     } finally {
-      setBrandUploading(false)
-      setUploading(false)
+      if (isProductPhoto) productUploadActiveRef.current = false
+      if (type === 'brand') setBrandUploading(false)
+      else setUploading(false)
     }
   }
 
@@ -1636,6 +1652,7 @@ export function useAdminDashboard() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (activeTab === 'products' && productUploadActiveRef.current) return
     setLoading(true)
 
     try {

@@ -5,14 +5,14 @@ import AdminImage from './AdminImage';
 
 export default function ProductsForm(props: any) {
   const { 
-    formData, savedProduct, setFormData, handleSave, loading, uploading, setUploading, handleFileUpload,
+    formData, savedProduct, setFormData, handleSave, loading, uploading, handleFileUpload,
     categories, brandSearch, setBrandSearch, showBrandSuggestions, setShowBrandSuggestions,
     filteredBrands, brandUploading, isAILoading, handleAIFill,
     handleAutoTranslate, isTranslatingLoading,
     sizesPricesList, setSizesPricesList, supplementFactsList, setSupplementFactsList,
     keyInfoObj, setKeyInfoObj, productSpecsObj, setProductSpecsObj,
     certificationsObj, setCertificationsObj, dosageCalculatorObj, setDosageCalculatorObj,
-    addLog, BACKEND_API, handleSEOAI, isSEOLoading
+    addLog, handleSEOAI, isSEOLoading
   } = props;
 
   const galleryList = parseImageList(formData.images);
@@ -227,32 +227,11 @@ export default function ProductsForm(props: any) {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={async (e) => {
-                        if (!e.target.files?.[0]) return;
-                        setUploading(true);
-                        const uploadData = new FormData();
-                        uploadData.append('image', e.target.files[0]);
-                        try {
-                          const res = await fetch(BACKEND_API + '/api/upload', {
-                            method: 'POST',
-                            body: uploadData,
-                            headers: (typeof window !== 'undefined' && (sessionStorage.getItem('mithaly_admin_token') || localStorage.getItem('mithaly_admin_token')))
-                              ? { 'Authorization': `Bearer ${sessionStorage.getItem('mithaly_admin_token') || localStorage.getItem('mithaly_admin_token')}` }
-                              : {}
-                          });
-                          const result = await res.json();
-                          if (res.ok && result.url) {
-                            const newExtra = [...extraImages];
-                            newExtra[idx] = result.url;
-                            const fullList = [secondImage, ...newExtra].filter(Boolean);
-                            setFormData({ ...formData, images: serializeImageList(fullList) });
-                            addLog?.('تم استبدال الصورة بنجاح');
-                          }
-                        } catch {
-                          alert('فشل الاستبدال');
-                        } finally {
-                          setUploading(false);
-                        }
+                      disabled={uploading}
+                      onChange={(e) => {
+                        const file = e.currentTarget.files?.[0];
+                        e.currentTarget.value = '';
+                        if (file) handleFileUpload(file, 'gallery', { index: idx + 1, source: img });
                       }}
                       className="absolute inset-0 opacity-0 cursor-pointer"
                     />
@@ -280,11 +259,11 @@ export default function ProductsForm(props: any) {
                 type="file"
                 accept="image/*"
                 multiple
-                onChange={async (e) => {
-                  if (!e.target.files) return;
-                  const files = Array.from(e.target.files);
-                  for (const file of files) await handleFileUpload(file, 'gallery');
-                  e.target.value = '';
+                disabled={uploading}
+                onChange={(e) => {
+                  const files = Array.from(e.currentTarget.files || []);
+                  e.currentTarget.value = '';
+                  if (files.length) handleFileUpload(files, 'gallery');
                 }}
                 className="absolute inset-0 opacity-0 cursor-pointer"
               />

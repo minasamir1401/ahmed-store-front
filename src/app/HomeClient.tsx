@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import SkeletonCard from '@/components/ui/SkeletonCard'
 import { newestProducts } from '@/lib/product-display'
+import { productDisplayImages } from '@/lib/product-images'
 import { getProductUrlParam } from '@/lib/slug'
 import SafeImage from '@/components/SafeImage'
 
@@ -599,9 +600,10 @@ export default function HomeClient({
                     { id: hero.prod4Id, img: translate(hero.prod4Image), type: hero.prod4Type || 'product' }
                   ].map((item, idx) => {
                     if (!item.id && !item.img) return null;
+                    const linkedProduct = Boolean(item.id && item.type === 'product');
                     
                     let title = language === 'ar' ? 'عنصر مميز' : 'Featured Item';
-                    let defaultImg = 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300';
+                    let imageSrc = linkedProduct ? '/logo-header.jpg' : item.img || '/logo-header.jpg';
                     let href = '#';
                     
                     if (item.id) {
@@ -609,14 +611,14 @@ export default function HomeClient({
                         const catObj = categories.find(c => c.id === item.id);
                         if (catObj) {
                           title = language === 'en' ? (catObj.nameEn || translate(catObj.name)) : catObj.name;
-                          defaultImg = catObj.image || defaultImg;
+                          imageSrc = item.img || catObj.image || imageSrc;
                           href = `/products?category=${item.id}`;
                         }
                       } else {
                         const prodObj = allProducts.find(p => p.id === item.id);
                         if (prodObj) {
                           title = translate(prodObj.title);
-                          defaultImg = prodObj.image || defaultImg;
+                          imageSrc = productDisplayImages(prodObj)[0] || imageSrc;
                           href = `/product/${getProductUrlParam(prodObj)}`;
                         }
                       }
@@ -634,9 +636,9 @@ export default function HomeClient({
                         <Link href={href} className="relative flex flex-col items-center justify-end w-full h-full p-4 gap-2 sm:gap-3 group overflow-hidden">
                           <div className="absolute inset-0 w-full h-full">
                             <SafeImage 
-                              src={item.img || defaultImg}
+                              src={imageSrc}
                               fill
-                              className="object-cover group-hover:scale-110 transition-transform duration-700"
+                              className={`${linkedProduct ? 'object-contain' : 'object-cover'} group-hover:scale-110 transition-transform duration-700`}
                               sizes="(max-width: 768px) 50vw, 25vw"
                               alt={title}
                             />
